@@ -1,0 +1,4 @@
+grep product\/title ../research/SecondYear/Amazon/All/Clothing_\&_Accessories.txt | awk '{ for (i = 2; i <=NF; i++) count[$i]++} END {for(word in count) printf "%d\t%s\n",count[word],word}' | sort -rn  >temp
+
+ grep -E -A7 'product\/title.*[Jj]acket.*' Clothing_\&_Accessories.txt  | grep 'review\/score' | awk '{count[$2]++;} END {for(x in count){sum += x*count[x];num+=count[x];} for(x in count) printf "%s\t%d\n",x,count[x]; print sum/num}'
+
