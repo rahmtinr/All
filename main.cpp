@@ -10,6 +10,7 @@
 #include<cstring>
 #include<cmath>
 #include<sstream>
+#include<set>
 
 #define FAIL false
 #define SUCCESS true
@@ -33,7 +34,10 @@ public:
 	int weekday;
 
 	MyTime(){}
-
+	void print() {
+		cout<< "Time: " << month << "/" << day << "/" << year<< "   ";
+		cout<< hour << ":" << minute << ":" << second <<endl;
+	}
 	MyTime(struct tm* time){
 		year = time->tm_year+1900;
 		month = time->tm_mon;
@@ -64,8 +68,7 @@ public:
 		cout<< "ProfileName: " << profile_name << endl;
 		cout<< "Helpfulness: " << helpfulness << endl;
 		cout<< "Score: " << score << endl;
-		cout<< "Time: " << time.month << "/" << time.day << "/" << time.year<< "   ";
-		cout<< time.hour << ":" << time.minute << ":" << time.second <<endl;
+		time.print();
 		cout<< "Summary: " << summary << endl;
 		cout<< "Text: " << text << endl;
 	}
@@ -80,6 +83,9 @@ public:
 			return time.day < other.time.day;
 		}
 		return product_id < other.product_id;
+	}
+	bool operator == (const Review &other) const {
+		return (product_id == other.product_id && user_id == other.user_id && text == other.text);
 	}
 };
 
@@ -132,13 +138,25 @@ map<int, double> length_to_rating;
 // Assuming 30 min is the longest video
 vector<double> video_votes[60*10+10], helpful_video_votes[60*10+10];
 
+// Seasonal variations, string to count of the word in that season
 map<string, int> words_in_winter, words_in_summer;
+// Count to the word so we can sort them
 vector<pair<int, string> > words_in_winter_vec, words_in_summer_vec;
+// Number of words in different seasons
 int summer_count, winter_count;
+
+// Langauge innovations
+vector<pair<string, Review> > innovations;
+set<string> dictionary;
+int TimeDifferenceInMonth(MyTime first, MyTime second) {
+	int first_month = first.year * 12 + first.month;
+	int second_month = second.year * 12 + second.month;
+	return abs(first_month - second_month);
+}
 
 string SimpleRemoveAnySymbol(string input) {
 	string result = "";
-	for (int i = 0; i < input.size(); i++) {
+	for (int i = 0; i <(int) input.size(); i++) {
 		if(isalpha(input[i]) || input[i] =='\''){
 			result += input[i];
 		}
@@ -176,7 +194,16 @@ string GetField(string raw_input) {
 	if (delimeter == std::string::npos) {
 		return "THIS INPUT IS TRASH";
 	}
-	return raw_input.substr(delimeter+2);
+	string ret="";
+	for (int i = delimeter + 2; i < (int)raw_input.size(); i++) {
+		if(isalpha(raw_input[i]) || raw_input[i]=='\'' || isspace(raw_input[i]) || isdigit(raw_input[i])) {
+			ret += raw_input[i];
+		}
+		if(raw_input[i] == ',' || raw_input[i]=='.') {
+			ret += ' ';
+		}
+	}
+	return ret;
 }
 
 bool ReadOneReview() {
@@ -230,6 +257,11 @@ void MyFilter(string key, string value) {
 	}
 	reviews = filter_reviews;
 }
+
+
+
+
+//////////////////////////////// End of Utility functions
 
 // Number of reviews written in different months.
 // The number for a month is accumulated over all the years.
@@ -497,35 +529,7 @@ void StarAveragePerTimeInTheDay() {
 	}
 }
 
-int main() {
-	// Read input.
-	while (true) {
-		if (!ReadOneReview()) {
-			break;
-		}
-	}
-	//	cerr << reviews.size() <<endl;
-	//	MyFilter("product_title", "skirt");
-	cerr << reviews.size() << endl;
-	sort(reviews.begin(), reviews.end(), cmp);
-	reviews.erase(unique( reviews.begin(), reviews.end(), cmp2 ), reviews.end());
-	cerr << reviews.size() << endl;
-	/*
-	CountMonthlyAccumulatedReviews();
-	CountYearlyReviews();
-
-	PerItemPerMonth();
-	PerItemPerYear();
-	// Top products.
-	int size_of_list = 40;
-	TopProducts(size_of_list);
-	// Video Average vs All average.
-	ReviewsWithVideo();
-	StarAveragePerMonth();
-	StarAveragePerYear();
-	// Time in Day is useless! The timestamp is on a daily basis
-	StarAveragePerTimeInTheDay();
-	 */
+void SeasonalTopWordsTitle() {
 	for (Review review : reviews) {
 		string word;
 		if (review.time.month == 0 || review.time.month == 1 || review.time.month == 11) { // winter
@@ -565,6 +569,165 @@ int main() {
 	for (auto x : words_in_winter_vec ) {
 		winter_top_words << x.first << " " << x.second <<endl;
 	}
+}
+
+//Learn Dictionary from the first len reviews
+void LearnDictionary(int start, int end) {
+	string word;
+	for (int i = start; i < end; i++ ) {
+		stringstream ss(reviews[i].text);
+		while (ss.good()) {
+			ss >> word;
+			dictionary.insert(word);
+		}
+	}
+}
+
+bool PopWordAddToDictionary(string word, vector<Review> *review_history) {
+	set<string> products_that_have_this_word;
+	set<string> users_that_have_used_this_word;
+	if (review_history->size() < 8) {
+		return false;
+	}
+	for (int i = 0; i < (int)review_history->size(); i++) {
+		products_that_have_this_word.insert((*review_history)[i].product_id);
+		users_that_have_used_this_word.insert((*review_history)[i].user_id);
+	}
+	if (products_that_have_this_word.size() < 5) {
+		return false;
+	}
+	if (users_that_have_used_this_word.size() < 10) {
+		return false;
+	}
+	return true;
+}
+
+void FindInnovations(int start, vector<pair<string, Review> > *innovations) {
+	map<string, vector<Review> > new_words;
+	string word;
+	vector<Review> temp;
+	for (int i = start; i < (int)reviews.size(); i++) {
+		stringstream ss(reviews[i].text);
+		while (ss.good()) {
+			ss >> word;
+			if(dictionary.find(word) != dictionary.end()) {
+				continue;
+			}
+			if (new_words.find(word) == new_words.end()) {
+				temp.clear();
+				temp.push_back(reviews[i]);
+				new_words[word] = temp;
+			} else {
+				temp = new_words.find(word)->second;
+				if (temp[temp.size() - 1] == reviews[i]) {
+					continue;
+				}
+				if (TimeDifferenceInMonth(temp[0].time, reviews[i].time) > 6) {
+					if (PopWordAddToDictionary(word, &temp) == true) {
+						innovations->push_back(make_pair(word, temp[0]));
+					}
+					new_words.erase(word);
+					dictionary.insert(word);
+				} else {
+					temp.push_back(reviews[i]);
+					new_words[word] = temp;
+				}
+			}
+		}
+	}
+	for (auto x : new_words) {
+		word = x.first;
+		temp = x.second;
+		if (TimeDifferenceInMonth(temp[0].time, temp[temp.size()-1].time) > 6) {
+			if (PopWordAddToDictionary(word, &temp) == true) {
+				innovations->push_back(make_pair(word, temp[0]));
+			}
+		}
+	}
+}
+
+class Innovator {
+public:
+	string word;
+	string user_id;
+	int num_of_reviews;
+	int experience_level;
+	Innovator() {
+		num_of_reviews = 0;
+		experience_level = 0;
+	}
+	bool operator < (const Innovator &other) const {
+		return user_id < other.user_id;
+	}
+};
+
+void FindNumOfReviews(vector<pair<string, Review> > *innovations,
+					  set<Innovator> *innovators) {
+	for (int i = 0; i < (int)reviews.size(); i++) {
+		for (int j = 0; j < (int)innovations->size(); j++) {
+			if(reviews[i].user_id == (*innovations)[j].second.user_id) {
+				Innovator temp;
+				temp.user_id = reviews[i].user_id;
+				if(innovators->find(temp) != innovators->end()) {
+					temp = *(innovators->find(temp));
+					innovators->erase(temp);
+				}
+				temp.num_of_reviews++;
+				if((*innovations)[j].second == reviews[i]) {
+					temp.experience_level = temp.num_of_reviews;
+				}
+				temp.word = (*innovations)[j].first;
+				innovators->insert(temp);
+			}
+		}
+	}
+}
+
+void AnalyseInnovation(vector<pair<string, Review> > *innovations) {
+	set<Innovator> innovators;
+	FindNumOfReviews(innovations, & innovators);
+	ofstream fout("../Output_All/innovators.txt");
+	fout << "word\tuser_id\tnum_of_reviews\texperience_level" << endl;
+	for ( Innovator innovator : innovators) {
+		fout << innovator.word << "\t" << innovator.user_id << "\t" << innovator.num_of_reviews << "\t" << innovator.experience_level << endl;
+	}
+}
+
+int main() {
+	// Read input.
+	while (true) {
+		if (!ReadOneReview()) {
+			break;
+		}
+	}
+
+	//	cerr << reviews.size() <<endl;
+	//	MyFilter("product_title", "skirt");
+	cerr << reviews.size() << endl;
+	sort(reviews.begin(), reviews.end(), cmp);
+	reviews.erase(unique( reviews.begin(), reviews.end(), cmp2 ), reviews.end());
+	cerr << reviews.size() << endl;
+	/*
+	CountMonthlyAccumulatedReviews();
+	CountYearlyReviews();
+
+	PerItemPerMonth();
+	PerItemPerYear();
+	// Top products.
+	int size_of_list = 40;
+	TopProducts(size_of_list);
+	// Video Average vs All average.
+	ReviewsWithVideo();
+	StarAveragePerMonth();
+	StarAveragePerYear();
+	// Time in Day is useless! The timestamp is on a daily basis
+	StarAveragePerTimeInTheDay();
+	 */
+
+	sort(reviews.begin(), reviews.end());
+	LearnDictionary(1500, 1700);
+	FindInnovations(2000, &innovations); // returns pair of word and review it was started.
+	AnalyseInnovation(&innovations);
 	return 0;
 }
 
