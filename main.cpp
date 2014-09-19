@@ -693,6 +693,46 @@ void AnalyseInnovation(vector<pair<string, Review> > *innovations) {
 	}
 }
 
+class UserInfo {
+public:
+	string user_id;
+	int num_of_reviews;
+	double sum_of_score;
+
+	bool operator < (const UserInfo &other) const {
+			return user_id < other.user_id;
+	}
+
+	UserInfo() {
+		num_of_reviews = 0;
+		sum_of_score = 0;
+	}
+};
+
+set<UserInfo> users_info;
+vector<UserInfo> users_info_vec;
+void FindUserInfo() {
+	for (int i = 0; i < (int)reviews.size(); i++) {
+		UserInfo temp;
+		temp.user_id = reviews[i].user_id;
+		if (users_info.find(temp) != users_info.end()) {
+			temp = *(users_info.find(temp));
+			users_info.erase(temp);
+		}
+		temp.num_of_reviews++;
+		temp.sum_of_score += SimpleStringToDouble(reviews[i].score);
+		cerr << SimpleStringToDouble(reviews[i].score) << " " << reviews[i].score <<endl;
+		users_info.insert(temp);
+	}
+}
+
+
+bool cmp3 (const UserInfo &x,const UserInfo &y) {
+	if(x.num_of_reviews == y.num_of_reviews) {
+		return x.user_id < y.user_id;
+	}
+	return x.num_of_reviews < y.num_of_reviews;
+}
 int main() {
 	// Read input.
 	while (true) {
@@ -724,10 +764,28 @@ int main() {
 	StarAveragePerTimeInTheDay();
 	 */
 
-	sort(reviews.begin(), reviews.end());
+/*
+ 	sort(reviews.begin(), reviews.end());
 	LearnDictionary(1500, 1700);
 	FindInnovations(2000, &innovations); // returns pair of word and review it was started.
 	AnalyseInnovation(&innovations);
+*/
+	FindUserInfo();
+	users_info_vec = vector<UserInfo>(users_info.begin(), users_info.end());
+	sort(users_info_vec.begin(), users_info_vec.end(), cmp3);
+	double current_sum = 0;
+	int current_num = 0;
+	for (int i = 0; i < (int)users_info_vec.size(); i++) {
+		if ( i == 0 || users_info_vec[i].num_of_reviews == users_info_vec[i-1].num_of_reviews) {
+			current_num++;
+			current_sum += users_info_vec[i].sum_of_score / users_info_vec[i].num_of_reviews;
+		} else {
+			cout << users_info_vec[i-1].num_of_reviews << " " << current_sum / current_num << endl;
+			current_num = 0;
+			current_sum = users_info_vec[i].sum_of_score / users_info_vec[i].num_of_reviews;
+		}
+	}
+	cout << users_info_vec[users_info_vec.size() - 1].num_of_reviews << " " <<  current_sum / current_num << endl;
 	return 0;
 }
 
