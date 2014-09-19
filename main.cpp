@@ -165,7 +165,7 @@ string SimpleRemoveAnySymbol(string input) {
 }
 
 //returns -1 if denominator is equal to 0.
-double SimpleStringToDouble(string input) {
+double SimpleStringFractionToDouble(string input) {
 	stringstream ss(input);
 	double numerator, denominator;
 	char ch;
@@ -175,6 +175,14 @@ double SimpleStringToDouble(string input) {
 	}
 	return numerator / denominator;
 }
+
+double SimpleStringToDouble(string input) {
+	stringstream ss(input);
+	double ret;
+	ss >> ret;
+	return ret;
+}
+
 
 bool EqDouble(double x, double y) {
 	if(abs(x-y) < 1e-6) {
@@ -194,8 +202,12 @@ string GetField(string raw_input) {
 	if (delimeter == std::string::npos) {
 		return "THIS INPUT IS TRASH";
 	}
-	string ret="";
-	for (int i = delimeter + 2; i < (int)raw_input.size(); i++) {
+	return raw_input.substr(delimeter+2);
+}
+
+string RemoveAllSymbols(string raw_input) {
+	string ret = "";
+	for (int i = 0; i < (int)raw_input.size(); i++) {
 		if(isalpha(raw_input[i]) || raw_input[i]=='\'' || isspace(raw_input[i]) || isdigit(raw_input[i])) {
 			ret += raw_input[i];
 		}
@@ -212,7 +224,7 @@ bool ReadOneReview() {
 	if (getline(cin, raw_input)) {
 		review.product_id = GetField(raw_input);
 		getline(cin, raw_input);
-		review.product_title = SimpleToLower(GetField(raw_input));
+		review.product_title = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(cin, raw_input);
 		review.price = GetField(raw_input);
 		getline(cin, raw_input);
@@ -230,10 +242,10 @@ bool ReadOneReview() {
 		time_t review_time(time_int);
 		review.time = MyTime(localtime(&review_time));
 		getline(cin, raw_input);
-		review.summary = GetField(raw_input);
+		review.summary = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(cin, raw_input);
 
-		review.text = SimpleToLower(GetField(raw_input));
+		review.text = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(cin, raw_input);
 		reviews.push_back(review);
 		return SUCCESS;
@@ -392,7 +404,7 @@ void ReviewsWithVideo() {
 	int number_of_videos = 0;
 
 	for (int i = 0; i < (int)reviews.size(); i++) {
-		double helpfulness = SimpleStringToDouble(reviews[i].helpfulness);
+		double helpfulness = SimpleStringFractionToDouble(reviews[i].helpfulness);
 		if (EqDouble(helpfulness,-1)){
 			continue;
 		}
@@ -413,7 +425,7 @@ void ReviewsWithVideo() {
 	map<string, vector<Review> > user_to_reviews;
 	user_to_reviews.clear();
 	for (int i = 0; i < (int)reviews.size(); i++) {
-		double helpfulness = SimpleStringToDouble(reviews[i].helpfulness);
+		double helpfulness = SimpleStringFractionToDouble(reviews[i].helpfulness);
 		if (EqDouble(helpfulness,-1)){
 			continue;
 		}
@@ -453,9 +465,9 @@ void ReviewsWithVideo() {
 		sort(reviews_of_one_user.begin(), reviews_of_one_user.end());
 		for (int i = 0; i < (int)reviews_of_one_user.size(); i++) {
 			if (i != (int)reviews_of_one_user.size() - 1) {
-				people_who_continued[i+1].push_back(SimpleStringToDouble(reviews_of_one_user[i].helpfulness));
+				people_who_continued[i+1].push_back(SimpleStringFractionToDouble(reviews_of_one_user[i].helpfulness));
 			} else {
-				people_who_ended[i+1].push_back(SimpleStringToDouble(reviews_of_one_user[i].helpfulness));
+				people_who_ended[i+1].push_back(SimpleStringFractionToDouble(reviews_of_one_user[i].helpfulness));
 			}
 		}
 	}
@@ -721,7 +733,6 @@ void FindUserInfo() {
 		}
 		temp.num_of_reviews++;
 		temp.sum_of_score += SimpleStringToDouble(reviews[i].score);
-		cerr << SimpleStringToDouble(reviews[i].score) << " " << reviews[i].score <<endl;
 		users_info.insert(temp);
 	}
 }
@@ -733,6 +744,27 @@ bool cmp3 (const UserInfo &x,const UserInfo &y) {
 	}
 	return x.num_of_reviews < y.num_of_reviews;
 }
+
+void UserAngrinessBasedOnNumberOfReviews() {
+	FindUserInfo();
+	users_info_vec = vector<UserInfo>(users_info.begin(), users_info.end());
+	sort(users_info_vec.begin(), users_info_vec.end(), cmp3);
+	double current_sum = 0;
+	int current_num = 0;
+	ofstream fout("../Output_All/user_angriness_based_on_number_of_reviews.txt");
+	for (int i = 0; i < (int)users_info_vec.size(); i++) {
+		if ( i == 0 || users_info_vec[i].num_of_reviews == users_info_vec[i-1].num_of_reviews) {
+			current_num++;
+			current_sum += users_info_vec[i].sum_of_score / users_info_vec[i].num_of_reviews;
+		} else {
+			fout << users_info_vec[i-1].num_of_reviews << " " <<  current_sum / current_num << endl;
+			current_num = 1;
+			current_sum = users_info_vec[i].sum_of_score / users_info_vec[i].num_of_reviews;
+		}
+	}
+	fout << users_info_vec[users_info_vec.size() - 1].num_of_reviews << " " <<  current_sum / current_num << endl;
+}
+
 int main() {
 	// Read input.
 	while (true) {
@@ -764,28 +796,13 @@ int main() {
 	StarAveragePerTimeInTheDay();
 	 */
 
-/*
+/**/
  	sort(reviews.begin(), reviews.end());
 	LearnDictionary(1500, 1700);
 	FindInnovations(2000, &innovations); // returns pair of word and review it was started.
 	AnalyseInnovation(&innovations);
-*/
-	FindUserInfo();
-	users_info_vec = vector<UserInfo>(users_info.begin(), users_info.end());
-	sort(users_info_vec.begin(), users_info_vec.end(), cmp3);
-	double current_sum = 0;
-	int current_num = 0;
-	for (int i = 0; i < (int)users_info_vec.size(); i++) {
-		if ( i == 0 || users_info_vec[i].num_of_reviews == users_info_vec[i-1].num_of_reviews) {
-			current_num++;
-			current_sum += users_info_vec[i].sum_of_score / users_info_vec[i].num_of_reviews;
-		} else {
-			cout << users_info_vec[i-1].num_of_reviews << " " << current_sum / current_num << endl;
-			current_num = 0;
-			current_sum = users_info_vec[i].sum_of_score / users_info_vec[i].num_of_reviews;
-		}
-	}
-	cout << users_info_vec[users_info_vec.size() - 1].num_of_reviews << " " <<  current_sum / current_num << endl;
+/**/
+	UserAngrinessBasedOnNumberOfReviews();
 	return 0;
 }
 
