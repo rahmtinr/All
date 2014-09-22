@@ -23,6 +23,9 @@ const string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug"
 
 map<string, int> product_count;
 
+map<string, int> counter_for_reviewer;
+map<int, int> distribution_for_count_of_reviewer;
+
 class MyTime { 
 public:
 	int year;
@@ -146,7 +149,7 @@ vector<pair<int, string> > words_in_winter_vec, words_in_summer_vec;
 int summer_count, winter_count;
 
 // Langauge innovations
-vector<pair<string, Review> > innovations;
+vector<pair<string, vector<Review>> > innovations;
 set<string> dictionary;
 int TimeDifferenceInMonth(MyTime first, MyTime second) {
 	int first_month = first.year * 12 + first.month;
@@ -240,11 +243,16 @@ bool ReadOneReview() {
 		getline(cin, raw_input);
 		int time_int = atoi((GetField(raw_input)).c_str());
 		time_t review_time(time_int);
+		if (review_time == -1) {
+			getline(cin, raw_input);
+			getline(cin, raw_input);
+			getline(cin, raw_input);
+			return SUCCESS;
+		}
 		review.time = MyTime(localtime(&review_time));
 		getline(cin, raw_input);
 		review.summary = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(cin, raw_input);
-
 		review.text = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(cin, raw_input);
 		reviews.push_back(review);
@@ -614,7 +622,7 @@ bool PopWordAddToDictionary(string word, vector<Review> *review_history) {
 	return true;
 }
 
-void FindInnovations(int start, vector<pair<string, Review> > *innovations) {
+void FindInnovations(int start, vector<pair<string, vector<Review> > > *innovations) {
 	map<string, vector<Review> > new_words;
 	string word;
 	vector<Review> temp;
@@ -636,7 +644,7 @@ void FindInnovations(int start, vector<pair<string, Review> > *innovations) {
 				}
 				if (TimeDifferenceInMonth(temp[0].time, reviews[i].time) > 6) {
 					if (PopWordAddToDictionary(word, &temp) == true) {
-						innovations->push_back(make_pair(word, temp[0]));
+						innovations->push_back(make_pair(word, temp));
 					}
 					new_words.erase(word);
 					dictionary.insert(word);
@@ -652,7 +660,7 @@ void FindInnovations(int start, vector<pair<string, Review> > *innovations) {
 		temp = x.second;
 		if (TimeDifferenceInMonth(temp[0].time, temp[temp.size()-1].time) > 6) {
 			if (PopWordAddToDictionary(word, &temp) == true) {
-				innovations->push_back(make_pair(word, temp[0]));
+				innovations->push_back(make_pair(word, temp));
 			}
 		}
 	}
@@ -673,11 +681,11 @@ public:
 	}
 };
 
-void FindNumOfReviews(vector<pair<string, Review> > *innovations,
+void FindNumOfReviews(vector<pair<string, vector<Review> > > *innovations,
 		set<Innovator> *innovators) {
 	for (int i = 0; i < (int)reviews.size(); i++) {
 		for (int j = 0; j < (int)innovations->size(); j++) {
-			if(reviews[i].user_id == (*innovations)[j].second.user_id) {
+			if(reviews[i].user_id == (*innovations)[j].second[0].user_id) {
 				Innovator temp;
 				temp.user_id = reviews[i].user_id;
 				if(innovators->find(temp) != innovators->end()) {
@@ -685,7 +693,7 @@ void FindNumOfReviews(vector<pair<string, Review> > *innovations,
 					innovators->erase(temp);
 				}
 				temp.num_of_reviews++;
-				if((*innovations)[j].second == reviews[i]) {
+				if((*innovations)[j].second[0] == reviews[i]) {
 					temp.experience_level = temp.num_of_reviews;
 				}
 				temp.word = (*innovations)[j].first;
@@ -695,13 +703,34 @@ void FindNumOfReviews(vector<pair<string, Review> > *innovations,
 	}
 }
 
-void AnalyseInnovation(vector<pair<string, Review> > *innovations) {
+void AnalyseInnovation(vector<pair<string, vector<Review> > > *innovations) {
 	set<Innovator> innovators;
-	FindNumOfReviews(innovations, & innovators);
-	ofstream fout("../Output_All/innovators.txt");
-	fout << "word\tuser_id\tnum_of_reviews\texperience_level" << endl;
+	FindNumOfReviews(innovations, &innovators);
+	counter_for_reviewer.clear();
+	distribution_for_count_of_reviewer.clear();
+	ofstream fout("../Output_All/innovators_distribution.txt");
+	int num_of_innovators = innovators.size();
 	for ( Innovator innovator : innovators) {
-		cout << innovator.word << "\t" << innovator.user_id << "\t" << innovator.num_of_reviews << "\t" << innovator.experience_level << endl;
+		distribution_for_count_of_reviewer[innovator.num_of_reviews]++;
+	}
+	for (pair<int, int> num_of_review_to_num_of_people : distribution_for_count_of_reviewer ){
+		fout << num_of_review_to_num_of_people.first << " " << num_of_review_to_num_of_people.second/(double)num_of_innovators << endl;
+	}
+	fout.close();
+	ofstream innovators_out("../Output_All/innovators.txt");
+	for (pair<string, vector<Review> > innovation : *innovations ) {
+		innovators_out << innovation.first << ":" <<endl;
+		int bound = 0;
+		for(Review review : innovation.second) {
+			innovators_out << review.score << endl;
+			innovators_out << review.text << endl << endl;
+
+			bound++;
+			if(bound == 5){
+				break;
+			}
+		}
+		innovators_out << " __________________________ " <<endl;
 	}
 }
 
@@ -738,7 +767,7 @@ void FindUserInfo() {
 }
 
 
-bool cmp3 (const UserInfo &x,const UserInfo &y) {
+bool cmp3(const UserInfo &x,const UserInfo &y) {
 	if(x.num_of_reviews == y.num_of_reviews) {
 		return x.user_id < y.user_id;
 	}
@@ -765,8 +794,21 @@ void UserAngrinessBasedOnNumberOfReviews() {
 	fout << users_info_vec[users_info_vec.size() - 1].num_of_reviews << " " <<  current_sum / current_num << endl;
 }
 
-map<string, int> counter_for_reviewer;
-map<int, int> distribution_for_count_of_reviewer;
+void UserDistributionBasedOnNumberOfReviews() {
+	counter_for_reviewer.clear();
+	distribution_for_count_of_reviewer.clear();
+	for (Review review : reviews) {
+		counter_for_reviewer[review.user_id]++;
+	}
+	int num_of_users = counter_for_reviewer.size();
+	for (pair<string, int> user : counter_for_reviewer) {
+		distribution_for_count_of_reviewer[user.second]++;
+	}
+	ofstream fout("../Output_All/all_reviewers_distribution.txt");
+	for (pair<int, int> num_of_review_to_num_of_people : distribution_for_count_of_reviewer){
+		fout << num_of_review_to_num_of_people.first << " " << num_of_review_to_num_of_people.second/(double)num_of_users << endl;
+	}
+}
 
 int main() {
 	// Read input.
@@ -774,8 +816,8 @@ int main() {
 		if (!ReadOneReview()) {
 			break;
 		}
+		//		reviews[reviews.size() - 1].print();
 	}
-
 	//	cerr << reviews.size() <<endl;
 	//	MyFilter("product_title", "skirt");
 	cerr << reviews.size() << endl;
@@ -801,23 +843,11 @@ int main() {
 
 	/**/
 	sort(reviews.begin(), reviews.end());
-	LearnDictionary(1500, 1700);
-	FindInnovations(2000, &innovations); // returns pair of word and review it was started.
+	LearnDictionary(0, reviews.size() / 4);
+	FindInnovations(reviews.size() / 4, &innovations); // returns pair of word and review it was started.
 	AnalyseInnovation(&innovations);
+	UserDistributionBasedOnNumberOfReviews();
 	/**/
-//	UserAngrinessBasedOnNumberOfReviews();
-	cout<<"______________________________"<<endl;
-	counter_for_reviewer.clear();
-	distribution_for_count_of_reviewer.clear();
-	for (Review x : reviews) {
-		counter_for_reviewer[x.user_id]++;
-	}
-	for (pair<string, int> y : counter_for_reviewer) {
-		distribution_for_count_of_reviewer[y.second]++;
-	}
-	for (pair<int, int> y : distribution_for_count_of_reviewer ){
-		cout << y.first << " " << y.second << endl;
-	}
-
+	UserAngrinessBasedOnNumberOfReviews();
 	return 0;
 }
