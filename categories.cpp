@@ -49,6 +49,7 @@ int main() {
 			if(!fin.good())
 				break;
 			getline(fin,s);
+			cerr << s <<endl;
 		}
 		stringstream ss(s);
 		while (ss.good()) {
@@ -56,6 +57,7 @@ int main() {
 			labels.insert(trim(label));
 		}
 		getline(fin, s);
+		cerr << fin.good() <<endl;
 	}
 	ofstream fout("../Output_All/num_in_categories.txt");
 	for (auto x : num_of_items_that_have_label) {

@@ -240,11 +240,16 @@ bool ReadOneReview() {
 		getline(cin, raw_input);
 		int time_int = atoi((GetField(raw_input)).c_str());
 		time_t review_time(time_int);
+		if (review_time == -1) {
+			getline(cin, raw_input);
+			getline(cin, raw_input);
+			getline(cin, raw_input);
+			return SUCCESS;
+		}
 		review.time = MyTime(localtime(&review_time));
 		getline(cin, raw_input);
 		review.summary = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(cin, raw_input);
-
 		review.text = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(cin, raw_input);
 		reviews.push_back(review);
@@ -699,9 +704,9 @@ void AnalyseInnovation(vector<pair<string, Review> > *innovations) {
 	set<Innovator> innovators;
 	FindNumOfReviews(innovations, & innovators);
 	ofstream fout("../Output_All/innovators.txt");
-	fout << "word\tuser_id\tnum_of_reviews\texperience_level" << endl;
+	fout << "word\t\tuser_id\t\tnum_of_reviews\t\texperience_level" << endl;
 	for ( Innovator innovator : innovators) {
-		fout << innovator.word << "\t" << innovator.user_id << "\t" << innovator.num_of_reviews << "\t" << innovator.experience_level << endl;
+		fout << innovator.word << "\t\t" << innovator.user_id << "\t\t" << innovator.num_of_reviews << "\t\t" << innovator.experience_level << endl;
 	}
 }
 
@@ -738,7 +743,7 @@ void FindUserInfo() {
 }
 
 
-bool cmp3 (const UserInfo &x,const UserInfo &y) {
+bool cmp3(const UserInfo &x,const UserInfo &y) {
 	if(x.num_of_reviews == y.num_of_reviews) {
 		return x.user_id < y.user_id;
 	}
@@ -765,14 +770,23 @@ void UserAngrinessBasedOnNumberOfReviews() {
 	fout << users_info_vec[users_info_vec.size() - 1].num_of_reviews << " " <<  current_sum / current_num << endl;
 }
 
+void UserDistributionBasedOnNumberOfReviews() {
+	sort(reviews.begin(), reviews.end());
+	for (int i = 0; i < reviews.size(); i++) {
+		if (i == 0 || users_info_vec[i].num_of_reviews == users_info_vec[i-1].num_of_reviews) {
+
+		}
+	}
+}
+
 int main() {
 	// Read input.
 	while (true) {
 		if (!ReadOneReview()) {
 			break;
 		}
+//		reviews[reviews.size() - 1].print();
 	}
-
 	//	cerr << reviews.size() <<endl;
 	//	MyFilter("product_title", "skirt");
 	cerr << reviews.size() << endl;
@@ -798,9 +812,10 @@ int main() {
 
 /**/
  	sort(reviews.begin(), reviews.end());
-	LearnDictionary(1500, 1700);
-	FindInnovations(2000, &innovations); // returns pair of word and review it was started.
+	LearnDictionary(0, reviews.size() / 4);
+	FindInnovations(reviews.size() / 4, &innovations); // returns pair of word and review it was started.
 	AnalyseInnovation(&innovations);
+	UserDistributionBasedOnNumberOfReviews();
 /**/
 	UserAngrinessBasedOnNumberOfReviews();
 	return 0;
