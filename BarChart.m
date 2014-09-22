@@ -6,6 +6,9 @@ for K = 1 : numfids
         continue
     end
     if strcmpi(OutputFiles(K).name(end-3 : end), '.txt')
+        if strcmpi(OutputFiles(K).name(1:1),'i')
+            continue;
+        end
         if length(findstr(OutputFiles(K).name, 'has_error')) == 0
             [X, Y] = textread(strcat('../Output_All/',OutputFiles(K).name) ...
                 , '%s %f', 100);

@@ -674,7 +674,7 @@ public:
 };
 
 void FindNumOfReviews(vector<pair<string, Review> > *innovations,
-					  set<Innovator> *innovators) {
+		set<Innovator> *innovators) {
 	for (int i = 0; i < (int)reviews.size(); i++) {
 		for (int j = 0; j < (int)innovations->size(); j++) {
 			if(reviews[i].user_id == (*innovations)[j].second.user_id) {
@@ -701,7 +701,7 @@ void AnalyseInnovation(vector<pair<string, Review> > *innovations) {
 	ofstream fout("../Output_All/innovators.txt");
 	fout << "word\tuser_id\tnum_of_reviews\texperience_level" << endl;
 	for ( Innovator innovator : innovators) {
-		fout << innovator.word << "\t" << innovator.user_id << "\t" << innovator.num_of_reviews << "\t" << innovator.experience_level << endl;
+		cout << innovator.word << "\t" << innovator.user_id << "\t" << innovator.num_of_reviews << "\t" << innovator.experience_level << endl;
 	}
 }
 
@@ -712,7 +712,7 @@ public:
 	double sum_of_score;
 
 	bool operator < (const UserInfo &other) const {
-			return user_id < other.user_id;
+		return user_id < other.user_id;
 	}
 
 	UserInfo() {
@@ -765,6 +765,9 @@ void UserAngrinessBasedOnNumberOfReviews() {
 	fout << users_info_vec[users_info_vec.size() - 1].num_of_reviews << " " <<  current_sum / current_num << endl;
 }
 
+map<string, int> counter_for_reviewer;
+map<int, int> distribution_for_count_of_reviewer;
+
 int main() {
 	// Read input.
 	while (true) {
@@ -796,13 +799,25 @@ int main() {
 	StarAveragePerTimeInTheDay();
 	 */
 
-/**/
- 	sort(reviews.begin(), reviews.end());
+	/**/
+	sort(reviews.begin(), reviews.end());
 	LearnDictionary(1500, 1700);
 	FindInnovations(2000, &innovations); // returns pair of word and review it was started.
 	AnalyseInnovation(&innovations);
-/**/
-	UserAngrinessBasedOnNumberOfReviews();
+	/**/
+//	UserAngrinessBasedOnNumberOfReviews();
+	cout<<"______________________________"<<endl;
+	counter_for_reviewer.clear();
+	distribution_for_count_of_reviewer.clear();
+	for (Review x : reviews) {
+		counter_for_reviewer[x.user_id]++;
+	}
+	for (pair<string, int> y : counter_for_reviewer) {
+		distribution_for_count_of_reviewer[y.second]++;
+	}
+	for (pair<int, int> y : distribution_for_count_of_reviewer ){
+		cout << y.first << " " << y.second << endl;
+	}
+
 	return 0;
 }
-
