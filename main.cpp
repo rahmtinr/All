@@ -388,7 +388,7 @@ double FindAverage(vector<double> *data) {
 	return average / data->size();
 }
 
-double FindError(vector<double> *data, double average) {
+double FindConfidenceInterval95(vector<double> *data, double average) {
 	if (data->size() == 0) {
 		return 0;
 	}
@@ -398,7 +398,8 @@ double FindError(vector<double> *data, double average) {
 	}
 
 	error /= data->size();
-	return sqrt(error);
+	error /= data->size();
+	return 1.96*sqrt(error);
 }
 
 // All the data that is analyzed have at least one vote.
@@ -462,7 +463,7 @@ void ReviewsWithVideo() {
 	for (int i = 0; i < 600/time_bucket ; i++) {
 		double average, error;
 		average = FindAverage(&video_votes[i]);
-		error = FindError(&video_votes[i], average);
+		error = FindConfidenceInterval95(&video_votes[i], average);
 		video_length_correlation_to_helpfulness << "[" << i*60 << "," << i*60+60 << "] " << average << " " << error <<endl;
 	}
 
@@ -507,7 +508,7 @@ void StarAveragePerMonth() {
 	ofstream overall_outputs_monthly_accumulated_out_star_rating("../Output_All/overall_monthly_accumulated_star_rating_has_error.txt");
 	for (int i = 0; i < 12; i++) {
 		average = FindAverage(&star_rating[i]);
-		error = FindError(&star_rating[i], average);
+		error = FindConfidenceInterval95(&star_rating[i], average);
 		overall_outputs_monthly_accumulated_out_star_rating << month[i] << " " << average << " " << error << endl;
 	}
 }
@@ -526,7 +527,7 @@ void StarAveragePerYear() {
 	ofstream overall_outputs_yearly_out_star_rating("../Output_All/overall_yearly_star_rating_has_error.txt");
 	for (int i = 1998; i < 2015; i++) {
 		average = FindAverage(&star_rating[i - 1998]);
-		error = FindError(&star_rating[i - 1998], average);
+		error = FindConfidenceInterval95(&star_rating[i - 1998], average);
 		overall_outputs_yearly_out_star_rating << i << " " << average  << " " << error << endl;
 	}
 }
@@ -544,7 +545,7 @@ void StarAveragePerTimeInTheDay() {
 	ofstream overall_outputs_hourly_accumulated_out_star_rating("../Output_All/overall_hourly_accumulated_star_rating_has_error.txt");
 	for (int i = 0; i < 24; i++) {
 		average = FindAverage(&star_rating[i]);
-		error = FindError(&star_rating[i], average);
+		error = FindConfidenceInterval95(&star_rating[i], average);
 		overall_outputs_hourly_accumulated_out_star_rating << i << " " << average  << " " << error << endl;
 	}
 }
@@ -613,10 +614,10 @@ bool PopWordAddToDictionary(string word, vector<Review> *review_history) {
 		products_that_have_this_word.insert((*review_history)[i].product_id);
 		users_that_have_used_this_word.insert((*review_history)[i].user_id);
 	}
-	if (products_that_have_this_word.size() < 5) {
+	if (products_that_have_this_word.size() < 3) {
 		return false;
 	}
-	if (users_that_have_used_this_word.size() < 5) {
+	if (users_that_have_used_this_word.size() < 3) {
 		return false;
 	}
 	return true;
@@ -824,7 +825,7 @@ int main() {
 	sort(reviews.begin(), reviews.end(), cmp);
 	reviews.erase(unique( reviews.begin(), reviews.end(), cmp2 ), reviews.end());
 	cerr << reviews.size() << endl;
-	/*
+	/**/
 	CountMonthlyAccumulatedReviews();
 	CountYearlyReviews();
 
@@ -839,7 +840,7 @@ int main() {
 	StarAveragePerYear();
 	// Time in Day is useless! The timestamp is on a daily basis
 	StarAveragePerTimeInTheDay();
-	 */
+	 /**/
 
 	/**/
 	sort(reviews.begin(), reviews.end());
@@ -848,6 +849,6 @@ int main() {
 	AnalyseInnovation(&innovations);
 	UserDistributionBasedOnNumberOfReviews();
 	/**/
-	UserAngrinessBasedOnNumberOfReviews();
+//	UserAngrinessBasedOnNumberOfReviews();
 	return 0;
 }
