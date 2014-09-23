@@ -616,7 +616,7 @@ bool PopWordAddToDictionary(string word, vector<Review> *review_history) {
 	if (products_that_have_this_word.size() < 5) {
 		return false;
 	}
-	if (users_that_have_used_this_word.size() < 10) {
+	if (users_that_have_used_this_word.size() < 5) {
 		return false;
 	}
 	return true;
@@ -723,8 +723,8 @@ void AnalyseInnovation(vector<pair<string, vector<Review> > > *innovations) {
 		int bound = 0;
 		for(Review review : innovation.second) {
 			innovators_out << review.score << endl;
-			innovators_out << review.text << endl << endl;
-
+			innovators_out << review.time.month << "/" <<review.time.day << "/" << review.time.year << endl;
+			innovators_out << review.text << endl;
 			bound++;
 			if(bound == 5){
 				break;
