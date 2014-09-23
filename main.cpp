@@ -20,7 +20,7 @@ using namespace std;
 typedef map<pair<string, int>, int> ProductTimeCount;
 
 const string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
+string NAMEOFTHEDATASET;
 map<string, int> product_count;
 
 map<string, int> counter_for_reviewer;
@@ -220,41 +220,42 @@ string RemoveAllSymbols(string raw_input) {
 	}
 	return ret;
 }
+ifstream fin;
 
 bool ReadOneReview() {
 	string raw_input;
 	Review review;
-	if (getline(cin, raw_input)) {
+	if (getline(fin, raw_input)) {
 		review.product_id = GetField(raw_input);
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		review.product_title = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		review.price = GetField(raw_input);
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		review.user_id = GetField(raw_input);
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		review.profile_name = GetField(raw_input);
 		do {
-			getline(cin, raw_input);
+			getline(fin, raw_input);
 			review.helpfulness = GetField(raw_input);
 		} while (review.helpfulness == "THIS INPUT IS TRASH");
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		review.score = GetField(raw_input);
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		int time_int = atoi((GetField(raw_input)).c_str());
 		time_t review_time(time_int);
 		if (review_time == -1) {
-			getline(cin, raw_input);
-			getline(cin, raw_input);
-			getline(cin, raw_input);
+			getline(fin, raw_input);
+			getline(fin, raw_input);
+			getline(fin, raw_input);
 			return SUCCESS;
 		}
 		review.time = MyTime(localtime(&review_time));
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		review.summary = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		review.text = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
-		getline(cin, raw_input);
+		getline(fin, raw_input);
 		reviews.push_back(review);
 		return SUCCESS;
 	}
@@ -811,11 +812,13 @@ void UserDistributionBasedOnNumberOfReviews() {
 	}
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+	NAMEOFTHEDATASET = (string(argv[1])).substr(0,string(argv[1]).find("."));
+	fin.open (argv[1], std::ifstream::in);
 	// Read input.
 	while (true) {
 		if (!ReadOneReview()) {
-			break;
+				break;
 		}
 		//		reviews[reviews.size() - 1].print();
 	}
@@ -839,7 +842,7 @@ int main() {
 	StarAveragePerMonth();
 	StarAveragePerYear();
 	// Time in Day is useless! The timestamp is on a daily basis
-	StarAveragePerTimeInTheDay();
+//	StarAveragePerTimeInTheDay();
 	 /**/
 
 	/**/
