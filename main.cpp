@@ -11,118 +11,23 @@
 #include<cmath>
 #include<sstream>
 #include<set>
-
-#define FAIL false
-#define SUCCESS true
+#include "MyUtility.h"
+#include "Reviews.h"
+#include "AmazonUtility.h"
+#include "ReviewReader.h"
+#include "Innovations.h"
 
 using namespace std;
 
 typedef map<pair<string, int>, int> ProductTimeCount;
 
-const string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"};
 string NAMEOFTHEDATASET;
 map<string, int> product_count;
 
 map<string, int> counter_for_reviewer;
 map<int, int> distribution_for_count_of_reviewer;
 
-class MyTime { 
-public:
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-	int second;
-	int weekday;
-
-	MyTime(){}
-	void print() {
-		cout<< "Time: " << month << "/" << day << "/" << year<< "   ";
-		cout<< hour << ":" << minute << ":" << second <<endl;
-	}
-	MyTime(struct tm* time){
-		year = time->tm_year+1900;
-		month = time->tm_mon;
-		day = time->tm_mday;
-		hour = time->tm_hour;
-		minute = time->tm_min;
-		second = time->tm_sec;
-		weekday = time->tm_wday;
-	}
-};
-
-class Review {
-public:
-	string product_id;
-	string product_title;
-	string price;
-	string user_id;
-	string profile_name;
-	string helpfulness;
-	string score;
-	MyTime time;
-	string summary;
-	string text;
-
-	void print() {
-		cout<< "ProductId: " << product_id << endl;
-		cout<< "UserId: " << user_id << endl;
-		cout<< "ProfileName: " << profile_name << endl;
-		cout<< "Helpfulness: " << helpfulness << endl;
-		cout<< "Score: " << score << endl;
-		time.print();
-		cout<< "Summary: " << summary << endl;
-		cout<< "Text: " << text << endl;
-	}
-	bool operator < (const Review &other) const {
-		if (time.year != other.time.year) {
-			return time.year < other.time.year;
-		}
-		if (time.month != other.time.month) {
-			return time.month < other.time.month;
-		}
-		if (time.year != other.time.year) {
-			return time.day < other.time.day;
-		}
-		return product_id < other.product_id;
-	}
-	bool operator == (const Review &other) const {
-		return (product_id == other.product_id && user_id == other.user_id && text == other.text);
-	}
-};
-
-bool cmp(Review x, Review y) {
-	if(x.user_id == y.user_id) {
-		return x.text < y.text;
-	}
-	return x.user_id < y.user_id;
-}
-
-bool cmp2(Review x, Review y) {
-	return (x.user_id == y.user_id && x.text == y.text);
-}
-
-class Product { 
-public:
-	string product_id;
-	int count;
-	bool operator < (const Product &other) const { 
-		return count > other.count;
-	}
-};
-
-class VoteRatio {
-public:
-	int helpful;
-	int all;
-	VoteRatio() {
-		helpful =0;
-		all = 0;
-	}
-};
-
-vector<Review> reviews, filter_reviews;
+vector<Review> reviews;
 vector<Product> products;
 // Number of fine food items purchased from Amazon is different years and months of years
 // Same months over different years are accumulated.
@@ -147,139 +52,8 @@ map<string, int> words_in_winter, words_in_summer;
 vector<pair<int, string> > words_in_winter_vec, words_in_summer_vec;
 // Number of words in different seasons
 int summer_count, winter_count;
-
 // Langauge innovations
 vector<pair<string, vector<Review>> > innovations;
-set<string> dictionary;
-int TimeDifferenceInMonth(MyTime first, MyTime second) {
-	int first_month = first.year * 12 + first.month;
-	int second_month = second.year * 12 + second.month;
-	return abs(first_month - second_month);
-}
-
-string SimpleRemoveAnySymbol(string input) {
-	string result = "";
-	for (int i = 0; i <(int) input.size(); i++) {
-		if(isalpha(input[i]) || input[i] =='\''){
-			result += input[i];
-		}
-	}
-	return result;
-}
-
-//returns -1 if denominator is equal to 0.
-double SimpleStringFractionToDouble(string input) {
-	stringstream ss(input);
-	double numerator, denominator;
-	char ch;
-	ss >> numerator >> ch >> denominator;
-	if (denominator == 0){
-		return -1;
-	}
-	return numerator / denominator;
-}
-
-double SimpleStringToDouble(string input) {
-	stringstream ss(input);
-	double ret;
-	ss >> ret;
-	return ret;
-}
-
-
-bool EqDouble(double x, double y) {
-	if(abs(x-y) < 1e-6) {
-		return true;
-	}
-	return false;
-}
-
-string SimpleToLower(string s) {
-	for (int i = 0; i < (int)s.size(); i++) {
-		s[i] = tolower(s[i]);
-	}
-	return s;
-}
-string GetField(string raw_input) {
-	int delimeter = raw_input.find(":");
-	if (delimeter == std::string::npos) {
-		return "THIS INPUT IS TRASH";
-	}
-	return raw_input.substr(delimeter+2);
-}
-
-string RemoveAllSymbols(string raw_input) {
-	string ret = "";
-	for (int i = 0; i < (int)raw_input.size(); i++) {
-		if(isalpha(raw_input[i]) || raw_input[i]=='\'' || isspace(raw_input[i]) || isdigit(raw_input[i])) {
-			ret += raw_input[i];
-		}
-		if(raw_input[i] == ',' || raw_input[i]=='.') {
-			ret += ' ';
-		}
-	}
-	return ret;
-}
-ifstream fin;
-
-bool ReadOneReview() {
-	string raw_input;
-	Review review;
-	if (getline(fin, raw_input)) {
-		review.product_id = GetField(raw_input);
-		getline(fin, raw_input);
-		review.product_title = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
-		getline(fin, raw_input);
-		review.price = GetField(raw_input);
-		getline(fin, raw_input);
-		review.user_id = GetField(raw_input);
-		getline(fin, raw_input);
-		review.profile_name = GetField(raw_input);
-		do {
-			getline(fin, raw_input);
-			review.helpfulness = GetField(raw_input);
-		} while (review.helpfulness == "THIS INPUT IS TRASH");
-		getline(fin, raw_input);
-		review.score = GetField(raw_input);
-		getline(fin, raw_input);
-		int time_int = atoi((GetField(raw_input)).c_str());
-		time_t review_time(time_int);
-		if (review_time == -1) {
-			getline(fin, raw_input);
-			getline(fin, raw_input);
-			getline(fin, raw_input);
-			return SUCCESS;
-		}
-		review.time = MyTime(localtime(&review_time));
-		getline(fin, raw_input);
-		review.summary = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
-		getline(fin, raw_input);
-		review.text = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
-		getline(fin, raw_input);
-		reviews.push_back(review);
-		return SUCCESS;
-	}
-	return FAIL;
-}
-
-void MyFilter(string key, string value) {
-	filter_reviews.clear();
-	for ( int i = 0; i < (int)reviews.size(); i++){
-		if (key == "productId") {
-			if (reviews[i].product_id == value) {
-				filter_reviews.push_back(reviews[i]);
-			}
-		}
-		if (key == "product_title") {
-			if (reviews[i].product_title.find(value) != string::npos) {
-				filter_reviews.push_back(reviews[i]);
-			}
-		}
-	}
-	reviews = filter_reviews;
-}
-
-
 
 
 //////////////////////////////// End of Utility functions
@@ -290,7 +64,7 @@ void CountMonthlyAccumulatedReviews() {
 	for (int i = 0; i < (int)reviews.size(); i++) {
 		overall_count_month[reviews[i].time.month]++;
 	}
-	ofstream overall_outputs_monthly_accumulated_out("../Output_All/overall_monthly_accumulated.txt");
+	ofstream overall_outputs_monthly_accumulated_out("../Output_All/overall_monthly_accumulated_" + NAMEOFTHEDATASET +".txt");
 	for (int i = 0; i < 12; i++) {
 		overall_outputs_monthly_accumulated_out << month[i] << " " << overall_count_month[i] << endl;
 	}
@@ -301,7 +75,7 @@ void CountYearlyReviews() {
 	for (int i = 0; i < (int)reviews.size(); i++) {
 		overall_count_year[reviews[i].time.year]++;
 	}
-	ofstream overall_outputs_yearly_out("../Output_All/overall_yearly.txt");
+	ofstream overall_outputs_yearly_out("../Output_All/overall_yearly_" + NAMEOFTHEDATASET +".txt");
 	for (int i = 1998; i < 2015; i++) {
 		overall_outputs_yearly_out << i << " " << overall_count_year[i] << endl;
 	}
@@ -322,7 +96,7 @@ void PerItemPerMonth() {
 		if (current == item_count_per_year.begin() ||
 				before->first.first != current->first.first) {
 			fout.close();
-			fout.open(("../Output_All/PerItem/" + current->first.first + "_monthly.txt").c_str(),std::ofstream::out);
+			fout.open(("../Output_All/PerItem/" + current->first.first + "_monthly_" + NAMEOFTHEDATASET +".txt").c_str(),std::ofstream::out);
 			//	fout << current ->first.first << endl;
 		}
 		fout << month[current->first.second%100] << "/" <<
@@ -361,7 +135,7 @@ void TopProducts(int size_of_list) {
 		product_count[reviews[i].product_id]++;
 	}
 	Product product;
-	ofstream top_products_out("../Output_All/top_products.txt");
+	ofstream top_products_out("../Output_All/top_products_" + NAMEOFTHEDATASET +".txt");
 	for (map<string, int>::iterator it = product_count.begin(); it!=product_count.end(); it++) {
 		product.product_id = it->first;
 		product.count = it->second;
@@ -454,13 +228,13 @@ void ReviewsWithVideo() {
 	data_error /= reviews.size();
 	video_error /= number_of_videos;
 
-	ofstream video_correlation_to_helpfulness("../Output_All/video_correlation_to_helpfulness.out");
+	ofstream video_correlation_to_helpfulness("../Output_All/video_correlation_to_helpfulness_" + NAMEOFTHEDATASET +".out");
 	video_correlation_to_helpfulness << "Number of videos " << number_of_videos << endl;
 	video_correlation_to_helpfulness << "Average of video and data: " << video_average << " " << data_average <<endl;
 	video_correlation_to_helpfulness << "Error of video and data: " << video_error << " " << data_error <<endl;
 
 	ofstream video_length_correlation_to_helpfulness(
-			"../Output_All/video_correlation_to_helpfulness_has_error.txt");
+			"../Output_All/video_correlation_to_helpfulness_" + NAMEOFTHEDATASET +"_has_error.txt");
 	for (int i = 0; i < 600/time_bucket ; i++) {
 		double average, error;
 		average = FindAverage(&video_votes[i]);
@@ -506,7 +280,7 @@ void StarAveragePerMonth() {
 		ss >> score;
 		star_rating[reviews[i].time.month].push_back(score);
 	}
-	ofstream overall_outputs_monthly_accumulated_out_star_rating("../Output_All/overall_monthly_accumulated_star_rating_has_error.txt");
+	ofstream overall_outputs_monthly_accumulated_out_star_rating("../Output_All/overall_monthly_accumulated_star_rating_" + NAMEOFTHEDATASET +"_has_error.txt");
 	for (int i = 0; i < 12; i++) {
 		average = FindAverage(&star_rating[i]);
 		error = FindConfidenceInterval95(&star_rating[i], average);
@@ -519,16 +293,18 @@ void StarAveragePerYear() {
 	vector<double> star_rating[30];
 	double average;
 	double error;
+	int min_year = 3000;
 	for (int i = 0; i < (int)reviews.size(); i++) {
 		stringstream ss(reviews[i].score);
+		min_year = min(min_year, reviews[i].time.year);
 		double score;
 		ss >> score;
-		star_rating[reviews[i].time.year-1998].push_back(score);
+		star_rating[reviews[i].time.year-min_year].push_back(score);
 	}
-	ofstream overall_outputs_yearly_out_star_rating("../Output_All/overall_yearly_star_rating_has_error.txt");
-	for (int i = 1998; i < 2015; i++) {
-		average = FindAverage(&star_rating[i - 1998]);
-		error = FindConfidenceInterval95(&star_rating[i - 1998], average);
+	ofstream overall_outputs_yearly_out_star_rating("../Output_All/overall_yearly_star_rating_" + NAMEOFTHEDATASET +"_has_error.txt");
+	for (int i = min_year; i < 2015; i++) {
+		average = FindAverage(&star_rating[i - min_year]);
+		error = FindConfidenceInterval95(&star_rating[i - min_year], average);
 		overall_outputs_yearly_out_star_rating << i << " " << average  << " " << error << endl;
 	}
 }
@@ -543,7 +319,7 @@ void StarAveragePerTimeInTheDay() {
 		ss >> score;
 		star_rating[reviews[i].time.hour].push_back(score);
 	}
-	ofstream overall_outputs_hourly_accumulated_out_star_rating("../Output_All/overall_hourly_accumulated_star_rating_has_error.txt");
+	ofstream overall_outputs_hourly_accumulated_out_star_rating("../Output_All/overall_hourly_accumulated_star_rating_" + NAMEOFTHEDATASET +"has_error_.txt");
 	for (int i = 0; i < 24; i++) {
 		average = FindAverage(&star_rating[i]);
 		error = FindConfidenceInterval95(&star_rating[i], average);
@@ -582,157 +358,14 @@ void SeasonalTopWordsTitle() {
 	sort(words_in_winter_vec.begin(), words_in_winter_vec.end());
 	reverse(words_in_summer_vec.begin(), words_in_summer_vec.end());
 	reverse(words_in_winter_vec.begin(), words_in_winter_vec.end());
-	ofstream summer_top_words("../Output_All/summer_top_words.txt");
-	ofstream winter_top_words("../Output_All/winter_top_words.txt");
+	ofstream summer_top_words("../Output_All/summer_top_words_" + NAMEOFTHEDATASET +".txt");
+	ofstream winter_top_words("../Output_All/winter_top_words_" + NAMEOFTHEDATASET +".txt");
 	for (auto x : words_in_summer_vec ) {
 		summer_top_words << x.first << " " << x.second <<endl;
 	}
 
 	for (auto x : words_in_winter_vec ) {
 		winter_top_words << x.first << " " << x.second <<endl;
-	}
-}
-
-//Learn Dictionary from the first len reviews
-void LearnDictionary(int start, int end) {
-	string word;
-	for (int i = start; i < end; i++ ) {
-		stringstream ss(reviews[i].text);
-		while (ss.good()) {
-			ss >> word;
-			dictionary.insert(word);
-		}
-	}
-}
-
-bool PopWordAddToDictionary(string word, vector<Review> *review_history) {
-	set<string> products_that_have_this_word;
-	set<string> users_that_have_used_this_word;
-	if (review_history->size() < 8) {
-		return false;
-	}
-	for (int i = 0; i < (int)review_history->size(); i++) {
-		products_that_have_this_word.insert((*review_history)[i].product_id);
-		users_that_have_used_this_word.insert((*review_history)[i].user_id);
-	}
-	if (products_that_have_this_word.size() < 3) {
-		return false;
-	}
-	if (users_that_have_used_this_word.size() < 3) {
-		return false;
-	}
-	return true;
-}
-
-void FindInnovations(int start, vector<pair<string, vector<Review> > > *innovations) {
-	map<string, vector<Review> > new_words;
-	string word;
-	vector<Review> temp;
-	for (int i = start; i < (int)reviews.size(); i++) {
-		stringstream ss(reviews[i].text);
-		while (ss.good()) {
-			ss >> word;
-			if(dictionary.find(word) != dictionary.end()) {
-				continue;
-			}
-			if (new_words.find(word) == new_words.end()) {
-				temp.clear();
-				temp.push_back(reviews[i]);
-				new_words[word] = temp;
-			} else {
-				temp = new_words.find(word)->second;
-				if (temp[temp.size() - 1] == reviews[i]) {
-					continue;
-				}
-				if (TimeDifferenceInMonth(temp[0].time, reviews[i].time) > 6) {
-					if (PopWordAddToDictionary(word, &temp) == true) {
-						innovations->push_back(make_pair(word, temp));
-					}
-					new_words.erase(word);
-					dictionary.insert(word);
-				} else {
-					temp.push_back(reviews[i]);
-					new_words[word] = temp;
-				}
-			}
-		}
-	}
-	for (auto x : new_words) {
-		word = x.first;
-		temp = x.second;
-		if (TimeDifferenceInMonth(temp[0].time, temp[temp.size()-1].time) > 6) {
-			if (PopWordAddToDictionary(word, &temp) == true) {
-				innovations->push_back(make_pair(word, temp));
-			}
-		}
-	}
-}
-
-class Innovator {
-public:
-	string word;
-	string user_id;
-	int num_of_reviews;
-	int experience_level;
-	Innovator() {
-		num_of_reviews = 0;
-		experience_level = 0;
-	}
-	bool operator < (const Innovator &other) const {
-		return user_id < other.user_id;
-	}
-};
-
-void FindNumOfReviews(vector<pair<string, vector<Review> > > *innovations,
-		set<Innovator> *innovators) {
-	for (int i = 0; i < (int)reviews.size(); i++) {
-		for (int j = 0; j < (int)innovations->size(); j++) {
-			if(reviews[i].user_id == (*innovations)[j].second[0].user_id) {
-				Innovator temp;
-				temp.user_id = reviews[i].user_id;
-				if(innovators->find(temp) != innovators->end()) {
-					temp = *(innovators->find(temp));
-					innovators->erase(temp);
-				}
-				temp.num_of_reviews++;
-				if((*innovations)[j].second[0] == reviews[i]) {
-					temp.experience_level = temp.num_of_reviews;
-				}
-				temp.word = (*innovations)[j].first;
-				innovators->insert(temp);
-			}
-		}
-	}
-}
-
-void AnalyseInnovation(vector<pair<string, vector<Review> > > *innovations) {
-	set<Innovator> innovators;
-	FindNumOfReviews(innovations, &innovators);
-	counter_for_reviewer.clear();
-	distribution_for_count_of_reviewer.clear();
-	ofstream fout("../Output_All/innovators_distribution.txt");
-	int num_of_innovators = innovators.size();
-	for ( Innovator innovator : innovators) {
-		distribution_for_count_of_reviewer[innovator.num_of_reviews]++;
-	}
-	for (pair<int, int> num_of_review_to_num_of_people : distribution_for_count_of_reviewer ){
-		fout << num_of_review_to_num_of_people.first << " " << num_of_review_to_num_of_people.second/(double)num_of_innovators << endl;
-	}
-	fout.close();
-	ofstream innovators_out("../Output_All/innovators.txt");
-	for (pair<string, vector<Review> > innovation : *innovations ) {
-		innovators_out << innovation.first << ":" <<endl;
-		int bound = 0;
-		for(Review review : innovation.second) {
-			innovators_out << review.score << endl;
-			innovators_out << review.time.month << "/" <<review.time.day << "/" << review.time.year << endl;
-			innovators_out << review.text << endl;
-			bound++;
-			if(bound == 5){
-				break;
-			}
-		}
-		innovators_out << " __________________________ " <<endl;
 	}
 }
 
@@ -782,7 +415,7 @@ void UserAngrinessBasedOnNumberOfReviews() {
 	sort(users_info_vec.begin(), users_info_vec.end(), cmp3);
 	double current_sum = 0;
 	int current_num = 0;
-	ofstream fout("../Output_All/user_angriness_based_on_number_of_reviews.txt");
+	ofstream fout("../Output_All/user_angriness_based_on_number_of_reviews_" + NAMEOFTHEDATASET +".txt");
 	for (int i = 0; i < (int)users_info_vec.size(); i++) {
 		if ( i == 0 || users_info_vec[i].num_of_reviews == users_info_vec[i-1].num_of_reviews) {
 			current_num++;
@@ -806,50 +439,53 @@ void UserDistributionBasedOnNumberOfReviews() {
 	for (pair<string, int> user : counter_for_reviewer) {
 		distribution_for_count_of_reviewer[user.second]++;
 	}
-	ofstream fout("../Output_All/all_reviewers_distribution.txt");
+	ofstream fout("../Output_All/all_reviewers_distribution_" + NAMEOFTHEDATASET +".txt");
 	for (pair<int, int> num_of_review_to_num_of_people : distribution_for_count_of_reviewer){
 		fout << num_of_review_to_num_of_people.first << " " << num_of_review_to_num_of_people.second/(double)num_of_users << endl;
 	}
 }
 
 int main(int argc, char *argv[]) {
-	NAMEOFTHEDATASET = (string(argv[1])).substr(0,string(argv[1]).find("."));
-	fin.open (argv[1], std::ifstream::in);
+	string MODE = "_Top3TaxRemoved";
+	NAMEOFTHEDATASET = (string(argv[1])).substr(0,string(argv[1]).find(".")) + MODE;
+	ifstream fin(argv[1]);
 	// Read input.
 	while (true) {
-		if (!ReadOneReview()) {
+		if (!ReadOneReview(fin, &reviews)) {
 				break;
 		}
 		//		reviews[reviews.size() - 1].print();
 	}
-	//	cerr << reviews.size() <<endl;
-	//	MyFilter("product_title", "skirt");
+//	cerr << reviews.size() <<endl;
+//	MyFilter("text", "turbotax");
+	MyFilter("text", "hr block", &reviews);
+	MyFilter("text", "taxact", &reviews);
 	cerr << reviews.size() << endl;
-	sort(reviews.begin(), reviews.end(), cmp);
-	reviews.erase(unique( reviews.begin(), reviews.end(), cmp2 ), reviews.end());
+	sort(reviews.begin(), reviews.end(), CompareReviewOnUserId);
+	reviews.erase(unique( reviews.begin(), reviews.end(), ReviewEquality), reviews.end());
 	cerr << reviews.size() << endl;
 	/**/
 	CountMonthlyAccumulatedReviews();
 	CountYearlyReviews();
 
-	PerItemPerMonth();
-	PerItemPerYear();
+//	PerItemPerMonth();
+//	PerItemPerYear();
 	// Top products.
-	int size_of_list = 40;
-	TopProducts(size_of_list);
+//	int size_of_list = 40;
+//	TopProducts(size_of_list);
 	// Video Average vs All average.
-	ReviewsWithVideo();
-	StarAveragePerMonth();
-	StarAveragePerYear();
+//	ReviewsWithVideo();
+//	StarAveragePerMonth();
+//	StarAveragePerYear();
 	// Time in Day is useless! The timestamp is on a daily basis
 //	StarAveragePerTimeInTheDay();
 	 /**/
 
 	/**/
 	sort(reviews.begin(), reviews.end());
-	LearnDictionary(0, reviews.size() / 4);
-	FindInnovations(reviews.size() / 4, &innovations); // returns pair of word and review it was started.
-	AnalyseInnovation(&innovations);
+	Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
+	Innovations::FindInnovations(reviews.size() / 2, &reviews, &innovations); // returns pair of word and review it was started.
+	Innovations::AnalyseInnovation(&innovations, &reviews);
 	UserDistributionBasedOnNumberOfReviews();
 	/**/
 //	UserAngrinessBasedOnNumberOfReviews();

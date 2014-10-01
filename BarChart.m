@@ -19,7 +19,7 @@ for K = 1 : numfids
         end
         figure1 = figure;
         if sum(Y)> 5
-            bar(Y);
+            plot(Y);
             hold on;
             histogram = errorbar(Y, Z, 'bx');
             hc = get(histogram, 'Children');
