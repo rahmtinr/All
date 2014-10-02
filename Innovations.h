@@ -7,14 +7,16 @@
 #ifndef INNOVATIONS_H
 #define INNOVATIONS_H
 
-#include<string>
-#include<set>
-#include<map>
-#include<vector>
-#include<sstream>
 #include<fstream>
-#include "Reviews.h"
+#include<map>
+#include<set>
+#include<sstream>
+#include<string>
+#include<vector>
+
 #include "MyUtility.h"
+#include "Reviews.h"
+
 using namespace std;
 
 class Innovator {
@@ -34,12 +36,12 @@ public:
 
 
 class Innovations {
+public:
 	static set<string> dictionary;
 	static map<string, int> counter_for_reviewer;
 	static string NAMEOFTHEDATASET;
 	static map<int, int> distribution_for_count_of_reviewer;
 
-public:
 	//Learn Dictionary from the first len reviews
 	static void LearnDictionary(int start, int end, vector<Review> *reviews) {
 		string word;
@@ -173,5 +175,11 @@ public:
 
 
 };
+
+set<string> Innovations::dictionary;
+map<string, int> Innovations::counter_for_reviewer;
+string Innovations::NAMEOFTHEDATASET;
+map<int, int> Innovations::distribution_for_count_of_reviewer;
+
 #endif /* INNOVATIONS_H_ */
 

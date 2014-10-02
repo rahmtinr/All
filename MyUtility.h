@@ -10,10 +10,16 @@
 
 #define FAIL false
 #define SUCCESS true
+
 #include<cmath>
+#include<iostream>
+#include<sstream>
+#include<string>
+#include<vector>
+
 using namespace std;
 
-const string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"};
+const static string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 class MyTime {
 public:
@@ -26,10 +32,7 @@ public:
 	int weekday;
 
 	MyTime(){}
-	void print() {
-		cout<< "Time: " << month + 1 << "/" << day << "/" << year<< "   ";
-		cout<< hour << ":" << minute << ":" << second <<endl;
-	}
+	friend ostream &operator<<(ostream&, const MyTime&);
 	MyTime(struct tm* time){
 		year = time->tm_year+1900;
 		month = time->tm_mon;
@@ -41,6 +44,11 @@ public:
 	}
 };
 
+ostream& operator <<(ostream& out, const MyTime& my_time){
+	out << my_time.month + 1 << "/" << my_time.day << "/" << my_time.year<< "   ";
+	out << my_time.hour << ":" << my_time.minute << ":" << my_time.second;
+	return out;
+}
 int TimeDifferenceInMonth(MyTime first, MyTime second) {
 	int first_month = first.year * 12 + first.month;
 	int second_month = second.year * 12 + second.month;
@@ -91,6 +99,30 @@ string SimpleToLower(string s) {
 	return s;
 }
 
+double FindAverage(vector<double> *data) {
+	if (data->size() == 0) {
+		return 0;
+	}
+	double average = 0;
+	for (int i = 0; i < (int)data->size(); i++) {
+		average += (*data)[i];
+	}
+	return average / data->size();
+}
+
+double FindConfidenceInterval95(vector<double> *data, double average) {
+	if (data->size() == 0) {
+		return 0;
+	}
+	double error = 0;
+	for (int i = 0; i < (int)data->size(); i++) {
+		error += ((*data)[i]-average) * ((*data)[i]-average);
+	}
+
+	error /= data->size();
+	error /= data->size();
+	return 1.96*sqrt(error);
+}
 
 
 #endif /* MYUTILITY_H_ */

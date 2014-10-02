@@ -8,8 +8,12 @@
 #ifndef REVIEWREADER_H_
 #define REVIEWREADER_H_
 
-#include "AmazonUtility.h"
+#include<ctime>
+#include<cstdlib>
+#include<fstream>
 #include<string>
+
+#include "AmazonUtility.h"
 
 using namespace std;
 

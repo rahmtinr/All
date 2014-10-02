@@ -8,6 +8,8 @@
 #ifndef AMAZONUTILITY_H_
 #define AMAZONUTILITY_H_
 
+#include<vector>
+
 #include "Reviews.h"
 
 using namespace std;

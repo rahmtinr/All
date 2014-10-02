@@ -8,8 +8,9 @@
 #ifndef REVIEWS_H_
 #define REVIEWS_H_
 
-#include<iostream>
 #include<cstdio>
+#include<iostream>
+
 #include "MyUtility.h"
 
 using namespace std;
@@ -27,16 +28,7 @@ public:
 	string summary;
 	string text;
 
-	void print() {
-		cout<< "ProductId: " << product_id << endl;
-		cout<< "UserId: " << user_id << endl;
-		cout<< "ProfileName: " << profile_name << endl;
-		cout<< "Helpfulness: " << helpfulness << endl;
-		cout<< "Score: " << score << endl;
-		time.print();
-		cout<< "Summary: " << summary << endl;
-		cout<< "Text: " << text << endl;
-	}
+	friend ostream& operator << (ostream& out, const Review &review);
 	bool operator < (const Review &other) const {
 		if (time.year != other.time.year) {
 			return time.year < other.time.year;
@@ -53,6 +45,18 @@ public:
 		return (product_id == other.product_id && user_id == other.user_id && text == other.text);
 	}
 };
+
+ostream& operator << (ostream& out, const Review &review) {
+	out << "ProductId: " << review.product_id << endl;
+	out << "UserId: " << review.user_id << endl;
+	out << "ProfileName: " << review.profile_name << endl;
+	out << "Helpfulness: " << review.helpfulness << endl;
+	out << "Score: " << review.score << endl;
+	out << "Time: " << review.time << endl;
+	out << "Summary: " << review.summary << endl;
+	out << "Text: " << review.text << endl;
+	return out;
+}
 
 bool CompareReviewOnUserId(const Review &x,const Review &y) {
 	if(x.user_id == y.user_id) {
