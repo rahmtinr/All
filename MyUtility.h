@@ -21,6 +21,13 @@ using namespace std;
 
 const static string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
+class Global {
+public:
+	static string NAMEOFDATASET;
+};
+string Global::NAMEOFDATASET;
+
+
 class MyTime {
 public:
 	int year;
@@ -124,5 +131,12 @@ double FindConfidenceInterval95(vector<double> *data, double average) {
 	return 1.96*sqrt(error);
 }
 
+string ToString(int x) {
+	stringstream ss;
+	string ret;
+	ss << x;
+	ss >> ret;
+	return ret;
+}
 
 #endif /* MYUTILITY_H_ */

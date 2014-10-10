@@ -57,4 +57,14 @@ public:
 	}
 };
 
+namespace Amazon {
+	class Global {
+	public:
+		static int min_year;
+		static int max_year;
+	};
+}
+
+int Amazon::Global::min_year;
+int Amazon::Global::max_year;
 #endif /* AMAZONUTILITY_H_ */

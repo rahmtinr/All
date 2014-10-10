@@ -25,7 +25,7 @@ for K = 1 : numfids
             hc = get(histogram, 'Children');
             set(hc(1),'color','b'); %// data
             set(hc(2),'color','r'); %// error bar
-            set(gca, 'XTickLabel', X, 'XTick',1:numel(X))
+            set(gca, 'XTickLabel', X, 'XTick',1:numel(X),'FontSize',5)
             rotateXLabels( gca(), 90 )
             saveas(figure1, strcat('../Output_All/',...
                 OutputFiles(K).name(1 : end-4), '.jpg'))

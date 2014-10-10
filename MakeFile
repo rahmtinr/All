@@ -1,7 +1,7 @@
 CC = g++ 
 CFLAGS = -g -std=c++11 -Wall -O2
 LDFLAGS = -lm
-all : main.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
+all : main.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
 	${CC} -o main main.o ${CFLAGS}
 
 main.o : main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
@@ -25,3 +25,15 @@ Innovations.o : Innovations.h Reviews.h MyUtility.h
 
 Videos.o : Videos.h Reviews.h
 	${CC} -c Videos.h ${CFLAGS}
+
+ProductRelated.o : ProductRelated.h Reviews.h MyUtility.h
+	${CC} -c ProductRelated.h ${CFLAGS}
+
+UserRelated.o : UserRelated.h Reviews.h MyUtility.h
+	${CC} -c UserRelated.h ${CFLAGS}
+	
+Aggregation.o : Aggregation.h Reviews.h MyUtility.h
+	${CC} -c Aggregation.h ${CFLAGS}
+	
+Seasonal.o : Seasonal.h Reviews.h MyUtility.h
+	${CC} -c  Seasonal.h ${CFLAGS}
