@@ -37,6 +37,7 @@ public:
 	int minute;
 	int second;
 	int weekday;
+	int epoch_time;
 
 	MyTime(){}
 	friend ostream &operator<<(ostream&, const MyTime&);
@@ -48,6 +49,22 @@ public:
 		minute = time->tm_min;
 		second = time->tm_sec;
 		weekday = time->tm_wday;
+		epoch_time = mktime(time);
+	}
+
+	bool operator < (const MyTime &other) const {
+		if(year == other.year) {
+			if(month == other.month) {
+				return day < other.day;
+			}
+			return month < other.month;
+		}
+		return year < other.year;
+	}
+
+	int Day(MyTime earliest_day){
+		int temp = abs(earliest_day.epoch_time - epoch_time);
+		return temp/(60*60*24);
 	}
 };
 

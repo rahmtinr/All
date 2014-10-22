@@ -26,18 +26,28 @@ using namespace std;
 
 
 vector<Review> reviews;
-
+map<string, vector<int>* > word_states;
 // Langauge innovations
 vector<pair<string, vector<Review> > >  innovations[100];
-
+map<int,int> distribution_for_entire_data_set;
 
 
 
 int main(int argc, char *argv[]) {
 	string MODE = "";
 	//	MODE = "_Top3TaxRemoved";
-	Global::NAMEOFDATASET = (string(argv[1])).substr(string(argv[1]).find("/") + 1 ,
-			string(argv[1]).find(".") - string(argv[1]).find("/") - 1) + MODE;
+	int last_slash = 0, last_dot = 0;
+	for(int i = strlen(argv[1]) - 1; i >=0; i--) {
+		if(argv[1][i] == '/' && last_slash == 0) {
+			last_slash = i;
+		}
+		if(argv[1][i] == '.' && last_dot == 0) {
+			last_dot = i;
+		}
+
+	}
+	Global::NAMEOFDATASET = (string(argv[1])).substr(last_slash + 1 ,
+			last_dot - last_slash - 1) + MODE;
 	cerr << Global::NAMEOFDATASET <<endl;
 	Innovations::numbers_for_appearances = {4 , 8, 10};
 	Innovations::numbers_for_products = {3 , 6, 10};
@@ -45,6 +55,9 @@ int main(int argc, char *argv[]) {
 	ifstream fin(argv[1]);
 	Amazon::Global::min_year = 2015;
 	Amazon::Global::max_year = 1995;
+	Amazon::Global::earliest.year = 2015;
+	Amazon::Global::state_coeffecient = 2;
+	Amazon::Global::probability_of_state_change = 0.1;
 	// Read input.
 	while (true) {
 		if (!ReadOneReview(fin, &reviews)) {
@@ -52,6 +65,8 @@ int main(int argc, char *argv[]) {
 		}
 		Amazon::Global::min_year = min(Amazon::Global::min_year, reviews[reviews.size() - 1].time.year);
 		Amazon::Global::max_year = max(Amazon::Global::max_year, reviews[reviews.size() - 1].time.year);
+		Amazon::Global::earliest = min(Amazon::Global::earliest, reviews[reviews.size() - 1].time);
+		Amazon::Global::latest = max(Amazon::Global::latest, reviews[reviews.size() - 1].time);
 	}
 	//	cerr << reviews.size() <<endl;
 	//	MyFilter("text", "turbotax");
@@ -76,10 +91,17 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerTimeInTheDay(&reviews);
 	//
 	// sort(reviews.begin(), reviews.end());
-	Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
-	Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
-	Innovations::AnalyseInnovation(innovations, &reviews);
-	//	UserDistributionBasedOnNumberOfReviews(&reviews);
+	// Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
+	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
+	// Innovations::AnalyseInnovation(innovations, &reviews);
+	Innovations::FindBursts(&word_states, &reviews);
+	cerr << (word_states["malware"])->size() << endl;
+	vector<int> temp = *(word_states["malware"]);
+	for(int i=0;i<temp.size();i++){
+		cerr << temp[i] << " " ;
+	}
+	cerr<< endl;
+	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);
 	//	StarAveragePerMonth(&reviews);

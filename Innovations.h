@@ -13,9 +13,12 @@
 #include<sstream>
 #include<string>
 #include<vector>
+#include<sstream>
 
+#include "AmazonUtility.h"
 #include "MyUtility.h"
 #include "Reviews.h"
+#include "UserRelated.h"
 
 using namespace std;
 
@@ -39,7 +42,8 @@ class Innovations {
 public:
 	static set<string> dictionary;
 	static map<string, int> counter_for_reviewer;
-	static map<int, int> distribution_for_count_of_reviewer;
+	static map<int, int> distribution_for_experience_level;
+	static map<int, int> distribution_for_num_of_reviews;
 	static vector<int> numbers_for_appearances;
 	static vector<int> numbers_for_products;
 	static vector<int> numbers_for_authors;
@@ -151,26 +155,37 @@ public:
 		}
 	}
 
-	static void AnalyseInnovation(	vector<pair<string, vector<Review> > > *innovations, vector<Review> *reviews) {
+	static void AnalyseInnovation(vector<pair<string, vector<Review> > > *innovations, vector<Review> *reviews) {
 		set<Innovator> innovators;
 		FindNumOfReviews(innovations, &innovators, reviews);
 		counter_for_reviewer.clear();
-		distribution_for_count_of_reviewer.clear();
+		distribution_for_num_of_reviews.clear();
+		distribution_for_experience_level.clear();
+		map<int, double> distribution_for_entire_data_set;
+		UserDistributionBasedOnNumberOfReviews(reviews, &distribution_for_entire_data_set);
 		for(int i = 0; i < (int) numbers_for_appearances.size(); i++) {
 			for(int j = 0; j < (int) numbers_for_products.size(); j++) {
 				for(int k = 0; k < (int) numbers_for_authors.size(); k++) {
 					if(innovations[(numbers_for_authors.size()*numbers_for_products.size())*i + numbers_for_authors.size()*j + k].size() == 0){
+						cerr << " CONTINUE" << endl;
 						continue;
 					}
 					ofstream fout("../Output_All/innovators_distribution_" + ToString(numbers_for_appearances[i]) + "_"
 							+ ToString(numbers_for_products[j]) + "_"
 							+ ToString(numbers_for_authors[k]) + "_" + Global::NAMEOFDATASET + ".txt");
+					cerr << "------------------------>   ../Output_All/innovators_distribution_" + ToString(numbers_for_appearances[i]) + "_"
+							+ ToString(numbers_for_products[j]) + "_"
+							+ ToString(numbers_for_authors[k]) + "_" + Global::NAMEOFDATASET + ".txt" << endl;
 					int num_of_innovators = innovators.size();
 					for ( Innovator innovator : innovators) {
-						distribution_for_count_of_reviewer[innovator.num_of_reviews]++;
+						distribution_for_num_of_reviews[innovator.num_of_reviews]++;
+						distribution_for_experience_level[innovator.experience_level]++;
 					}
-					for (pair<int, int> num_of_review_to_num_of_people : distribution_for_count_of_reviewer ){
-						fout << num_of_review_to_num_of_people.first << " " << num_of_review_to_num_of_people.second/(double)num_of_innovators << endl;
+					fout << "#reviewers \t innovators #reviews \t innovators' xp level \t entire data" << endl;
+					for (pair<int, int> num_of_review_to_num_of_people : distribution_for_num_of_reviews ){
+						int number_of_reviews = num_of_review_to_num_of_people.first;
+						fout << number_of_reviews << "\t " << distribution_for_num_of_reviews[number_of_reviews]/(double)num_of_innovators << "\t" <<
+								distribution_for_experience_level[number_of_reviews] / (double)num_of_innovators << "\t" <<distribution_for_entire_data_set[number_of_reviews] << endl;
 					}
 					fout.close();
 					ofstream innovators_out("../Output_All/innovations_" + ToString(numbers_for_appearances[i]) + "_"
@@ -183,7 +198,9 @@ public:
 						for(Review review : innovation.second) {
 							innovators_out << review.score << endl;
 							innovators_out << review.time << endl;
-							innovators_out << review.text << endl;
+							if(bound < 1) {
+								innovators_out << review.text << endl;
+							}
 							bound++;
 							if(bound == 5){
 								break;
@@ -196,11 +213,115 @@ public:
 		}
 	}
 
+	static void FindBursts(map<string, vector<int>* > *word_states, vector<Review> *reviews) {
+		map<string, vector<int>* > occurances;
+		string text, word;
+		for(Review review : *reviews) {
+			text = review.text;
+			stringstream ss(text);
+			while(!ss.eof()){
+				ss >> word;
+				if(occurances.find(word) == occurances.end()){
+					vector<int> *temp = new vector<int>();
+					temp->push_back(review.time.Day(Amazon::Global::earliest));
+					occurances[word] = temp;
+				} else {
+					vector<int> *temp = occurances[word];
+					temp->push_back(review.time.Day(Amazon::Global::earliest));
+					occurances[word] = temp;
+				}
+			}
+		}
+		// int max_size = 0;
+		// int sum = 0;
+		vector<int> *states;
+		for(auto word_occurance : occurances) {
+			string word = word_occurance.first;
+			if(word != "malware"){
+				continue;
+			}
+			vector<int> word_time_of_occurance = *(word_occurance.second);
+			sort(word_time_of_occurance.begin(), word_time_of_occurance.end());
+			for(int i = 0; i + 1 < word_time_of_occurance.size(); i++) {
+				cerr << word_time_of_occurance[i] << " ";
+				word_time_of_occurance[i] = word_time_of_occurance[i+1] - word_time_of_occurance[i];
+			}
+			cerr << endl;
+			word_time_of_occurance.pop_back();
+			states = new vector<int>();
+		//	max_size = max(max_size, (int)word_time_of_occurance.size());
+		//	sum += word_time_of_occurance.size();
+			FindBurstsForWords(word_time_of_occurance, word, states);
+			(*word_states)[word] = states;
+		}
+		// cerr << "--------->" << max_size << " " << sum << endl;
+
+	}
+
+
+	static double ProbabilityFinder(double alpha, int gap){
+		return (-1) * (log(alpha) - 1 * alpha * gap);
+	}
+
+	static void FindPar(vector<int> *par , int x, int y, vector<int> *states) {
+		while(x >= 0) {
+			states->push_back(par[y][x]);
+			y = par[y][x];
+			x--;
+		}
+		reverse(states->begin(),states->end());
+	}
+
+	static void FindBurstsForWords(const vector<int> &time_gaps, string word, vector<int> *states) {
+		if(word!="malware"){
+			return;
+		}
+		vector<int> par[2];
+		double alpha[2];
+		int T = 0;
+		for (int x : time_gaps) {
+			T += x;
+		}
+		cerr << T << endl;
+		cerr << Amazon::Global::latest.Day(Amazon::Global::earliest) << endl;;
+		alpha[0] = time_gaps.size() / (double)T;
+		cerr << "------>" << alpha[0] << endl;
+		alpha[1] = alpha[0] * Amazon::Global::state_coeffecient;
+		double viterbi[2];
+		viterbi[0] = 0;
+		viterbi[1] = 2000 * 1000 * 1000;
+		double v[2];
+		double p;
+		for(int i = 1; i < (int)time_gaps.size(); i++) {
+			v[0] = viterbi[0];
+			v[1] = viterbi[1];
+			p = Amazon::Global::probability_of_state_change;
+			for(int j = 0; j < 2; j++) {
+			//	cerr << j << ":::::" << v[j] + ProbabilityFinder(alpha[j],time_gaps[i]) << " " << v[1-j] + log((1-p)/p) + ProbabilityFinder(alpha[j],time_gaps[i]) << endl;
+				if(v[j] + ProbabilityFinder(alpha[j],time_gaps[i])  <
+						v[1-j] + log((1-p)/p) + ProbabilityFinder(alpha[j],time_gaps[i])) {
+					viterbi[j] = v[j] + ProbabilityFinder(alpha[j],time_gaps[i]);
+					par[j].push_back(j);
+				} else {
+					viterbi[j] = v[1-j] + log((1-p)/p) + ProbabilityFinder(alpha[j],time_gaps[i]);
+					par[j].push_back(1-j);
+				}
+			}
+		}
+		if(viterbi[0] < viterbi[1]){
+			FindPar(par, par[0].size() - 1, 0, states);
+			states->push_back(0);
+		} else {
+			FindPar(par, par[1].size() - 1, 1, states);
+			states->push_back(1);
+		}
+	}
 };
 
 set<string> Innovations::dictionary;
 map<string, int> Innovations::counter_for_reviewer;
-map<int, int> Innovations::distribution_for_count_of_reviewer;
+map<int, int> Innovations::distribution_for_experience_level;
+map<int, int> Innovations::distribution_for_num_of_reviews;
 vector<int> Innovations::numbers_for_appearances;
 vector<int> Innovations::numbers_for_products;
 vector<int> Innovations::numbers_for_authors;

@@ -62,9 +62,17 @@ namespace Amazon {
 	public:
 		static int min_year;
 		static int max_year;
+		static MyTime earliest;
+		static MyTime latest;
+		static double state_coeffecient;
+		static double probability_of_state_change;
 	};
 }
 
 int Amazon::Global::min_year;
 int Amazon::Global::max_year;
+MyTime Amazon::Global::earliest;
+MyTime Amazon::Global::latest;
+double Amazon::Global::state_coeffecient;
+double Amazon::Global::probability_of_state_change;
 #endif /* AMAZONUTILITY_H_ */

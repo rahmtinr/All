@@ -80,7 +80,7 @@ void UserAngrinessBasedOnNumberOfReviews(vector<Review> *reviews) {
 	fout << users_info_vec[users_info_vec.size() - 1].num_of_reviews << " " <<  current_sum / current_num << endl;
 }
 
-void UserDistributionBasedOnNumberOfReviews(vector<Review> *reviews) {
+void UserDistributionBasedOnNumberOfReviews(vector<Review> *reviews, map<int, double> *distribution_for_entire_data_set) {
 	map<string, int> counter_for_reviewer;
 	map<int, int> distribution_for_count_of_reviewer;
 	counter_for_reviewer.clear();
@@ -90,11 +90,12 @@ void UserDistributionBasedOnNumberOfReviews(vector<Review> *reviews) {
 	}
 	int num_of_users = counter_for_reviewer.size();
 	for (pair<string, int> user : counter_for_reviewer) {
-		distribution_for_count_of_reviewer[user.second]++;
+		(*distribution_for_entire_data_set)[user.second]++;
 	}
 	ofstream fout("../Output_All/all_reviewers_distribution_" + Global::NAMEOFDATASET +".txt");
-	for (pair<int, int> num_of_review_to_num_of_people : distribution_for_count_of_reviewer){
-		fout << num_of_review_to_num_of_people.first << " " << num_of_review_to_num_of_people.second/(double)num_of_users << endl;
+	for (pair<int, int> num_of_review_to_num_of_people : *distribution_for_entire_data_set){
+		(*distribution_for_entire_data_set)[num_of_review_to_num_of_people.first] = num_of_review_to_num_of_people.second/(double)num_of_users;
+		fout << num_of_review_to_num_of_people.first << " " << num_of_review_to_num_of_people.second << endl;
 	}
 }
 
