@@ -237,16 +237,13 @@ public:
 		vector<int> *states;
 		for(auto word_occurance : occurances) {
 			string word = word_occurance.first;
-			if(word != "malware"){
-				continue;
-			}
 			vector<int> word_time_of_occurance = *(word_occurance.second);
 			sort(word_time_of_occurance.begin(), word_time_of_occurance.end());
 			for(int i = 0; i + 1 < word_time_of_occurance.size(); i++) {
-				cerr << word_time_of_occurance[i] << " ";
+		//		cerr << word_time_of_occurance[i] << " ";
 				word_time_of_occurance[i] = word_time_of_occurance[i+1] - word_time_of_occurance[i];
 			}
-			cerr << endl;
+		//	cerr << endl;
 			word_time_of_occurance.pop_back();
 			states = new vector<int>();
 		//	max_size = max(max_size, (int)word_time_of_occurance.size());
@@ -273,19 +270,16 @@ public:
 	}
 
 	static void FindBurstsForWords(const vector<int> &time_gaps, string word, vector<int> *states) {
-		if(word!="malware"){
-			return;
-		}
 		vector<int> par[2];
 		double alpha[2];
 		int T = 0;
 		for (int x : time_gaps) {
 			T += x;
 		}
-		cerr << T << endl;
-		cerr << Amazon::Global::latest.Day(Amazon::Global::earliest) << endl;;
+//		cerr << T << endl;
+//		cerr << Amazon::Global::latest.Day(Amazon::Global::earliest) << endl;;
 		alpha[0] = time_gaps.size() / (double)T;
-		cerr << "------>" << alpha[0] << endl;
+//		cerr << "------>" << alpha[0] << endl;
 		alpha[1] = alpha[0] * Amazon::Global::state_coeffecient;
 		double viterbi[2];
 		viterbi[0] = 0;
@@ -323,7 +317,7 @@ map<string, int> Innovations::counter_for_reviewer;
 map<int, int> Innovations::distribution_for_experience_level;
 map<int, int> Innovations::distribution_for_num_of_reviews;
 vector<int> Innovations::numbers_for_appearances;
-vector<int> Innovations::numbers_for_products;
 vector<int> Innovations::numbers_for_authors;
+vector<int> Innovations::numbers_for_products;
 #endif /* INNOVATIONS_H_ */
 

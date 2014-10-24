@@ -26,38 +26,51 @@ using namespace std;
 
 
 vector<Review> reviews;
-map<string, vector<int>* > word_states;
+map<string, vector<int>* > words_states;
 // Langauge innovations
 vector<pair<string, vector<Review> > >  innovations[100];
 map<int,int> distribution_for_entire_data_set;
+set<string> jon_innovation;
+string MODE;
 
-
-
-int main(int argc, char *argv[]) {
-	string MODE = "";
-	//	MODE = "_Top3TaxRemoved";
+void initialize(string s) {
+	MODE = "";
 	int last_slash = 0, last_dot = 0;
-	for(int i = strlen(argv[1]) - 1; i >=0; i--) {
-		if(argv[1][i] == '/' && last_slash == 0) {
+	for(int i = s.length() - 1; i >=0; i--) {
+		if(s[i] == '/' && last_slash == 0) {
 			last_slash = i;
 		}
-		if(argv[1][i] == '.' && last_dot == 0) {
+		if(s[i] == '.' && last_dot == 0) {
 			last_dot = i;
 		}
 
 	}
-	Global::NAMEOFDATASET = (string(argv[1])).substr(last_slash + 1 ,
+	Global::NAMEOFDATASET = s.substr(last_slash + 1 ,
 			last_dot - last_slash - 1) + MODE;
 	cerr << Global::NAMEOFDATASET <<endl;
 	Innovations::numbers_for_appearances = {4 , 8, 10};
 	Innovations::numbers_for_products = {3 , 6, 10};
 	Innovations::numbers_for_authors = {3, 5, 7};
-	ifstream fin(argv[1]);
 	Amazon::Global::min_year = 2015;
 	Amazon::Global::max_year = 1995;
 	Amazon::Global::earliest.year = 2015;
 	Amazon::Global::state_coeffecient = 2;
 	Amazon::Global::probability_of_state_change = 0.1;
+	Innovations::numbers_for_appearances = {4 , 8, 10};
+	Innovations::numbers_for_products = {3 , 6, 10};
+	Innovations::numbers_for_authors = {3, 5, 7};
+	Amazon::Global::min_year = 2015;
+	Amazon::Global::max_year = 1995;
+	Amazon::Global::earliest.year = 2015;
+	Amazon::Global::state_coeffecient = 10;
+	Amazon::Global::probability_of_state_change = 0.1;
+	Amazon::Global::threshold_for_innovation = 10;
+
+}
+
+int main(int argc, char *argv[]) {
+	initialize(argv[1]);
+	ifstream fin(argv[1]);
 	// Read input.
 	while (true) {
 		if (!ReadOneReview(fin, &reviews)) {
@@ -94,13 +107,25 @@ int main(int argc, char *argv[]) {
 	// Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
 	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
 	// Innovations::AnalyseInnovation(innovations, &reviews);
-	Innovations::FindBursts(&word_states, &reviews);
-	cerr << (word_states["malware"])->size() << endl;
-	vector<int> temp = *(word_states["malware"]);
-	for(int i=0;i<temp.size();i++){
-		cerr << temp[i] << " " ;
+	Innovations::FindBursts(&words_states, &reviews);
+	for(pair<string,vector<int> *> word_states : words_states) {
+		string word = word_states.first;
+		vector<int> states = *(word_states.second);
+		int longest_one = 0;
+		int current = 0;
+		for(int i = 0; i < (int) states.size(); i++) {
+			if(states[i] == 1) {
+				current++;
+			} else {
+				current = 0;
+			}
+			longest_one = max(longest_one, current);
+		}
+		if(longest_one >= states.size() / Amazon::Global::threshold_for_innovation + 25) {
+			jon_innovation.insert(word);
+			cerr << word << endl;
+		}
 	}
-	cerr<< endl;
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);

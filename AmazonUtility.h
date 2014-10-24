@@ -66,6 +66,7 @@ namespace Amazon {
 		static MyTime latest;
 		static double state_coeffecient;
 		static double probability_of_state_change;
+		static int threshold_for_innovation;
 	};
 }
 
@@ -75,4 +76,5 @@ MyTime Amazon::Global::earliest;
 MyTime Amazon::Global::latest;
 double Amazon::Global::state_coeffecient;
 double Amazon::Global::probability_of_state_change;
+int Amazon::Global::threshold_for_innovation;
 #endif /* AMAZONUTILITY_H_ */
