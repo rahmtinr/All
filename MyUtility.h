@@ -27,58 +27,6 @@ public:
 };
 string Global::NAMEOFDATASET;
 
-
-class MyTime {
-public:
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-	int second;
-	int weekday;
-	int epoch_time;
-
-	MyTime(){}
-	friend ostream &operator<<(ostream&, const MyTime&);
-	MyTime(struct tm* time){
-		year = time->tm_year+1900;
-		month = time->tm_mon;
-		day = time->tm_mday;
-		hour = time->tm_hour;
-		minute = time->tm_min;
-		second = time->tm_sec;
-		weekday = time->tm_wday;
-		epoch_time = mktime(time);
-	}
-
-	bool operator < (const MyTime &other) const {
-		if(year == other.year) {
-			if(month == other.month) {
-				return day < other.day;
-			}
-			return month < other.month;
-		}
-		return year < other.year;
-	}
-
-	int Day(MyTime earliest_day){
-		int temp = abs(earliest_day.epoch_time - epoch_time);
-		return temp/(60*60*24);
-	}
-};
-
-ostream& operator <<(ostream& out, const MyTime& my_time){
-	out << my_time.month + 1 << "/" << my_time.day << "/" << my_time.year<< "   ";
-	out << my_time.hour << ":" << my_time.minute << ":" << my_time.second;
-	return out;
-}
-int TimeDifferenceInMonth(MyTime first, MyTime second) {
-	int first_month = first.year * 12 + first.month;
-	int second_month = second.year * 12 + second.month;
-	return abs(first_month - second_month);
-}
-
 string SimpleRemoveAnySymbol(string input) {
 	string result = "";
 	for (int i = 0; i <(int) input.size(); i++) {
@@ -155,5 +103,71 @@ string ToString(int x) {
 	ss >> ret;
 	return ret;
 }
+
+class MyTime {
+public:
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
+	int second;
+	int weekday;
+	int epoch_time;
+
+	MyTime(){}
+	friend ostream &operator<<(ostream&, const MyTime&);
+	MyTime(struct tm* time){
+		year = time->tm_year+1900;
+		month = time->tm_mon;
+		day = time->tm_mday;
+		hour = time->tm_hour;
+		minute = time->tm_min;
+		second = time->tm_sec;
+		weekday = time->tm_wday;
+		epoch_time = mktime(time);
+	}
+	string ToString() {
+		stringstream ss;
+		string ret;
+		ss << year << "/";
+		if(month<10){
+			ss<<"0";
+		}
+		ss<<month;
+		ss >> ret;
+		return ret;
+	}
+	bool operator < (const MyTime &other) const {
+		if(year == other.year) {
+			if(month == other.month) {
+				return day < other.day;
+			}
+			return month < other.month;
+		}
+		return year < other.year;
+	}
+
+	bool operator == (const MyTime &other) const {
+		return ( (year == other.year) && (month == other.month) && (day == other.day));
+	}
+	int Day(MyTime earliest_day){
+		int temp = abs(earliest_day.epoch_time - epoch_time);
+		return temp/(60*60*24);
+	}
+};
+
+ostream& operator <<(ostream& out, const MyTime& my_time){
+	out << my_time.month + 1 << "/" << my_time.day << "/" << my_time.year<< "   ";
+	out << my_time.hour << ":" << my_time.minute << ":" << my_time.second;
+	return out;
+}
+int TimeDifferenceInMonth(MyTime first, MyTime second) {
+	int first_month = first.year * 12 + first.month;
+	int second_month = second.year * 12 + second.month;
+	return abs(first_month - second_month);
+}
+
+
 
 #endif /* MYUTILITY_H_ */
