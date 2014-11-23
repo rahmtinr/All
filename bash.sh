@@ -4,7 +4,7 @@ then
     echo "Compilation error!"
     exit 0
 fi
-input_directory="/media/rahmtin/1E3655063654E077/cygwin64/home/rahmtin/research/SecondYear/Amazon/All/inputs/"
+input_directory=$1
 InputFiles=("Software")
 #, "Electronics.txt")
 TimeMode=("RealTime" "ReviewTime")
