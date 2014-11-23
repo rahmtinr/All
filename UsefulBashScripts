@@ -2,4 +2,4 @@ grep product\/title ../research/SecondYear/Amazon/All/Clothing_\&_Accessories.tx
 
 grep -E -A7 'product\/title.*[Jj]acket.*' Clothing_\&_Accessories.txt  | grep 'review\/score' | awk '{count[$2]++;} END {for(x in count){sum += x*count[x];num+=count[x];} for(x in count) printf "%s\t%d\n",x,count[x]; print sum/num}'
 
-awk '{print $1 }' timeline.txt | unique words
+awk '{print $1 }' timeline.txt | sort | unique words

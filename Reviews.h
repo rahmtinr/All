@@ -10,7 +10,7 @@
 
 #include<cstdio>
 #include<iostream>
-
+#include<sstream>
 #include "MyUtility.h"
 
 using namespace std;
@@ -28,6 +28,8 @@ public:
 	string summary;
 	string text;
 	int index;
+	int current_experience_level; // how many reviews written before this one
+	int final_experience_level; // how many reviews written.
 	friend ostream& operator << (ostream& out, const Review &review);
 	bool operator < (const Review &other) const { // this is based on time!
 		if (time.year != other.time.year) {
@@ -42,7 +44,36 @@ public:
 		return product_id < other.product_id;
 	}
 	bool operator == (const Review &other) const {
-		return (product_id == other.product_id && user_id == other.user_id && text == other.text);
+		if(user_id == other.user_id) {
+			stringstream ss(text);
+			stringstream sss(other.text);
+			int diff = 0;
+			int total = 0;
+			string temp1, temp2;
+			while(!ss.eof() && !sss.eof()) {
+				ss >> temp1;
+				sss >> temp2;
+				total++;
+				if(temp1 != temp2) {
+					diff++;
+				}
+			}
+			while(!ss.eof()) {
+				total++;
+				diff++;
+				ss >> temp1;
+			}
+			while(!sss.eof()) {
+				total++;
+				diff++;
+				sss >> temp2;
+			}
+			if((double)diff / total < 0.1) { // true means they are equal
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 };
 

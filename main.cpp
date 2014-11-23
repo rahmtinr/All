@@ -31,46 +31,79 @@ vector<WordTimeLine> top_innovations;
 // Langauge innovations
 vector<pair<string, vector<Review> > >  innovations[100];
 map<int,int> distribution_for_entire_data_set;
+map<string, int> experience_level;
 set<WordTimeLine> burst_innovation;
 string MODE;
 
-void initialize(string s) {
+
+string filename;
+string burst_mode;
+string real_time;
+
+void initialize(char *argv[]) {
+	filename = argv[1];
+	burst_mode = argv[2];
+	real_time = argv[3];
 	MODE = "";
 	int last_slash = 0, last_dot = 0;
-	for(int i = s.length() - 1; i >=0; i--) {
-		if(s[i] == '/' && last_slash == 0) {
+	for(int i = filename.length() - 1; i >=0; i--) {
+		if(filename[i] == '/' && last_slash == 0) {
 			last_slash = i;
 		}
-		if(s[i] == '.' && last_dot == 0) {
+		if(filename[i] == '.' && last_dot == 0) {
 			last_dot = i;
 		}
 
 	}
-	Global::NAMEOFDATASET = s.substr(last_slash + 1 ,
+	Global::NAMEOFDATASET = filename.substr(last_slash + 1 ,
 			last_dot - last_slash - 1) + MODE;
+
+	if(burst_mode == "Longest") {
+		Amazon::Global::burst_mode = LONGBURST;
+	} else if(burst_mode == "MaxBenefit") {
+		Amazon::Global::burst_mode = MAXBURST;
+	} else if(burst_mode == "All"){
+		Amazon::Global::burst_mode = ALL;
+	} else {
+		cerr << "Second argument did not match! Force quitting." <<endl;
+		exit(0);
+	}
+
+	if(real_time == "RealTime"){
+		Amazon::Global::real_time = true;
+	} else if (real_time == "ReviewTime") {
+
+	} else {
+		cerr << "Third argument did not match! Force quitting." <<endl;
+		exit(0);
+	}
+
 	cerr << Global::NAMEOFDATASET <<endl;
+
 	Innovations::numbers_for_appearances = {4 , 8, 10};
 	Innovations::numbers_for_products = {3 , 6, 10};
 	Innovations::numbers_for_authors = {3, 5, 7};
-	Amazon::Global::min_year = 2015;
+
+	// Set +INF and -INF for dates
+	Amazon::Global::min_year = 2030;
 	Amazon::Global::max_year = 1995;
-	Amazon::Global::earliest.year = 2015;
-	Amazon::Global::state_coeffecient = 2;
-	Amazon::Global::probability_of_state_change = 0.1;
-	Innovations::numbers_for_appearances = {4 , 8, 10};
-	Innovations::numbers_for_products = {3 , 6, 10};
-	Innovations::numbers_for_authors = {3, 5, 7};
-	Amazon::Global::min_year = 2015;
-	Amazon::Global::max_year = 1995;
-	Amazon::Global::earliest.year = 2015;
+	Amazon::Global::earliest.year = 2030;
+
+	//State machine parameters.
 	Amazon::Global::state_coeffecient = 10;
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
 
+
+
 }
 
 int main(int argc, char *argv[]) {
-	initialize(argv[1]);
+	if(argc != 4) {
+		cerr << "The number of arguments is not correct! Force quitting." << endl;
+		return 0;
+	}
+	initialize(argv);
 	ifstream fin(argv[1]);
 	// Read input.
 	while (true) {
@@ -89,7 +122,7 @@ int main(int argc, char *argv[]) {
 	//	MyFilter("text", "taxact", &reviews);
 	cerr << reviews.size() << endl;
 	sort(reviews.begin(), reviews.end(), CompareReviewOnUserId);
-	reviews.erase(unique( reviews.begin(), reviews.end(), ReviewEquality), reviews.end());
+	reviews.erase(unique( reviews.begin(), reviews.end()), reviews.end());
 	cerr << reviews.size() << endl;
 	sort(reviews.begin(), reviews.end());
 	reviews[0].index = 0;
@@ -100,7 +133,17 @@ int main(int argc, char *argv[]) {
 			reviews[i].index = i;
 		}
 	}
-	/**/
+	for(int i = 0; i < (int)reviews.size(); i++){
+		if(experience_level.find(reviews[i].user_id) == experience_level.end()) {
+			experience_level[reviews[i].user_id] = 0;
+		}
+		reviews[i].current_experience_level = experience_level[reviews[i].user_id];
+		experience_level[reviews[i].user_id]++;
+	}
+	for(int i = 0; i < (int) reviews.size(); i++) {
+		reviews[i].final_experience_level = experience_level[reviews[i].user_id];
+	}
+/*
 	// CountMonthlyAccumulatedReviews(&reviews);
 	// CountYearlyReviews(&reviews);
 	// PerItemPerMonth(&reviews);
@@ -118,6 +161,7 @@ int main(int argc, char *argv[]) {
 	// Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
 	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
 	// Innovations::AnalyseInnovation(innovations, &reviews);
+*/
 	Innovations::FindBursts(&words_states, &reviews);
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
@@ -129,6 +173,9 @@ int main(int argc, char *argv[]) {
 			if(states[i] == 1) {
 				current++;
 			} else {
+				if(Amazon::Global::burst_mode == MAXBURST) { // Looking for best interval
+					word_states.CalculateCosts(i - current, current);
+				}
 				if (longest_one == current) {
 					best_start = i - current;
 				}
@@ -137,19 +184,21 @@ int main(int argc, char *argv[]) {
 			longest_one = max(longest_one, current);
 		}
 		if(longest_one >= (int)states.size() / Amazon::Global::threshold_for_innovation + 5
-			|| (longest_one > 200 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
+				|| (longest_one > 200 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
 
-			// Longest burst difference
-			// word_states.CalculateCosts(best_start, longest_one);
 
-			// Entire difference
-				word_states.CalculateCosts();
+			if(Amazon::Global::burst_mode == LONGBURST) { // Longest burst difference
+				word_states.CalculateCosts(best_start, longest_one);
+			}
+
+			if(Amazon::Global::burst_mode == ALL) {  // Entire difference
+				word_states.CalculateCosts(0, states.size());
+			}
 			burst_innovation.insert(word_states);
 		}
 	}
-//	ofstream words_out("../Output_All/words.txt");
-	ofstream fout("../Output_All/timeline.txt");
-	cerr << burst_innovation.size() << endl;
+	ofstream fout("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/timeline.txt");
+	cerr << "Size of innovations found: " << burst_innovation.size() << endl;
 	int x = 0;
 	for(WordTimeLine word_time_line : burst_innovation) {
 		x++;
@@ -161,13 +210,19 @@ int main(int argc, char *argv[]) {
 		vector<int> states = *(word_time_line.states);
 		top_innovations.push_back(word_time_line);
 		for(int j=0; j < (int)times.size(); j++) {
-			//time_t review_time(times[j]*60*60*24+Amazon::Global::earliest.epoch_time);
-			//fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << MyTime(localtime(&review_time)).year + (double)(MyTime(localtime(&review_time)).month)/12 << endl;
 			fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << (*word_time_line.dates)[j].year + (*word_time_line.dates)[j].month/(double)12 << endl;
 		}
 	}
 	map<string, vector<Review>*> innovators_reviews;
-	Innovations::FindInnovationsBursts(&reviews, &burst_innovation, &innovators_reviews);
+	ofstream innovators_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/distribution.txt");
+	Innovations::FindInnovationsBursts(&reviews, &top_innovations, &innovators_reviews);
+	for(auto p : innovators_reviews) {
+		innovators_out << p.first << " " << p.second->size() << endl;
+		for(Review review : *(p.second)) {
+			innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
+		}
+		innovators_out << endl << endl << endl;
+	}
 
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/

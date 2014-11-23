@@ -216,7 +216,8 @@ public:
 	static void FindBursts(set<WordTimeLine> *word_states, vector<Review> *reviews) {
 		sort(reviews->begin(), reviews->end());
 		string text, word;
-		for(Review review : *reviews) {
+		for(int i = 0; i < (int)reviews->size(); i++) {
+			Review review = (*reviews)[i];
 			text = review.text;
 			stringstream ss(text);
 			set<string> mark;
@@ -233,13 +234,12 @@ public:
 					word_time_line = *(word_states->find(word_time_line));
 					word_states->erase(word_time_line);
 				}
-
-				// go by real time
-				// word_time_line.timeline->push_back(review.time.Day(Amazon::Global::earliest));
-
-				// slow the time for amazon and go for index
-				word_time_line.timeline->push_back(review.index);
-
+				if(Amazon::Global::real_time == true) { // Gap is based on real time
+					word_time_line.timeline->push_back(review.time.Day(Amazon::Global::earliest));
+				} else { // Gap is based on the review number
+					word_time_line.timeline->push_back(review.index);
+				}
+				word_time_line.review_index->push_back(i);
 				word_time_line.dates->push_back(review.time);
 				word_states->insert(word_time_line);
 			}
@@ -313,24 +313,10 @@ public:
 		}
 	}
 
-	static void FindInnovationsBursts(vector<Review> *reviews, vector<WordTimeLine> *top_innovations, map<string, vector<Review>*> *innovators_reviews) {
-		map<WordTimeLine, vector<Review> *> words_reviews;
-		for(Review review : *reviews) {
-			for(WordTimeLine word_time_line : *top_innovations) {
-				if(review.text.find(word_time_line.word) == string::npos) {
-					continue;
-				}
-				if(words_reviews.find(word_time_line) == words_reviews.end()) {
-					vector<Review> *temp = new vector<Review>();
-					words_reviews[word_time_line] = temp;
-				}
-				words_reviews[word_time_line]->push_back(review);
-			}
-		}
-		for(auto word_reviews : words_reviews) {
-			sort(word_reviews.second->begin(), word_reviews.second->end());
-			string word = word_reviews.first.word;
-			vector<int> states = *(word_reviews.first.states);
+	static void FindInnovationsBursts(vector<Review> *reviews, vector	<WordTimeLine> *top_innovations, map<string, vector<Review>*> *innovators_reviews) {
+		for(WordTimeLine word_time_line : *top_innovations) {
+			string word = word_time_line.word;
+			vector<int> states = *(word_time_line.states);
 			int longest_one = 0;
 			int current = 0;
 			int best_start = 0;
@@ -353,10 +339,11 @@ public:
 			}
 			vector<Review> *temp = new vector<Review>();
 			while(burst_start < burst_end) {
-				temp->push_back((*reviews)[burst_start]);
+				int current_index = (*(word_time_line.review_index))[burst_start];
+				temp->push_back((*reviews)[current_index]);
 				burst_start ++;
 			}
-			innovators_reviews[word_reviews.first] = temp;
+			(*innovators_reviews)[word_time_line.word] = temp;
 		}
 	}
 };

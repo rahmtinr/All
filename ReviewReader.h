@@ -70,7 +70,7 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		getline(fin, raw_input);
 		review.summary = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(fin, raw_input);
-		review.text = review.product_title + " " + RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
+		review.text = review.product_title + " " + RemoveAllSymbols(SimpleToLower(GetField(raw_input))) + " ";
 		getline(fin, raw_input);
 		reviews->push_back(review);
 		return SUCCESS;
