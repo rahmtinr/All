@@ -221,8 +221,15 @@ int main(int argc, char *argv[]) {
 		for(Review review : *(p.second)) {
 			innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
 		}
-	//	innovators_out << endl << endl << endl;
+	//		innovators_out << endl << endl << endl;
 	}
+
+	/*
+	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "/distribution.txt");
+	for(Review review : reviews) {
+		input_distribution_out << review.current_experience_level << " " << review.final_experience_level << endl;
+	}
+	*/
 
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
