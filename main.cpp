@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 		vector<int> times = *(word_time_line.timeline);
 		vector<int> states = *(word_time_line.states);
 		top_innovations.push_back(word_time_line);
-		for(int j=0; j < (int)times.size(); j++) {
+		for(int j = 0; j < (int)times.size(); j++) {
 			fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << (*word_time_line.dates)[j].year + (*word_time_line.dates)[j].month/(double)12 << endl;
 		}
 	}

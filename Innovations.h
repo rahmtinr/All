@@ -338,10 +338,14 @@ public:
 				}
 			}
 			vector<Review> *temp = new vector<Review>();
-			while(burst_start < burst_end) {
-				int current_index = (*(word_time_line.review_index))[burst_start];
+			int it = burst_start;
+			while(it < burst_end) {
+				if(*(word_time_line.timeline)[burst_end] - *(word_time_line.timeline)[it] > 30) { //30 days
+					break;
+				}
+				int current_index = (*(word_time_line.review_index))[it];
 				temp->push_back((*reviews)[current_index]);
-				burst_start ++;
+				it ++;
 			}
 			(*innovators_reviews)[word_time_line.word] = temp;
 		}
