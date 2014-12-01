@@ -216,12 +216,33 @@ int main(int argc, char *argv[]) {
 	map<string, vector<Review>*> innovators_reviews;
 	ofstream innovators_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/distribution.txt");
 	Innovations::FindInnovationsBursts(&reviews, &top_innovations, &innovators_reviews);
+	int num_of_innovation_reviews = 0;
+	double upvotes_of_reviews = 0;
+	map<string, int> innovator_ids;
 	for(auto p : innovators_reviews) {
+		bool first = false;
 		for(Review review : *(p.second)) {
+			if(first == false)
+				innovator_ids[review.user_id] ++;
+			first = true;
 			innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
+			num_of_innovation_reviews ++;
+			upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
 		}
 	}
+	cerr << "number of innovation words" << innovators_reviews.size() << endl;
+	cerr << "Innovation helpfulness: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
 
+	num_of_innovation_reviews = 0;
+	upvotes_of_reviews = 0;
+	for(Review review: reviews) {
+		num_of_innovation_reviews ++;
+		upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
+	}
+	cerr << "All helpfulness: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
+	for(auto temp : innovator_ids) {
+		cerr << temp.first << " " << temp.second << endl;
+	}
 	/*
 	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "/distribution.txt");
 	for(Review review : reviews) {

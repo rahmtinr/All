@@ -316,6 +316,7 @@ public:
 	static void FindInnovationsBursts(vector<Review> *reviews, vector	<WordTimeLine> *top_innovations, map<string, vector<Review>*> *innovators_reviews) {
 		for(WordTimeLine word_time_line : *top_innovations) {
 			string word = word_time_line.word;
+			cerr << word << endl;
 			vector<int> states = *(word_time_line.states);
 			int longest_one = 0;
 			int current = 0;
