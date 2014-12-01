@@ -340,7 +340,7 @@ public:
 			vector<Review> *temp = new vector<Review>();
 			int it = burst_start;
 			while(it < burst_end) {
-				if((*(word_time_line.timeline))[burst_end] - (*(word_time_line.timeline))[it] > 0) { //1 days
+				if((*(word_time_line.timeline))[it] - (*(word_time_line.timeline))[burst_start] > 0) { //1 days
 					break;
 				}
 				int current_index = (*(word_time_line.review_index))[it];
