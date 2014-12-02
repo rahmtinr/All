@@ -44,8 +44,7 @@ void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
 	real_time = argv[3];
-	MODE = "";
-	int last_slash = 0, last_dot = 0;
+	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
 		if(filename[i] == '/' && last_slash == 0) {
 			last_slash = i;
@@ -56,7 +55,7 @@ void initialize(char *argv[]) {
 
 	}
 	Global::NAMEOFDATASET = filename.substr(last_slash + 1 ,
-			last_dot - last_slash - 1) + MODE;
+			last_dot - last_slash - 1);
 
 	if(burst_mode == "Longest") {
 		Amazon::Global::burst_mode = LONGBURST;
@@ -201,6 +200,7 @@ int main(int argc, char *argv[]) {
 	cerr << "Size of innovations found: " << burst_innovation.size() << endl;
 	int x = 0;
 	for(WordTimeLine word_time_line : burst_innovation) {
+		cerr << word_time_line.word << " " << word_time_line.difference << endl;
 		x++;
 		if (x == 50) {
 			break;
@@ -219,6 +219,7 @@ int main(int argc, char *argv[]) {
 	int num_of_innovation_reviews = 0;
 	double upvotes_of_reviews = 0;
 	map<string, int> innovator_ids;
+
 	for(auto p : innovators_reviews) {
 		bool first = false;
 		for(Review review : *(p.second)) {
@@ -230,6 +231,7 @@ int main(int argc, char *argv[]) {
 			upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
 		}
 	}
+/*
 	cerr << "number of innovation words" << innovators_reviews.size() << endl;
 	cerr << "Innovation helpfulness: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
 
@@ -243,12 +245,11 @@ int main(int argc, char *argv[]) {
 	for(auto temp : innovator_ids) {
 		cerr << temp.first << " " << temp.second << endl;
 	}
-	/*
 	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "/distribution.txt");
 	for(Review review : reviews) {
 		input_distribution_out << review.current_experience_level << " " << review.final_experience_level << endl;
 	}
-	*/
+*/
 
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/

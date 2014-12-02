@@ -78,21 +78,26 @@ public:
 class WordTimeLine {
 public:
 	string word;
-	double alpha[2];
+	double *alpha;
 	vector<int> *timeline;
 	vector<int> *states;
 	vector<MyTime> *dates;
 	vector<int> *review_index;
 	double opt_cost, static_cost;
 	double difference;
+	int burst_start;
+	int burst_end;
 	WordTimeLine() {
 		timeline = new vector<int>();
 		states = new vector<int>();
 		dates = new vector<MyTime>();
 		review_index = new vector<int>();
+		alpha = new double[2];
 		static_cost = 0;
 		opt_cost = 0;
 		difference = 0;
+		burst_start = 0;
+		burst_end = 0;
 	}
 	bool operator < (const WordTimeLine &other) const {
 		if (difference == other.difference)
@@ -101,22 +106,32 @@ public:
 	}
 
 	void Benefit() {
+		if(static_cost < opt_cost) {
+			cout << "FUCK " <<  word << " " << static_cost << " " << opt_cost << endl;
+		}
+//		cerr << static_cost <<" " << opt_cost << endl;
 		difference = max(static_cost - opt_cost, difference);
 	}
 
 	void CalculateCosts(int starter, int len) {
-			opt_cost = 0;
-			static_cost = 0;
 			double p = Amazon::Global::probability_of_state_change;
-			for(int i = starter; i < starter + len; i++) {
-				int gap = (*timeline)[i] - (*timeline)[i-1];
-				opt_cost += (-1) * (log(alpha[(*states)[i]]) - 1 * alpha[(*states)[i]] * gap);
-				if((*states)[i] != (*states)[i-1]) {
+			static_cost = 0;
+			if(starter != 0) {
+				opt_cost = 2* log(p/(1-p));
+			}
+			for(int i = starter; i < starter + len - 1; i++) {
+				int gap = (*timeline)[i + 1] - (*timeline)[i];
+				if((*states)[i + 1] != (*states)[i]) {
 					opt_cost += log(p/(1-p));
 				}
-				static_cost += (-1) * (log(alpha[0]) - 1 * alpha[0] * gap);
+				opt_cost += (-1) * (log(alpha[(*states)[i]]) - alpha[(*states)[i]] * gap);
+				static_cost += (-1) * (log(alpha[0]) - alpha[0] * gap);
 			}
 			Benefit();
+			if(EqDouble(difference, static_cost - opt_cost)) {
+				burst_start = starter;
+				burst_end = starter + len;
+			}
 		}
 
 };

@@ -274,10 +274,11 @@ public:
 
 	static void FindBurstsForWords(const vector<int> &time_gaps, string word, WordTimeLine *word_time_line) {
 		vector<int> par[2];
-		int T = 0;
+		int T = 1;
 		for (int x : time_gaps) {
 			T += x;
 		}
+
 		//		cerr << T << endl;
 		//		cerr << Amazon::Global::latest.Day(Amazon:	:Global::earliest) << endl;;
 		word_time_line->alpha[0] = time_gaps.size() / (double)T;
@@ -316,32 +317,11 @@ public:
 	static void FindInnovationsBursts(vector<Review> *reviews, vector	<WordTimeLine> *top_innovations, map<string, vector<Review>*> *innovators_reviews) {
 		for(WordTimeLine word_time_line : *top_innovations) {
 			string word = word_time_line.word;
-			cerr << word << endl;
 			vector<int> states = *(word_time_line.states);
-			int longest_one = 0;
-			int current = 0;
-			int best_start = 0;
-			int burst_start = 0;
-			int burst_end = 0;
-			for(int i = 0; i < (int) states.size(); i++) {
-				if(states[i] == 1) {
-					current++;
-				} else {
-					if (longest_one == current) {
-						best_start = i - current;
-					}
-					current = 0;
-				}
-				if(longest_one < current) {
-					longest_one = current;
-					burst_start = best_start;
-					burst_end = i + 1; // [burst_start, burst_end)
-				}
-			}
 			vector<Review> *temp = new vector<Review>();
-			int it = burst_start;
-			while(it < burst_end) {
-				if((*(word_time_line.timeline))[it] - (*(word_time_line.timeline))[burst_start] > 0) { //1 days
+			int it = word_time_line.burst_start;
+			while(it < word_time_line.burst_end) {
+				if((*(word_time_line.timeline))[it] - (*(word_time_line.timeline))[word_time_line.burst_start] > 0) { //1 days
 					break;
 				}
 				int current_index = (*(word_time_line.review_index))[it];
