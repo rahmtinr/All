@@ -206,7 +206,7 @@ int main(int argc, char *argv[]) {
 	cerr << "Size of innovations found: " << burst_innovation.size() << endl;
 	int x = 0;
 	for(WordTimeLine word_time_line : burst_innovation) {
-		cerr << word_time_line.word << " " << word_time_line.difference << endl;
+//		cerr << word_time_line.word << " " << word_time_line.difference << endl;
 		x++;
 		if (x == max((int)burst_innovation.size() / 10, 50)) {
 			break;
@@ -303,7 +303,7 @@ int main(int argc, char *argv[]) {
 		int sum = 0;
 		map<int,int> distribution_usage_after_innovations;
 		for(WordTimeLine word_time_line : burst_innovation) {
-			for(int i = word_time_line.burst_start; i < word_time_line.states->size(); i++) {
+			for(int i = word_time_line.burst_start; i < (int)word_time_line.states->size(); i++) {
 				int day = (*(word_time_line.dates))[i].Day((*(word_time_line.dates))[word_time_line.burst_start]);
 				distribution_usage_after_innovations[day] ++;
 				sum ++;
