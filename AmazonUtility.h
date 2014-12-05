@@ -72,6 +72,7 @@ public:
 	static int threshold_for_innovation;
 	static bool real_time;
 	static BurstMode burst_mode;
+	static bool remove_unknown;
 };
 }
 
@@ -106,9 +107,6 @@ public:
 	}
 
 	void Benefit() {
-		if(static_cost < opt_cost) {
-			cout << "FUCK " <<  word << " " << static_cost << " " << opt_cost << endl;
-		}
 //		cerr << static_cost <<" " << opt_cost << endl;
 		difference = max(static_cost - opt_cost, difference);
 	}
@@ -145,5 +143,6 @@ double Amazon::Global::probability_of_state_change;
 int Amazon::Global::threshold_for_innovation;
 BurstMode Amazon::Global::burst_mode;
 bool Amazon::Global::real_time;
+bool Amazon::Global::remove_unknown;
 
 #endif /* AMAZONUTILITY_H_ */

@@ -20,13 +20,14 @@ for x in ${InputFiles[*]}; do
             echo $burst_mode
             echo $time_mode
             output_directory="../Output_All/"$x"_bursts/"$time_mode"/"$burst_mode"/"
-           rm $output_directory*
-            ./main $input $burst_mode $time_mode
+#           rm $output_directory*
+#           ./main $input $burst_mode $time_mode
             time_line_txt=$output_directory"timeline.txt"
             awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory"/words"
             Rscript "R Scripts/word_timeline_plot.R" $time_line_txt
             mv *.jpg $output_directory
             Rscript "R Scripts/innovators_distribution.R" $output_directory "../Output_All/"$x"_bursts/"
+            Rscript "R Scripts/innovators_cdf.R" $output_directory
             echo "________________________________"
         done
     done

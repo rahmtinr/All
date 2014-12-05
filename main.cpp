@@ -46,7 +46,7 @@ void initialize(char *argv[]) {
 	real_time = argv[3];
 	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
-		if(filename[i] == '/' && last_slash == 0) {
+		if(filename[i] == '/' && last_slash == -1) {
 			last_slash = i;
 		}
 		if(filename[i] == '.' && last_dot == 0) {
@@ -93,6 +93,8 @@ void initialize(char *argv[]) {
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
 
+	//Remove unknown reviews
+	Amazon::Global::remove_unknown = true;
 
 
 }
@@ -108,6 +110,9 @@ int main(int argc, char *argv[]) {
 	while (true) {
 		if (!ReadOneReview(fin, &reviews)) {
 			break;
+		}
+		if(reviews.size() == 0) {
+			continue;
 		}
 		Amazon::Global::min_year = min(Amazon::Global::min_year, reviews[reviews.size() - 1].time.year);
 		Amazon::Global::max_year = max(Amazon::Global::max_year, reviews[reviews.size() - 1].time.year);
@@ -142,7 +147,7 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < (int) reviews.size(); i++) {
 		reviews[i].final_experience_level = experience_level[reviews[i].user_id];
 	}
-/*
+	/*
 	// CountMonthlyAccumulatedReviews(&reviews);
 	// CountYearlyReviews(&reviews);
 	// PerItemPerMonth(&reviews);
@@ -160,7 +165,7 @@ int main(int argc, char *argv[]) {
 	// Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
 	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
 	// Innovations::AnalyseInnovation(innovations, &reviews);
-*/
+	 */
 	Innovations::FindBursts(&words_states, &reviews);
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
@@ -197,12 +202,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	ofstream fout("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/timeline.txt");
+
 	cerr << "Size of innovations found: " << burst_innovation.size() << endl;
 	int x = 0;
 	for(WordTimeLine word_time_line : burst_innovation) {
 		cerr << word_time_line.word << " " << word_time_line.difference << endl;
 		x++;
-		if (x == 50) {
+		if (x == max((int)burst_innovation.size() / 10, 50)) {
 			break;
 		}
 		string word = word_time_line.word;
@@ -220,37 +226,77 @@ int main(int argc, char *argv[]) {
 	double upvotes_of_reviews = 0;
 	map<string, int> innovator_ids;
 
-	for(auto p : innovators_reviews) {
-		bool first = false;
-		for(Review review : *(p.second)) {
-			if(first == false)
-				innovator_ids[review.user_id] ++;
-			first = true;
-			innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
-			num_of_innovation_reviews ++;
-			upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
+	map<int, int> pdf_current_experience;
+	map<int,int> pdf_final_experience;
+	int sum_cdf = 0;
+
+	{ // Innovation present
+		for(auto p : innovators_reviews) {
+			bool first = false;
+			for(Review review : *(p.second)) {
+				if(first == false)
+					innovator_ids[review.user_id] ++;
+				first = true;
+				innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
+				num_of_innovation_reviews ++;
+				upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
+				pdf_current_experience[review.current_experience_level] ++;
+				pdf_final_experience[review.final_experience_level] ++;
+			}
+		}
+		ofstream innovators_cdf_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/innovator_present_cdf.txt");
+		innovators_cdf_out << (--pdf_current_experience.end())->first + 1 << " " << 0 << endl;
+		for(map<int,int>::iterator it = pdf_current_experience.end(); it != pdf_current_experience.begin();) {
+			it--;
+			sum_cdf += it -> second;
+			innovators_cdf_out << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 		}
 	}
-/*
+	{ // Innovation final
+		ofstream innovators_cdf_out2("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/innovator_final_cdf.txt");
+		sum_cdf = 0;
+		innovators_cdf_out2 << (--pdf_final_experience.end())->first + 1 << " " << 0 << endl;
+		for(map<int,int>::iterator it = pdf_final_experience.end(); it != pdf_final_experience.begin();) {
+			it--;
+			sum_cdf += it -> second;
+			innovators_cdf_out2 << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
+		}
+	}
 	cerr << "number of innovation words" << innovators_reviews.size() << endl;
 	cerr << "Innovation helpfulness: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
-
-	num_of_innovation_reviews = 0;
-	upvotes_of_reviews = 0;
-	for(Review review: reviews) {
-		num_of_innovation_reviews ++;
-		upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
+	{ // All reviews present
+		upvotes_of_reviews = 0;
+		pdf_current_experience.clear();
+		pdf_final_experience.clear();
+		for(Review review: reviews) {
+			upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
+			pdf_current_experience[review.current_experience_level] ++;
+			pdf_final_experience[review.final_experience_level] ++;
+		}
+		ofstream all_cdf_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/all_present_cdf.txt");
+		all_cdf_out << (--pdf_current_experience.end())->first + 1 << " " << 0 << endl;
+		sum_cdf = 0;
+		for(map<int,int>::iterator it = pdf_current_experience.end(); it != pdf_current_experience.begin();) {
+			it--;
+			sum_cdf += it -> second;
+			all_cdf_out << it->first << " " << sum_cdf / (double)reviews.size() << endl;
+		}
 	}
-	cerr << "All helpfulness: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
-	for(auto temp : innovator_ids) {
-		cerr << temp.first << " " << temp.second << endl;
-	}
+	cerr << "All helpfulness: " << upvotes_of_reviews / (double)reviews.size() << endl;
 	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "/distribution.txt");
 	for(Review review : reviews) {
 		input_distribution_out << review.current_experience_level << " " << review.final_experience_level << endl;
 	}
-*/
-
+	{ // All reviews final
+		ofstream all_cdf_out2("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/all_final_cdf.txt");
+		all_cdf_out2 << (--pdf_final_experience.end())->first + 1 << " " << 0 << endl;
+		sum_cdf = 0;
+		for(map<int,int>::iterator it = pdf_final_experience.end(); it != pdf_final_experience.begin();) {
+			it--;
+			sum_cdf += it -> second;
+			all_cdf_out2 << it->first << " " << sum_cdf / (double)reviews.size() << endl;
+		}
+	}
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);

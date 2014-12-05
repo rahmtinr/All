@@ -28,7 +28,7 @@ string GetField(string raw_input) {
 string RemoveAllSymbols(string raw_input) {
 	string ret = "";
 	for (int i = 0; i < (int)raw_input.size(); i++) {
-		if(isalpha(raw_input[i]) || raw_input[i]=='\'' || isspace(raw_input[i]) || isdigit(raw_input[i])) {
+		if(isalpha(raw_input[i]) || isspace(raw_input[i]) || isdigit(raw_input[i])) {
 			ret += raw_input[i];
 		}
 		if(raw_input[i] == ',' || raw_input[i]=='.') {
@@ -72,7 +72,10 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		getline(fin, raw_input);
 		review.text = review.product_title + " " + RemoveAllSymbols(SimpleToLower(GetField(raw_input))) + " ";
 		getline(fin, raw_input);
-		reviews->push_back(review);
+		if(Amazon::Global::remove_unknown == false ||
+				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
+			reviews->push_back(review);
+		}
 		return SUCCESS;
 	}
 	return FAIL;
