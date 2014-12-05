@@ -22,12 +22,22 @@ ReviewCurFreq$Freq = log(ReviewCurFreq$Freq / nrow(review_distribution))
 ReviewFinishFreq$Freq = log(ReviewFinishFreq$Freq / nrow(review_distribution))
 
 jpeg(paste(directory,"distribution_ending_experience_level",sep=""))
-plot(ReviewFinishFreq$Freq, col = "blue", xlab = "Experience level", ylab = "Frequency")
-points(FinishFreq$Freq, col = "red")
+plot(ReviewFinishFreq$Freq, col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
+lines(FinishFreq$Freq, col = "red")
+legend("topright", 
+    col = c("blue", "red"), 
+    legend = c("All reviews", "Innovations"),
+    lty=c(1,1,1)
+)
 dev.off()
 
 jpeg(paste(directory,"distribution_present_experience_level",sep=""))
-plot(ReviewCurFreq, col = "blue", xlab = "Experience level", ylab = "Frequency")
-points(CurFreq , col = "red")
+plot(ReviewCurFreq$Freq, col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
+lines(CurFreq$Freq , col = "red")
+legend("topright", 
+    col = c("blue", "red"), 
+    legend = c("All reviews", "Innovations"),
+    lty=c(1,1,1)
+)
 dev.off()
 

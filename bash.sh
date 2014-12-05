@@ -1,4 +1,4 @@
-make main
+#make main
 if [ $? -ne 0 ]
 then
     echo "Compilation error!"
@@ -28,6 +28,7 @@ for x in ${InputFiles[*]}; do
             mv *.jpg $output_directory
             Rscript "R Scripts/innovators_distribution.R" $output_directory "../Output_All/"$x"_bursts/"
             Rscript "R Scripts/innovators_cdf.R" $output_directory
+            Rscript "R Scripts/usage_after_innovation_pdf.R" $output_directory
             echo "________________________________"
         done
     done

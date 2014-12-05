@@ -296,6 +296,23 @@ int main(int argc, char *argv[]) {
 			sum_cdf += it -> second;
 			all_cdf_out2 << it->first << " " << sum_cdf / (double)reviews.size() << endl;
 		}
+		pdf_current_experience.clear();
+		pdf_final_experience.clear();
+	}
+	if(real_time == "RealTime") {
+		int sum = 0;
+		map<int,int> distribution_usage_after_innovations;
+		for(WordTimeLine word_time_line : burst_innovation) {
+			for(int i = word_time_line.burst_start; i < word_time_line.states->size(); i++) {
+				int day = (*(word_time_line.dates))[i].Day((*(word_time_line.dates))[word_time_line.burst_start]);
+				distribution_usage_after_innovations[day] ++;
+				sum ++;
+			}
+		}
+		ofstream pdf_after_innovation_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/pdf_after_innovation.txt");
+		for(pair<int, int> p : distribution_usage_after_innovations) {
+			pdf_after_innovation_out << p.first << " " << p.second / (double)sum << endl;
+		}
 	}
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
