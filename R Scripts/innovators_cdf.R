@@ -9,10 +9,10 @@ colnames(innovator_present_cdf) = c("Num", "Probability")
 colnames(innovator_final_cdf) = c("Num", "Probability")
 
 
-#review_present_cdf$Probability = log(review_present_cdf$Probability)
-#review_final_cdf$Probability = log(review_final_cdf$Probability)
-#innovator_present_cdf$Probability = log(innovator_present_cdf$Probability)
-#innovator_final_cdf$Probability = log(innovator_final_cdf$Probability)
+review_present_cdf$Probability = log(review_present_cdf$Probability)
+review_final_cdf$Probability = log(review_final_cdf$Probability)
+innovator_present_cdf$Probability = log(innovator_present_cdf$Probability)
+innovator_final_cdf$Probability = log(innovator_final_cdf$Probability)
 
 
 jpeg(paste(directory,"cdf_ending_experience_level",sep=""))
