@@ -13,7 +13,7 @@ legend("topright",
 )
 dev.off()
 
-jpeg(paste(directory,"pdf_after_innovation_log_log",sep=""))
+jpeg(paste(directory,"AggregationPlots/pdf_after_innovation_log_log",sep=""))
 plot(log(temp$Group.1),log(temp$Probability), col = "blue", xlab = "10 day bucket", ylab = "Frequency", type="l")
 legend("topright", 
     col = c("blue"), 
@@ -22,7 +22,7 @@ legend("topright",
 )
 dev.off()
 
-jpeg(paste(directory,"pdf_after_innovation_log_linear",sep=""))
+jpeg(paste(directory,"AggregationPlots/pdf_after_innovation_log_linear",sep=""))
 plot(temp$Group.1,log(temp$Probability), col = "blue", xlab = "10 day bucket", ylab = "Frequency", type="l")
 legend("topright", 
     col = c("blue"), 

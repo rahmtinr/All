@@ -73,6 +73,7 @@ public:
 	static bool real_time;
 	static BurstMode burst_mode;
 	static bool remove_unknown;
+	static string output_directory;
 };
 }
 
@@ -144,5 +145,5 @@ int Amazon::Global::threshold_for_innovation;
 BurstMode Amazon::Global::burst_mode;
 bool Amazon::Global::real_time;
 bool Amazon::Global::remove_unknown;
-
+string Amazon::Global::output_directory;
 #endif /* AMAZONUTILITY_H_ */

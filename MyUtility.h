@@ -104,6 +104,10 @@ string ToString(int x) {
 	return ret;
 }
 
+string SimpleIntToString(int x) {
+	return ToString(x);
+}
+
 class MyTime {
 public:
 	int year;
