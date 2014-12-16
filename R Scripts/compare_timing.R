@@ -10,7 +10,7 @@ total = rbind(real_time_distribution, review_time_distribution)
 
 
 png(paste(directory, "innovation_timing.png", sep=""),height=800,width=1300)
-ggplot(data = total, aes(x = Time, y = Freq, fill = time)) + 
-    geom_bar(stat="identity", position=position_dodge(), colour="black")
+ggplot(data = total, aes(x = floor(Time), y = Freq, fill = time)) + 
+    geom_bar(stat="identity", position=position_dodge()) + scale_x_continuous(breaks=floor(total$Time))
 dev.off()
 
