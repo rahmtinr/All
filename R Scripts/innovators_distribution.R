@@ -21,7 +21,7 @@ FinishFreq$Freq = FinishFreq$Freq / nrow(innovator_distribution)
 ReviewCurFreq$Freq = ReviewCurFreq$Freq / nrow(review_distribution)
 ReviewFinishFreq$Freq = ReviewFinishFreq$Freq / nrow(review_distribution)
 
-jpeg(paste(directory,"AggregationPlots/distribution_ending_experience_level_linear_linear",sep=""))
+jpeg(paste(directory,"AggregationPlots/distribution_ending_experience_level_linear_linear.jpg",sep=""))
 plot(ReviewFinishFreq$Freq, col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 lines(FinishFreq$Freq, col = "red")
 legend("topright", 
@@ -31,7 +31,7 @@ legend("topright",
 )
 dev.off()
 
-jpeg(paste(directory,"AggregationPlots/distribution_present_experience_level_linear_linear",sep=""))
+jpeg(paste(directory,"AggregationPlots/distribution_present_experience_level_linear_linear.jpg",sep=""))
 plot(ReviewCurFreq$Freq, col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 lines(CurFreq$Freq , col = "red")
 legend("topright", 
@@ -41,7 +41,7 @@ legend("topright",
 )
 dev.off()
 
-jpeg(paste(directory,"AggregationPlots/distribution_ending_experience_level_log_linear",sep=""))
+jpeg(paste(directory,"AggregationPlots/distribution_ending_experience_level_log_linear.jpg",sep=""))
 plot(log(ReviewFinishFreq$Freq), col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 lines(FinishFreq$Freq, col = "red")
 legend("topright", 
@@ -51,7 +51,7 @@ legend("topright",
 )
 dev.off()
 
-jpeg(paste(directory,"AggregationPlots/distribution_present_experience_level_log_linear",sep=""))
+jpeg(paste(directory,"AggregationPlots/distribution_present_experience_level_log_linear.jpg",sep=""))
 plot(log(ReviewCurFreq$Freq), col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 lines(CurFreq$Freq , col = "red")
 legend("topright", 
@@ -61,7 +61,7 @@ legend("topright",
 )
 dev.off()
 
-jpeg(paste(directory,"AggregationPlots/distribution_ending_experience_level_log_log",sep=""))
+jpeg(paste(directory,"AggregationPlots/distribution_ending_experience_level_log_log.jpg",sep=""))
 plot(log(as.numeric(ReviewFinishFreq$Var1)), log(ReviewFinishFreq$Freq), col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 lines(FinishFreq$Freq, col = "red")
 legend("topright", 
@@ -71,7 +71,7 @@ legend("topright",
 )
 dev.off()
 head(log(as.numeric(ReviewCurFreq$Var1)))
-jpeg(paste(directory,"AggregationPlots/distribution_present_experience_level_log_log",sep=""))
+jpeg(paste(directory,"AggregationPlots/distribution_present_experience_level_log_log.jpg",sep=""))
 plot(log(as.numeric(ReviewCurFreq$Var1)), log(ReviewCurFreq$Freq), col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 lines(CurFreq$Freq , col = "red")
 legend("topright", 
