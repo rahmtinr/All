@@ -234,23 +234,24 @@ public:
 					word_time_line = *(word_states->find(word_time_line));
 					word_states->erase(word_time_line);
 				}
-				if(Amazon::Global::real_time == true) { // Gap is based on real time
-					word_time_line.timeline->push_back(review.time.Day(Amazon::Global::earliest));
-				} else { // Gap is based on the review number
-					word_time_line.timeline->push_back(review.index);
-				}
 				word_time_line.review_index->push_back(i);
-				word_time_line.dates->push_back(review.time);
 				word_states->insert(word_time_line);
 			}
 		}
 		vector<int> time_gaps;
 		for(auto time_line : *word_states) {
 			string word = time_line.word;
-			vector<int> word_time_of_occurance = *(time_line.timeline);
 			time_gaps.clear();
-			for(int i = 0; i + 1 < (int)word_time_of_occurance.size(); i++) {
-				time_gaps.push_back(word_time_of_occurance[i+1] - word_time_of_occurance[i]);
+			for(int i = 0; i + 1 < (int)time_line.review_index->size(); i++) {
+				if(Amazon::Global::real_time == true) {
+					MyTime after = (*reviews)[(*(time_line.review_index))[i+1]].time;
+					MyTime before = (*reviews)[(*(time_line.review_index))[i]].time;
+					time_gaps.push_back(after.Day(before));
+				} else {
+					int after = (*reviews)[(*(time_line.review_index))[i+1]].index;
+					int before = (*reviews)[(*(time_line.review_index))[i]].index;
+					time_gaps.push_back(after - before);
+				}
 			}
 			FindBurstsForWords(time_gaps, word, &time_line);
 		}
@@ -262,7 +263,7 @@ public:
 		return (-1) * (log(alpha) - 1 * alpha * gap);
 	}
 
-	static void FindPar(vector<int> *par , int x, int y, vector<int> *states) {
+	static void FindPar(vector<int> *par , int x, int y, vector<bool> *states) {
 		while(x >= 0) {
 			states->push_back(par[y][x]);
 			y = par[y][x];
@@ -280,7 +281,7 @@ public:
 		}
 
 		//		cerr << T << endl;
-		//		cerr << Amazon::Global::latest.Day(Amazon:	:Global::earliest) << endl;;
+		//		cerr << Amazon::Global::latest.Day(Amazon::Global::earliest) << endl;;
 		word_time_line->alpha[0] = time_gaps.size() / (double)T;
 		//		cerr << "------>" << alpha[0] << endl;
 		word_time_line->alpha[1] = word_time_line->alpha[0] * Amazon::Global::state_coeffecient;
@@ -317,11 +318,20 @@ public:
 	static void FindInnovationsBursts(vector<Review> *reviews, vector	<WordTimeLine> *top_innovations, map<string, vector<Review>*> *innovators_reviews) {
 		for(WordTimeLine word_time_line : *top_innovations) {
 			string word = word_time_line.word;
-			vector<int> states = *(word_time_line.states);
+			vector<bool> states = *(word_time_line.states);
 			vector<Review> *temp = new vector<Review>();
 			int it = word_time_line.burst_start;
+			int after, before;
 			while(it < word_time_line.burst_end) {
-				if((*(word_time_line.timeline))[it] - (*(word_time_line.timeline))[word_time_line.burst_start] > 0) { //1 days
+				if(Amazon::Global::real_time == true) { // Gap is based on real time
+					after =  (*reviews)[(*(word_time_line.review_index))[it]].time.Day(Amazon::Global::earliest);
+					before = (*reviews)[(*(word_time_line.review_index))[word_time_line.burst_start]].time.Day(Amazon::Global::earliest);
+				} else { // Gap is based on the review number
+					// The index here is the day by day index not their index in the reviews array
+					after =  (*reviews)[(*(word_time_line.review_index))[it]].index;
+					before = (*reviews)[(*(word_time_line.review_index))[word_time_line.burst_start]].index;
+				}
+				if(after - before > 0) { //1 day
 					break;
 				}
 				int current_index = (*(word_time_line.review_index))[it];

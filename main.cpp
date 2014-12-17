@@ -174,7 +174,7 @@ int main(int argc, char *argv[]) {
 	Innovations::FindBursts(&words_states, &reviews);
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
-		vector<int> states = *(word_states.states);
+		vector<bool> states = *(word_states.states);
 		int longest_one = 0;
 		int current = 0;
 		int best_start = 0;
@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 				current++;
 			} else {
 				if(Amazon::Global::burst_mode == MAXBURST) { // Looking for best interval
-					word_states.CalculateCosts(i - current, current);
+					word_states.CalculateCosts(i - current, current, &reviews);
 				}
 				if (longest_one == current) {
 					best_start = i - current;
@@ -197,11 +197,11 @@ int main(int argc, char *argv[]) {
 
 
 			if(Amazon::Global::burst_mode == LONGBURST) { // Longest burst difference
-				word_states.CalculateCosts(best_start, longest_one);
+				word_states.CalculateCosts(best_start, longest_one, &reviews);
 			}
 
 			if(Amazon::Global::burst_mode == ALL) {  // Entire difference
-				word_states.CalculateCosts(0, states.size());
+				word_states.CalculateCosts(0, states.size(), &reviews);
 			}
 			burst_innovation.insert(word_states);
 		}
@@ -217,11 +217,22 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		string word = word_time_line.word;
-		vector<int> times = *(word_time_line.timeline);
-		vector<int> states = *(word_time_line.states);
+		vector<int> times;
+		vector<MyTime> dates;
+		for(int index : *(word_time_line.review_index)) {
+			if(Amazon::Global::real_time == true) { // Gap is based on real time
+				times.push_back(reviews[index].time.Day(Amazon::Global::earliest));
+			} else { // Gap is based on the review number
+				// The index here is the day by day index not their index in the reviews array
+				times.push_back(reviews[index].index);
+			}
+			dates.push_back(reviews[index].time);
+		}
+
+		vector<bool> states = *(word_time_line.states);
 		top_innovations.push_back(word_time_line);
 		for(int j = 0; j < (int)times.size(); j++) {
-			fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << (*word_time_line.dates)[j].year + (*word_time_line.dates)[j].month/(double)12 << endl;
+			fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].year + dates[j].month/(double)12 << endl;
 		}
 	}
 	map<string, vector<Review>*> innovators_reviews;
@@ -229,6 +240,7 @@ int main(int argc, char *argv[]) {
 	Innovations::FindInnovationsBursts(&reviews, &top_innovations, &innovators_reviews);
 	int num_of_innovation_reviews = 0;
 	double upvotes_of_reviews = 0;
+	double fraction_helpfulness = 0;
 	map<string, int> innovator_ids;
 
 	map<int, int> pdf_current_experience;
@@ -245,6 +257,7 @@ int main(int argc, char *argv[]) {
 				innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
 				num_of_innovation_reviews ++;
 				upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
+				fraction_helpfulness += SimpleStringFractionToDouble(review.helpfulness);
 				pdf_current_experience[review.current_experience_level] ++;
 				pdf_final_experience[review.final_experience_level] ++;
 			}
@@ -257,6 +270,10 @@ int main(int argc, char *argv[]) {
 			innovators_cdf_out << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 		}
 	}
+	ofstream data_facts_out(Amazon::Global::output_directory + "random_facts.txt");
+	data_facts_out << "number of innovation words: " << innovators_reviews.size() << endl;
+	data_facts_out << "Average number of helpfulness in innovations: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
+	data_facts_out << "Average fraction of helpfulness in innovations: " << fraction_helpfulness / num_of_innovation_reviews << endl;
 	{ // Innovation final
 		ofstream innovators_cdf_out2(Amazon::Global::output_directory + "innovator_final_cdf.txt");
 		sum_cdf = 0;
@@ -267,15 +284,15 @@ int main(int argc, char *argv[]) {
 			innovators_cdf_out2 << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 		}
 	}
-	ofstream data_facts_out(Amazon::Global::output_directory + "random_facts.txt");
-	data_facts_out << "number of innovation words: " << innovators_reviews.size() << endl;
-	data_facts_out << "Innovation helpfulness: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
+
 	{ // All reviews present
 		upvotes_of_reviews = 0;
+		fraction_helpfulness = 0;
 		pdf_current_experience.clear();
 		pdf_final_experience.clear();
 		for(Review review: reviews) {
 			upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
+			fraction_helpfulness += SimpleStringFractionToDouble(review.helpfulness);
 			pdf_current_experience[review.current_experience_level] ++;
 			pdf_final_experience[review.final_experience_level] ++;
 		}
@@ -288,7 +305,8 @@ int main(int argc, char *argv[]) {
 			all_cdf_out << it->first << " " << sum_cdf / (double)reviews.size() << endl;
 		}
 	}
-	data_facts_out << "All helpfulness: " << upvotes_of_reviews / (double)reviews.size() << endl;
+	data_facts_out << "Average number of helpfulness in all reviews: " << upvotes_of_reviews / (double)reviews.size() << endl;
+	data_facts_out << "Average fraction of helpfulness in all reviews: " << fraction_helpfulness / (double)reviews.size()<< endl;
 	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "distribution.txt");
 	for(Review review : reviews) {
 		input_distribution_out << review.current_experience_level << " " << review.final_experience_level << endl;
@@ -311,7 +329,9 @@ int main(int argc, char *argv[]) {
 			map<int,int> distribution_usage_after_innovations;
 			for(WordTimeLine word_time_line : burst_innovation) {
 				for(int i = word_time_line.burst_start; i < (int)word_time_line.states->size(); i++) {
-					int day = (*(word_time_line.dates))[i].Day((*(word_time_line.dates))[word_time_line.burst_start]);
+					MyTime current = reviews[(*(word_time_line.review_index))[i]].time;
+					MyTime started =reviews[(*(word_time_line.review_index))[word_time_line.burst_start]].time;
+					int day = current.Day(started);
 					distribution_usage_after_innovations[day] ++;
 					sum ++;
 				}
@@ -355,7 +375,7 @@ int main(int argc, char *argv[]) {
 		map<int, int> time_to_num;
 		for(auto p : innovators_reviews) {
 			for(Review review : *(p.second)) {
-				time_to_num[review.time.year*12 + review.time.month] ++;
+				time_to_num[review.time.year * 12 + review.time.month] ++;
 			}
 		}
 		ofstream innovation_timing_out(Amazon::Global::output_directory + "innovation_timing.txt");
@@ -364,6 +384,7 @@ int main(int argc, char *argv[]) {
 			innovation_timing_out << time_num.first/12.0 << " " << time_num.second << endl;
 		}
 	}
+
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);

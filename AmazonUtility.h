@@ -81,22 +81,16 @@ class WordTimeLine {
 public:
 	string word;
 	double *alpha;
-	vector<int> *timeline;
-	vector<int> *states;
-	vector<MyTime> *dates;
+	vector<bool> *states;
 	vector<int> *review_index;
-	double opt_cost, static_cost;
 	double difference;
 	int burst_start;
 	int burst_end;
 	WordTimeLine() {
-		timeline = new vector<int>();
-		states = new vector<int>();
-		dates = new vector<MyTime>();
+		states = new vector<bool>();
 		review_index = new vector<int>();
 		alpha = new double[2];
-		static_cost = 0;
-		opt_cost = 0;
+
 		difference = 0;
 		burst_start = 0;
 		burst_end = 0;
@@ -107,31 +101,38 @@ public:
 		return difference > other.difference;
 	}
 
-	void Benefit() {
-//		cerr << static_cost <<" " << opt_cost << endl;
-		difference = max(static_cost - opt_cost, difference);
-	}
 
-	void CalculateCosts(int starter, int len) {
-			double p = Amazon::Global::probability_of_state_change;
-			static_cost = 0;
-			if(starter != 0) {
-				opt_cost = 2* log(p/(1-p));
-			}
-			for(int i = starter; i < starter + len - 1; i++) {
-				int gap = (*timeline)[i + 1] - (*timeline)[i];
-				if((*states)[i + 1] != (*states)[i]) {
-					opt_cost += log(p/(1-p));
-				}
-				opt_cost += (-1) * (log(alpha[(*states)[i]]) - alpha[(*states)[i]] * gap);
-				static_cost += (-1) * (log(alpha[0]) - alpha[0] * gap);
-			}
-			Benefit();
-			if(EqDouble(difference, static_cost - opt_cost)) {
-				burst_start = starter;
-				burst_end = starter + len;
-			}
+	void CalculateCosts(int starter, int len, vector<Review> *reviews) {
+		double opt_cost = 0, static_cost = 0;
+		double p = Amazon::Global::probability_of_state_change;
+		static_cost = 0;
+		if(starter != 0) {
+			opt_cost = 2* log(p/(1-p));
 		}
+		for(int i = starter; i < starter + len - 1; i++) {
+			int after;
+			int before;
+			if(Amazon::Global::real_time == true) { // Gap is based on real time
+				after = (*reviews)[(*(review_index))[i+1]].time.Day(Amazon::Global::earliest);
+				before = (*reviews)[(*(review_index))[i]].time.Day(Amazon::Global::earliest);
+			} else { // Gap is based on the review number
+				// The index here is the day by day index not their index in the reviews array
+				after = (*reviews)[(*(review_index))[i+1]].index;
+				before = (*reviews)[(*(review_index))[i]].index;
+			}
+			int gap = after - before;
+			if((*states)[i + 1] != (*states)[i]) {
+				opt_cost += log(p/(1-p));
+			}
+			opt_cost += (-1) * (log(alpha[(*states)[i]]) - alpha[(*states)[i]] * gap);
+			static_cost += (-1) * (log(alpha[0]) - alpha[0] * gap);
+		}
+		difference = max(static_cost - opt_cost, difference);
+		if(EqDouble(difference, static_cost - opt_cost)) {
+			burst_start = starter;
+			burst_end = starter + len;
+		}
+	}
 
 };
 
