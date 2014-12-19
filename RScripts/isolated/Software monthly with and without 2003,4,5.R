@@ -1,0 +1,16 @@
+temp = read.table("C:/cygwin64/home/rahmtin/research/SecondYear/Amazon/Output_All/overall_monthly_accumulated_star_rating_Software_has_error.txt",head=FALSE)
+temp2 = read.table("C:/cygwin64/home/rahmtin/research/SecondYear/Amazon/Output_All/overall_monthly_accumulated_star_rating_Software_removing_2003_to_2006_has_error.txt",head=FALSE)
+min_bound = min(min(temp$V2-temp$V3), min(temp2$V2-temp2$V3))
+max_bound = max(max(temp$V2+temp$V3), max(temp2$V2+temp2$V3))
+plot(temp$V2, main="Overall monthly accumulated star rating Software has error", xlab="Month", ylab="Star rating average", ylim=c(min_bound,max_bound), xaxt='n')
+axis(side = 1, at = 1:12,labels = temp$V1)
+arrows(1:12,temp$V3+temp$V2,1:12,temp$V2-temp$V3,angle=90,length=0.1,code=3)
+#lines(temp$V2, main="Overall monthly accumulated star rating Software has error", xlab="Month", ylab="Star rating average", ylim=c(min(-temp$V3+temp$V2),max(temp$V2+temp$V3)), xaxt='n')
+par(new=TRUE)
+points(temp2$V2, main="\n\nOverall monthly accumulated star rating Software has error without years 2003,4,5", xaxt='n', col="blue")
+axis(side = 1, at = 1:12,labels = temp2$V1)
+arrows(1:12,temp2$V3+temp2$V2,1:12,temp2$V2-temp2$V3,angle=90,length=0.1,code=3,col="blue")
+abline(h=mean(temp$V2))
+abline(h=mean(temp2$V2), col="blue")
+
+

@@ -99,7 +99,7 @@ void initialize(char *argv[]) {
 
 	//Output Directory
 
-	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/";
+	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_";
 
 
 }
@@ -384,7 +384,21 @@ int main(int argc, char *argv[]) {
 			innovation_timing_out << time_num.first/12.0 << " " << time_num.second << endl;
 		}
 	}
-
+	{ // When do different experiences show up in innovations
+		ofstream xp_level_out(Amazon::Global::output_directory + "experiences_showing_up_on_timeline.txt");
+		for(WordTimeLine word_time_line : burst_innovation) {
+			set<string> users;
+			MyTime started =reviews[(*(word_time_line.review_index))[word_time_line.burst_start]].time;
+			for(int i = word_time_line.burst_start; i < (int)word_time_line.states->size(); i++) {
+				int index = (*(word_time_line.review_index))[i];
+				if(users.find(reviews[index].user_id) == users.end()) {
+					users.insert(reviews[index].user_id);
+					xp_level_out << word_time_line.word << " " << reviews[index].current_experience_level << " " << reviews[index].final_experience_level;
+					xp_level_out << " " << reviews[index].time.Day(started)<< endl;
+				}
+			}
+		}
+	}
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);
