@@ -35,6 +35,7 @@ for x in ${InputFiles[*]}; do
             fi
             Rscript "RScripts/repeated_innovator.R" $output_directory $x
             Rscript "RScripts/baseline_boxplot.R" $output_directory $x
+            Rscript "RScripts/xp_showing_up_on_timeline.R" $output_directory $x
             echo "________________________________"
         done
     done
