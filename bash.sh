@@ -1,12 +1,12 @@
-make main
+#make main
 if [ $? -ne 0 ]
 then
     echo "Compilation error!"
     exit 0
 fi
 input_directory=$1
-#InputFiles=("Software")
-InputFiles=("Software" "Music" "Books" "Movies_and_TV")
+InputFiles=("Software")
+#InputFiles=("Software" "Music" "Books" "Movies_and_TV")
 TimeMode=("RealTime" "ReviewTime")
 BurstMode=("MaxBenefit")
 #"Longest" "All")
@@ -20,10 +20,10 @@ for x in ${InputFiles[*]}; do
             echo $burst_mode
             echo $time_mode
             output_directory="../Output_All/"$x"_bursts/"$time_mode"/"$burst_mode"/"
-            rm $output_directory* -rf
-            mkdir $output_directory"BurstPlots"
-            mkdir $output_directory"AggregationPlots"
-           ./main $input $burst_mode $time_mode
+#            rm $output_directory* -rf
+#            mkdir $output_directory"BurstPlots"
+#            mkdir $output_directory"AggregationPlots"
+#           ./main $input $burst_mode $time_mode
             time_line_txt=$output_directory$x"_timeline.txt"
             awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
             Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x

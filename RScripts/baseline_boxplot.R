@@ -16,11 +16,11 @@ innovator_distribution$Group = "innovation"
 
 png(paste(directory, "AggregationPlots/",dataset,"_random_baseline_ending_exp.png", sep=""),height=800,width=1300)
 total = rbind(innovator_distribution, baseline) 
-ggplot(total, aes(x = factor(Group), y = FinishingExp), height=600, width=800) + geom_boxplot() #+ coord_cartesian(ylim = c(0, 200))
+ggplot(total, aes(x = factor(Group), y = FinishingExp), height=600, width=800) + geom_boxplot() + coord_cartesian(ylim = c(0, 5000))
 dev.off()
 
 png(paste(directory, "AggregationPlots/",dataset,"_random_baseline_present_exp.png", sep=""),height=800,width=1300)
 total = rbind(innovator_distribution, baseline) 
-ggplot(total, aes(x = factor(Group), y = CurrentExp), height=600, width=800) + geom_boxplot() # + coord_cartesian(ylim = c(0, 200))
+ggplot(total, aes(x = factor(Group), y = CurrentExp), height=600, width=800) + geom_boxplot() + coord_cartesian(ylim = c(0, 5000))
 
 dev.off()
