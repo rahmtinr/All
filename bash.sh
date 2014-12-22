@@ -5,7 +5,8 @@ then
     exit 0
 fi
 input_directory=$1
-InputFiles=("Software")
+#InputFiles=("Software")
+InputFiles=("Software" "Music" "Books" "Movies_and_TV")
 TimeMode=("RealTime" "ReviewTime")
 BurstMode=("MaxBenefit")
 #"Longest" "All")
