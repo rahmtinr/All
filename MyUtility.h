@@ -108,6 +108,13 @@ string SimpleIntToString(int x) {
 	return ToString(x);
 }
 
+int SimpleStringToInt(string input) {
+	stringstream ss(input);
+	int ret;
+	ss >> ret;
+	return ret;
+}
+
 class MyTime {
 public:
 	int year;

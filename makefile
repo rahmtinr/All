@@ -4,8 +4,17 @@ LDFLAGS = -lm
 all : main.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
 	${CC} -o main main.o ${CFLAGS}
 
+
+DBLP : DBLP_main.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
+	${CC} -o dblp DBLP_main.o ${CFLAGS}
+
+
 main.o : main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c main.cpp ${CFLAGS}
+
+
+DBLP_main.o : DBLP_main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
+	${CC} -c DBLP_main.cpp ${CFLAGS}
 
 ReviewReader.o : ReviewReader.h AmazonUtility.h
 	${CC} -c ReviewReader.h ${CFLAGS}
