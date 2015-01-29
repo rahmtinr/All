@@ -25,6 +25,7 @@
 
 #include "Aggregation.h"
 #include "AmazonUtility.h"
+#include "DBLPComponents.h"
 #include "DBLPReader.h"
 #include "Innovations.h"
 #include "MyUtility.h"
@@ -58,7 +59,6 @@ string real_time;
 void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
-	real_time = argv[3];
 	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
 		if(filename[i] == '/' && last_slash == -1) {
@@ -69,8 +69,8 @@ void initialize(char *argv[]) {
 		}
 
 	}
-	Global::NAMEOFDATASET = filename.substr(last_slash + 1 ,
-			last_dot - last_slash - 1);
+	real_time = "RealTime";
+	Global::NAMEOFDATASET = "DBLP";
 
 	if(burst_mode == "Longest") {
 		Amazon::Global::burst_mode = LONGBURST;
@@ -83,25 +83,15 @@ void initialize(char *argv[]) {
 		exit(0);
 	}
 
-	if(real_time == "RealTime"){
-		Amazon::Global::real_time = true;
-	} else if (real_time == "ReviewTime") {
-
-	} else {
-		cerr << "Third argument did not match! Force quitting." <<endl;
-		exit(0);
-	}
-
-	cerr << Global::NAMEOFDATASET <<endl;
-
 	Innovations::numbers_for_appearances = {4 , 8, 10};
 	Innovations::numbers_for_products = {3 , 6, 10};
 	Innovations::numbers_for_authors = {3, 5, 7};
 
 	// Set +INF and -INF for dates
 	Amazon::Global::min_year = 2030;
-	Amazon::Global::max_year = 1995;
+	Amazon::Global::max_year = 1900;
 	Amazon::Global::earliest.year = 2030;
+	Amazon::Global::real_time = true;
 
 	//State machine parameters.
 	Amazon::Global::state_coeffecient = 10;
@@ -113,13 +103,11 @@ void initialize(char *argv[]) {
 
 	//Output Directory
 
-	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_";
-
-
+	Amazon::Global::output_directory = "../Output_All/DBLP/Bursts/" + Global::NAMEOFDATASET + "_";
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 4) {
+	if(argc != 3 ) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -139,14 +127,18 @@ int main(int argc, char *argv[]) {
 			DBLPRecord record = records.back();
 			review.time.year = 0;
 			review.time.month = 0;
-			review.time.day = (record.year - 1970);
-			review.time.epoch_time = (record.year - 1970) * 60 * 60 * 24;
+			// Changing years to days
+			review.time.day = (record.year - 1935); // 1936 is the first paper so we change
+
+			review.time.epoch_time = (record.year - 1935) * 60 * 60 * 24;
 			review.text = record.title;
 			review.product_title = record.venue;
+			review.product_id = record.venue;
 			review.helpfulness = "0/1";
 			reviews.push_back(review);
 			Amazon::Global::min_year = min(Amazon::Global::min_year, record.year);
 			Amazon::Global::max_year = max(Amazon::Global::max_year, record.year);
+
 			for(int i = 0 ; i < (int)record.authors.size(); i++) {
 				if(author_id.find(record.authors[i]) == author_id.end()) {
 					author_id[record.authors[i]] = counter ++;
@@ -167,14 +159,13 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-	cerr << Amazon::Global::min_year << endl;
-	cerr << Amazon::Global::max_year << endl;
-	cerr << edges.size() << endl;
-	cerr << author_id.size() << endl;
+	cerr << "Min year: " << Amazon::Global::min_year << endl;
+	cerr << "Max year: " << Amazon::Global::max_year << endl;
+	cerr << "Number of edges: " << edges.size() << endl;
+	cerr << "Number of authors: " << author_id.size() << endl;
+	Components(&edges, author_id.size() + 1);
+
 	//	cerr << reviews.size() <<endl;
-	//	MyFilter("text", "turbotax");
-	//	MyFilter("text", "hr block", &reviews);
-	//	MyFilter("text", "taxact", &reviews);
 	cerr << reviews.size() << endl;
 	sort(reviews.begin(), reviews.end());
 	reviews[0].index = 0;
@@ -185,6 +176,8 @@ int main(int argc, char *argv[]) {
 			reviews[i].index = i;
 		}
 	}
+	/*
+	// TODO what do you define as the experience level for a paper with a lot of authors!
 	for(int i = 0; i < (int)reviews.size(); i++){
 		if(experience_level.find(reviews[i].user_id) == experience_level.end()) {
 			experience_level[reviews[i].user_id] = 0;
@@ -195,6 +188,7 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < (int) reviews.size(); i++) {
 		reviews[i].final_experience_level = experience_level[reviews[i].user_id];
 	}
+	*/
 	/*
 	// CountMonthlyAccumulatedReviews(&reviews);
 	// CountYearlyReviews(&reviews);
@@ -214,7 +208,7 @@ int main(int argc, char *argv[]) {
 	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
 	// Innovations::AnalyseInnovation(innovations, &reviews);
 	 */
-	Innovations::FindBursts(&words_states, &reviews);
+	Innovations::FindBurstsTimeDifference(&words_states, &reviews);
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
 		vector<bool> states = *(word_states.states);
@@ -236,9 +230,7 @@ int main(int argc, char *argv[]) {
 			longest_one = max(longest_one, current);
 		}
 		if(longest_one >= (int)states.size() / Amazon::Global::threshold_for_innovation + 5
-				|| (longest_one > 200 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
-
-
+				|| (longest_one > 100 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
 			if(Amazon::Global::burst_mode == LONGBURST) { // Longest burst difference
 				word_states.CalculateCosts(best_start, longest_one, &reviews);
 			}
@@ -250,13 +242,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	ofstream fout(Amazon::Global::output_directory + "timeline.txt");
-
 	cerr << "Size of innovations found: " << burst_innovation.size() << endl;
 	int x = 0;
 	for(WordTimeLine word_time_line : burst_innovation) {
 		//		cerr << word_time_line.word << " " << word_time_line.difference << endl;
 		x++;
-		if (x == max((int)burst_innovation.size() / 10, 50)) {
+		if (x == 1000) {
 			break;
 		}
 		string word = word_time_line.word;
@@ -275,7 +266,7 @@ int main(int argc, char *argv[]) {
 		vector<bool> states = *(word_time_line.states);
 		top_innovations.push_back(word_time_line);
 		for(int j = 0; j < (int)times.size(); j++) {
-			fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].year + dates[j].month/(double)12 << endl;
+			fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].day + 1935 << endl;
 		}
 	}
 	map<string, vector<Review>*> innovators_reviews;
@@ -313,6 +304,7 @@ int main(int argc, char *argv[]) {
 			innovators_cdf_out << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 		}
 	}
+	/*
 	ofstream data_facts_out(Amazon::Global::output_directory + "random_facts.txt");
 	data_facts_out << "number of innovation words: " << innovators_reviews.size() << endl;
 	data_facts_out << "Average number of helpfulness in innovations: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
@@ -348,12 +340,11 @@ int main(int argc, char *argv[]) {
 			all_cdf_out << it->first << " " << sum_cdf / (double)reviews.size() << endl;
 		}
 	}
-	data_facts_out << "Average number of helpfulness in all reviews: " << upvotes_of_reviews / (double)reviews.size() << endl;
-	data_facts_out << "Average fraction of helpfulness in all reviews: " << fraction_helpfulness / (double)reviews.size()<< endl;
 	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "distribution.txt");
 	for(Review review : reviews) {
 		input_distribution_out << review.current_experience_level << " " << review.final_experience_level << endl;
 	}
+
 	{ // All reviews final
 		ofstream all_cdf_out2(Amazon::Global::output_directory + "all_final_cdf.txt");
 		all_cdf_out2 << (--pdf_final_experience.end())->first + 1 << " " << 0 << endl;
@@ -366,6 +357,7 @@ int main(int argc, char *argv[]) {
 		pdf_current_experience.clear();
 		pdf_final_experience.clear();
 	}
+
 	{ // Usage after innovation
 		if(real_time == "RealTime") {
 			int sum = 0;
@@ -441,7 +433,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
-	}
+	}*/
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);

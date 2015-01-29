@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
 	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
 	// Innovations::AnalyseInnovation(innovations, &reviews);
 	 */
-	Innovations::FindBursts(&words_states, &reviews);
+	Innovations::FindBurstsTimeDifference(&words_states, &reviews);
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
 		vector<bool> states = *(word_states.states);
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
 	for(WordTimeLine word_time_line : burst_innovation) {
 		//		cerr << word_time_line.word << " " << word_time_line.difference << endl;
 		x++;
-		if (x == max((int)burst_innovation.size() / 10, 50)) {
+		if (x == min((int)burst_innovation.size() / 10, 50)) {
 			break;
 		}
 		string word = word_time_line.word;

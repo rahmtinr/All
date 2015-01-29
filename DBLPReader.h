@@ -37,8 +37,7 @@ bool ReadOneRecord(std::ifstream& fin, vector<DBLPRecord> *Records) {
 		getline(fin, raw_input);
 		record.venue = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
 		getline(fin, raw_input);
-		record.year = SimpleStringToInt(raw_input);
-
+		record.year = SimpleStringToInt(GetField(raw_input));
 		while(true) {
 			getline(fin, raw_input);
 			if(raw_input == "") {
