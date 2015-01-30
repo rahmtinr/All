@@ -69,7 +69,7 @@ public:
 	static MyTime latest;
 	static double state_coeffecient;
 	static double probability_of_state_change;
-	static int threshold_for_innovation;
+	static double threshold_for_innovation;
 	static bool real_time;
 	static BurstMode burst_mode;
 	static bool remove_unknown;
@@ -142,7 +142,7 @@ MyTime Amazon::Global::earliest;
 MyTime Amazon::Global::latest;
 double Amazon::Global::state_coeffecient;
 double Amazon::Global::probability_of_state_change;
-int Amazon::Global::threshold_for_innovation;
+double Amazon::Global::threshold_for_innovation;
 BurstMode Amazon::Global::burst_mode;
 bool Amazon::Global::real_time;
 bool Amazon::Global::remove_unknown;

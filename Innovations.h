@@ -311,12 +311,17 @@ public:
 	static double ProbabilityFinderDocumentRatio (double alpha, double r, double d) {
 		double ret = 0;
 		ret += log(alpha) * r + log(1 - alpha) * (d - r);
-		for (int i = d; i > r; i--) {
+		/*for (int i = d; i > r; i--) {
 			ret += log(i);
 		}
+		*/
+		ret += ((d * log(d) - d + 1) - (r * log(r) - r + 1));
+		/*
 		for(int i = 1; i <= d - r; i++) {
 			ret -= log(i);
 		}
+		*/
+		ret -= (d - r) * log(d - r);
 		return -ret;
 	}
 	static double ProbabilityFinder(double alpha, int gap){

@@ -27,7 +27,7 @@ for x in ${InputFiles[*]}; do
             time_line_txt=$output_directory$x"_timeline.txt"
             awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory"words"
 #            Rscript "RScripts/word_timeline_plot.R" $time_line_txt "DBLP"
-            mv *.jpg $output_directory"BurstPlots"
+#            mv *.jpg $output_directory"BurstPlots"
 #            Rscript "RScripts/innovators_distribution.R" $output_directory $output_directory "DBLP"
 #            Rscript "RScripts/innovators_cdf.R" $output_directory "DBLP"
 #            if [[ "$time_mode" == "RealTime" ]]
