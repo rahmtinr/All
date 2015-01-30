@@ -214,7 +214,7 @@ public:
 	}
 
 	static void FindBurstsDocumentRatio(set<WordTimeLine> *word_states, vector<Review> *reviews) {
-		int document_counter[2100];
+		int document_counter[100];
 		sort(reviews->begin(), reviews->end());
 		string text, word;
 		for(int i = 0; i < (int)reviews->size(); i++) {
@@ -223,7 +223,7 @@ public:
 			stringstream ss(text);
 			set<string> mark;
 			mark.clear();
-			document_counter[(*reviews)[i].time.day]++;
+			document_counter[(*reviews)[i].time.day - 1935]++;
 			while(!ss.eof()){
 				ss >> word;
 				if(mark.find(word) != mark.end()) {
@@ -308,7 +308,17 @@ public:
 
 	}
 
-
+	static double ProbabilityFinderDocumentRatio (double alpha, double r, double d) {
+		double ret = 0;
+		ret += log(alpha) * r + log(1 - alpha) * (d - r);
+		for (int i = d; i > r; i--) {
+			ret += log(i);
+		}
+		for(int i = 1; i <= d - r; i++) {
+			ret -= log(i);
+		}
+		return -ret;
+	}
 	static double ProbabilityFinder(double alpha, int gap){
 		return (-1) * (log(alpha) - 1 * alpha * gap);
 	}
@@ -338,18 +348,21 @@ public:
 		viterbi[1] = 2000 * 1000 * 1000;
 		double v[2];
 		double p;
-		for(int i = 1; i < (int)ratio_sequence.size(); i++) {
+		for(int i = 1; i < (int)ratio_sequence.size(); i++) { // 1935!!!!
 			v[0] = viterbi[0];
 			v[1] = viterbi[1];
 			p = Amazon::Global::probability_of_state_change;
 			for(int j = 0; j < 2; j++) {
-				//	cerr << j << ":::::" << v[j] + ProbabilityFinder(alpha[j],time_gaps[i]) << " " << v[1-j] + log((1-p)/p) + ProbabilityFinder(alpha[j],time_gaps[i]) << endl;
-				if(v[j] + ProbabilityFinder(word_time_line->alpha[j],ratio_sequence[i])  <
-						v[1-j] + log((1-p)/p) + ProbabilityFinder(word_time_line->alpha[j],ratio_sequence[i])) {
-					viterbi[j] = v[j] + ProbabilityFinder(word_time_line->alpha[j],ratio_sequence[i]);
+				double same_state =
+						v[j] + ProbabilityFinderDocumentRatio(word_time_line->alpha[j], ratio_sequence[i], document_counter[i]);
+				double other_state = v[1-j] + log((1-p)/p) +
+						ProbabilityFinderDocumentRatio(word_time_line->alpha[j],ratio_sequence[i], document_counter[i]);
+
+				if(same_state < other_state) {
+					viterbi[j] = same_state;
 					par[j].push_back(j);
 				} else {
-					viterbi[j] = v[1-j] + log((1-p)/p) + ProbabilityFinder(word_time_line->alpha[j], ratio_sequence[i]);
+					viterbi[j] = other_state;
 					par[j].push_back(1-j);
 				}
 			}
