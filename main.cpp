@@ -90,10 +90,10 @@ void initialize(char *argv[]) {
 	Amazon::Global::earliest.year = 2030;
 
 	//State machine parameters.
-	Amazon::Global::state_coeffecient = 10;
+	Amazon::Global::state_coeffecient = 3;
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
-
+	Amazon::Global::state_machine_doc_ratio = false;
 	//Remove unknown reviews
 	Amazon::Global::remove_unknown = true;
 

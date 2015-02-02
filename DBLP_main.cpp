@@ -94,20 +94,37 @@ void initialize(char *argv[]) {
 	Amazon::Global::real_time = true;
 
 	//State machine parameters.
-	Amazon::Global::state_coeffecient = 10;
+	Amazon::Global::state_coeffecient = 3;
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
+	string temp(argv[3]);
+	if(temp == "DocRatio") {
+		Amazon::Global::state_machine_doc_ratio = true;
+	} else {
+		Amazon::Global::state_machine_doc_ratio = false;
+	}
 
 	//Remove unknown reviews
 	Amazon::Global::remove_unknown = true;
 
-	//Output Directory
+	// PreProcess
+	int bound = 2 * 1000 * 1000;
+	Amazon::Global::sum_ln.push_back(0);
+	Amazon::Global::sum_ln.push_back(0);
+	for(int i = 2; i < bound; i++) {
+		Amazon::Global::sum_ln.push_back(Amazon::Global::sum_ln.back() + log(i));
+	}
 
-	Amazon::Global::output_directory = "../Output_All/DBLP/Bursts/" + Global::NAMEOFDATASET + "_";
+	//Output Directory
+	if(Amazon::Global::state_machine_doc_ratio == true) {
+		Amazon::Global::output_directory = "../Output_All/DBLP/Bursts/DocRatio/" + Global::NAMEOFDATASET + "_";
+	} else {
+		Amazon::Global::output_directory = "../Output_All/DBLP/Bursts/Appearance/" + Global::NAMEOFDATASET + "_";
+	}
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 3 ) {
+	if(argc != 4) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -165,8 +182,6 @@ int main(int argc, char *argv[]) {
 	cerr << "Number of authors: " << author_id.size() << endl;
 	Components(&edges, author_id.size() + 1);
 
-	//	cerr << reviews.size() <<endl;
-	cerr << reviews.size() << endl;
 	sort(reviews.begin(), reviews.end());
 	reviews[0].index = 0;
 	for(int i = 1; i < (int) reviews.size(); i++) {
@@ -208,13 +223,17 @@ int main(int argc, char *argv[]) {
 	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
 	// Innovations::AnalyseInnovation(innovations, &reviews);
 	 */
-	Innovations::FindBurstsDocumentRatio(&words_states, &reviews);
+	cerr << "Review size: " << reviews.size() << endl;
+	if(Amazon::Global::state_machine_doc_ratio == true) {
+		Innovations::FindBurstsDocumentRatio(&words_states, &reviews);
+	} else {
+		Innovations::FindBurstsTimeDifference(&words_states, &reviews);
+	}
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
 		vector<bool> states = *(word_states.states);
 		int longest_one = 0;
 		int current = 0;
-		int best_start = 0;
 		for(int i = 0; i < (int) states.size(); i++) {
 			if(states[i] == 1) {
 				current++;
@@ -222,23 +241,30 @@ int main(int argc, char *argv[]) {
 				if(Amazon::Global::burst_mode == MAXBURST) { // Looking for best interval
 					word_states.CalculateCosts(i - current, current, &reviews);
 				}
-				if (longest_one == current) {
-					best_start = i - current;
-				}
 				current = 0;
 			}
 			longest_one = max(longest_one, current);
 		}
-		if(longest_one >= (int)states.size() / Amazon::Global::threshold_for_innovation + 5
-				|| (longest_one > 100 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
-			if(Amazon::Global::burst_mode == LONGBURST) { // Longest burst difference
-				word_states.CalculateCosts(best_start, longest_one, &reviews);
+		if(Amazon::Global::state_machine_doc_ratio == false) {
+			if(longest_one >= (int)states.size() / Amazon::Global::threshold_for_innovation + 5
+					|| (longest_one > 100 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
+				burst_innovation.insert(word_states);
 			}
-
-			if(Amazon::Global::burst_mode == ALL) {  // Entire difference
-				word_states.CalculateCosts(0, states.size(), &reviews);
-			}
+		}
+		if(Amazon::Global::state_machine_doc_ratio ==true && longest_one > 3){
 			burst_innovation.insert(word_states);
+		}
+		if(word == "quantum") {
+			cerr << "quantum" << endl;
+			for(int i = 1; i < (int) states.size(); i++) {
+				cerr << (i - 1) + 1935 << "     "  << states[i] << endl;
+			}
+		}
+		if(word == "algorithm") {
+			cerr << "ALG:" << endl;
+			for(int i = 1; i < (int) states.size(); i++) {
+				cerr << (i - 1) + 1935 << "     "  << states[i] << endl;
+			}
 		}
 	}
 	ofstream fout(Amazon::Global::output_directory + "timeline.txt");
@@ -251,8 +277,8 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 		string word = word_time_line.word;
-		vector<int> times;
 		vector<MyTime> dates;
+		vector<int> times;
 		for(int index : *(word_time_line.review_index)) {
 			if(Amazon::Global::real_time == true) { // Gap is based on real time
 				times.push_back(reviews[index].time.Day(Amazon::Global::earliest));
@@ -263,13 +289,25 @@ int main(int argc, char *argv[]) {
 			dates.push_back(reviews[index].time);
 		}
 
+		for(int index : *(word_time_line.review_index)) {
+			dates.push_back(reviews[index].time);
+		}
+
 		vector<bool> states = *(word_time_line.states);
 		top_innovations.push_back(word_time_line);
-		for(int j = 0; j < (int)times.size(); j++) {
-			fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].day + 1935 << endl;
+
+		if(Amazon::Global::state_machine_doc_ratio == true) {
+			for(int j = 0; j < (int)states.size(); j++) {
+				fout << word << " " << 0 << " " << j+1  << " " << states[j] << " " << j + 1935 << endl;
+			}
+		} else {
+			for(int j = 0; j < (int)states.size(); j++) {
+				fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].year + dates[j].month/(double)12 << endl;
+			}
+
 		}
 	}
-	map<string, vector<Review>*> innovators_reviews;
+/*	map<string, vector<Review>*> innovators_reviews;
 	ofstream innovators_out(Amazon::Global::output_directory + "distribution.txt");
 	Innovations::FindInnovationsBursts(&reviews, &top_innovations, &innovators_reviews);
 	int num_of_innovation_reviews = 0;
@@ -303,7 +341,7 @@ int main(int argc, char *argv[]) {
 			sum_cdf += it -> second;
 			innovators_cdf_out << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 		}
-	}
+	}*/
 	/*
 	ofstream data_facts_out(Amazon::Global::output_directory + "random_facts.txt");
 	data_facts_out << "number of innovation words: " << innovators_reviews.size() << endl;

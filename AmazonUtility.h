@@ -74,6 +74,8 @@ public:
 	static BurstMode burst_mode;
 	static bool remove_unknown;
 	static string output_directory;
+	static bool state_machine_doc_ratio;
+	static vector<double> sum_ln;
 };
 }
 
@@ -106,31 +108,33 @@ public:
 		double opt_cost = 0, static_cost = 0;
 		double p = Amazon::Global::probability_of_state_change;
 		static_cost = 0;
-		if(starter != 0) {
-			opt_cost = 2* log(p/(1-p));
-		}
-		for(int i = starter; i < starter + len - 1; i++) {
-			int after;
-			int before;
-			if(Amazon::Global::real_time == true) { // Gap is based on real time
-				after = (*reviews)[(*(review_index))[i+1]].time.Day(Amazon::Global::earliest);
-				before = (*reviews)[(*(review_index))[i]].time.Day(Amazon::Global::earliest);
-			} else { // Gap is based on the review number
-				// The index here is the day by day index not their index in the reviews array
-				after = (*reviews)[(*(review_index))[i+1]].index;
-				before = (*reviews)[(*(review_index))[i]].index;
+		if(Amazon::Global::state_machine_doc_ratio == false) {
+			if(starter != 0) {
+				opt_cost = 2* log(p/(1-p));
 			}
-			int gap = after - before;
-			if((*states)[i + 1] != (*states)[i]) {
-				opt_cost += log(p/(1-p));
+			for(int i = starter; i < starter + len - 1; i++) {
+				int after;
+				int before;
+				if(Amazon::Global::real_time == true) { // Gap is based on real time
+					after = (*reviews)[(*(review_index))[i+1]].time.Day(Amazon::Global::earliest);
+					before = (*reviews)[(*(review_index))[i]].time.Day(Amazon::Global::earliest);
+				} else { // Gap is based on the review number
+					// The index here is the day by day index not their index in the reviews array
+					after = (*reviews)[(*(review_index))[i+1]].index;
+					before = (*reviews)[(*(review_index))[i]].index;
+				}
+				int gap = after - before;
+				if((*states)[i + 1] != (*states)[i]) {
+					opt_cost += log(p/(1-p));
+				}
+				opt_cost += (-1) * (log(alpha[(*states)[i]]) - alpha[(*states)[i]] * gap);
+				static_cost += (-1) * (log(alpha[0]) - alpha[0] * gap);
 			}
-			opt_cost += (-1) * (log(alpha[(*states)[i]]) - alpha[(*states)[i]] * gap);
-			static_cost += (-1) * (log(alpha[0]) - alpha[0] * gap);
-		}
-		difference = max(static_cost - opt_cost, difference);
-		if(EqDouble(difference, static_cost - opt_cost)) {
-			burst_start = starter;
-			burst_end = starter + len;
+			difference = max(static_cost - opt_cost, difference);
+			if(EqDouble(difference, static_cost - opt_cost)) {
+				burst_start = starter;
+				burst_end = starter + len;
+			}
 		}
 	}
 
@@ -147,4 +151,7 @@ BurstMode Amazon::Global::burst_mode;
 bool Amazon::Global::real_time;
 bool Amazon::Global::remove_unknown;
 string Amazon::Global::output_directory;
+bool Amazon::Global::state_machine_doc_ratio;
+vector<double> Amazon::Global::sum_ln;
+
 #endif /* AMAZONUTILITY_H_ */

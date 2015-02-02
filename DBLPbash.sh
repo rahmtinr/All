@@ -8,6 +8,8 @@ input_directory="./DBLPparser/"
 InputFiles=("DBLP")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
+StateMachine=("DocRatio")
+#StateMachine=("Appearance")
 #"Longest" "All")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
@@ -19,11 +21,11 @@ for x in ${InputFiles[*]}; do
             burst_mode=$z;
             echo $burst_mode
             echo $time_mode
-            output_directory="../Output_All/DBLP/Bursts/"
+            output_directory="../Output_All/DBLP/Bursts/"$StateMachine"/"
 #            rm $output_directory* -rf
 #            mkdir $output_directory"BurstPlots"
 #            mkdir $output_directory"AggregationPlots"
-           ./dblp $input $burst_mode #always real time
+           ./dblp $input $burst_mode $StateMachine #always real time
             time_line_txt=$output_directory$x"_timeline.txt"
             awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory"words"
 #            Rscript "RScripts/word_timeline_plot.R" $time_line_txt "DBLP"

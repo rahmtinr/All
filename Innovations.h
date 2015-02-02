@@ -215,6 +215,10 @@ public:
 
 	static void FindBurstsDocumentRatio(set<WordTimeLine> *word_states, vector<Review> *reviews) {
 		int document_counter[100];
+		for(int i = 0; i < 100 ; i++) {
+			document_counter[i] = 0;
+		}
+		set<WordTimeLine> temp;
 		sort(reviews->begin(), reviews->end());
 		string text, word;
 		for(int i = 0; i < (int)reviews->size(); i++) {
@@ -223,7 +227,7 @@ public:
 			stringstream ss(text);
 			set<string> mark;
 			mark.clear();
-			document_counter[(*reviews)[i].time.day - 1935]++;
+			document_counter[(*reviews)[i].time.day]++;
 			while(!ss.eof()){
 				ss >> word;
 				if(mark.find(word) != mark.end()) {
@@ -241,25 +245,33 @@ public:
 			}
 		}
 		vector<int> ratio_sequence;
+
 		for(auto time_line : *word_states) {
 			string word = time_line.word;
 			ratio_sequence.clear();
 			MyTime first = (*reviews)[(*(time_line.review_index))[0]].time;
-			for(int i = 1935; i < first.day; i++) {
+			for(int i = 0; i < first.day; i++) {
 				ratio_sequence.push_back(0);
 			}
 			ratio_sequence.push_back(1);
 			for(int i = 1; i < (int)time_line.review_index->size(); i++) {
-				ratio_sequence.back()++;
 				MyTime current = (*reviews)[(*(time_line.review_index))[i]].time;
 				MyTime before = (*reviews)[(*(time_line.review_index))[i-1]].time;
 				if(current.day != before.day) {
-					ratio_sequence.back();
-					ratio_sequence.push_back(0);
+					for(int i = before.day + 1; i <= current.day; i++) {
+						ratio_sequence.push_back(0);
+					}
 				}
+				ratio_sequence.back()++;
 			}
-			FindBurstsForWordsDocumentRatio(ratio_sequence, word, &time_line, document_counter,
-					(double)time_line.review_index->size() / reviews->size());
+			if(FindBurstsForWordsDocumentRatio(ratio_sequence, word, &time_line, document_counter,
+					(double)time_line.review_index->size() / reviews->size()) == true) {
+				temp.insert(time_line);
+			}
+		}
+		word_states->clear();
+		for(auto time_line : temp) {
+			word_states->insert(time_line);
 		}
 	}
 
@@ -305,23 +317,19 @@ public:
 			}
 			FindBurstsForWordsTimeDifference(time_gaps, word, &time_line);
 		}
-
+		exit(0);
 	}
 
 	static double ProbabilityFinderDocumentRatio (double alpha, double r, double d) {
 		double ret = 0;
 		ret += log(alpha) * r + log(1 - alpha) * (d - r);
-		/*for (int i = d; i > r; i--) {
-			ret += log(i);
+		if(d > Amazon::Global::sum_ln.size()) {
+			cerr << d << "   WE FUCKED UP!!" << endl;
+			exit(0);
 		}
-		*/
-		ret += ((d * log(d) - d + 1) - (r * log(r) - r + 1));
-		/*
-		for(int i = 1; i <= d - r; i++) {
-			ret -= log(i);
-		}
-		*/
-		ret -= (d - r) * log(d - r);
+		ret += Amazon::Global::sum_ln[d] - Amazon::Global::sum_ln[r];
+
+		ret -=  Amazon::Global::sum_ln[d - r];
 		return -ret;
 	}
 	static double ProbabilityFinder(double alpha, int gap){
@@ -338,31 +346,36 @@ public:
 		reverse(states->begin(),states->end());
 	}
 
-	static void FindBurstsForWordsDocumentRatio(const vector<int> &ratio_sequence,
+	static bool FindBurstsForWordsDocumentRatio(const vector<int> &ratio_sequence,
 			string word, WordTimeLine *word_time_line, int *document_counter, double alpha_0) {
 		vector<int> par[2];
-
-		word_time_line->alpha[0] = alpha_0;
+		word_time_line->alpha[0] = alpha_0 * 1/2;
 		word_time_line->alpha[1] = word_time_line->alpha[0] * Amazon::Global::state_coeffecient;
 		if(word_time_line->alpha[1] > 1 ) {
-			cerr << " THAT IS SUPER BAD YOU UNDERSTAND? " << endl;
-			exit(0);
+			return false;
 		}
+	//	if(word != "algorithm" && word != "quantum") {
+	//		return false;
+	//	}
+	//	cerr << word << " " << alpha_0 << endl;
 		double viterbi[2];
 		viterbi[0] = 0;
 		viterbi[1] = 2000 * 1000 * 1000;
 		double v[2];
 		double p;
+		int temp = 0;
+		for(int i = 1; i < (int) ratio_sequence.size(); i++) {
+			temp += ratio_sequence[i];
+		}
+		p = Amazon::Global::probability_of_state_change;
 		for(int i = 1; i < (int)ratio_sequence.size(); i++) { // 1935!!!!
 			v[0] = viterbi[0];
 			v[1] = viterbi[1];
-			p = Amazon::Global::probability_of_state_change;
 			for(int j = 0; j < 2; j++) {
 				double same_state =
-						v[j] + ProbabilityFinderDocumentRatio(word_time_line->alpha[j], ratio_sequence[i], document_counter[i]);
+						v[j] + ProbabilityFinderDocumentRatio(word_time_line->alpha[j], ratio_sequence[i], temp);
 				double other_state = v[1-j] + log((1-p)/p) +
-						ProbabilityFinderDocumentRatio(word_time_line->alpha[j],ratio_sequence[i], document_counter[i]);
-
+						ProbabilityFinderDocumentRatio(word_time_line->alpha[1-j],ratio_sequence[i], temp); // it first transitions and then produces the output
 				if(same_state < other_state) {
 					viterbi[j] = same_state;
 					par[j].push_back(j);
@@ -371,6 +384,8 @@ public:
 					par[j].push_back(1-j);
 				}
 			}
+	//		cerr << i << " ::::: " << ProbabilityFinderDocumentRatio(word_time_line->alpha[0], ratio_sequence[i], document_counter[i]) << " "
+	//				<<ProbabilityFinderDocumentRatio(word_time_line->alpha[1], ratio_sequence[i], document_counter[i]) << "::::: " << ratio_sequence[i] << "   " << document_counter[i] << endl;
 		}
 		if(viterbi[0] < viterbi[1]){
 			FindPar(par, par[0].size() - 1, 0, word_time_line->states);
@@ -379,7 +394,35 @@ public:
 			FindPar(par, par[1].size() - 1, 1, word_time_line->states);
 			word_time_line->states->push_back(1);
 		}
-
+		if(word_time_line->states->size() - 1 != ratio_sequence.size()) {
+			return false;
+		}
+		if(Amazon::Global::state_machine_doc_ratio == true) {
+			vector<bool> states = *(word_time_line->states);
+			int starter;
+			double zero_cost = 0, one_cost = 0;
+			for(int i = 1; i < (int)word_time_line->states->size(); i++) {
+				if(states[i] == 0) {
+					zero_cost = 0;
+					one_cost = 0;
+					continue;
+				}
+				starter = i;
+				one_cost = 2 * log((1 - p) / p);
+				while(i <(int) states.size() && states[i] == true) {
+					zero_cost += ProbabilityFinderDocumentRatio(word_time_line->alpha[0], ratio_sequence[i - 1], document_counter[i - 1]);
+					one_cost += ProbabilityFinderDocumentRatio(word_time_line->alpha[1], ratio_sequence[i - 1], document_counter[i - 1]);
+					i++;
+				}
+				if(zero_cost - one_cost > word_time_line->difference) {
+					word_time_line->difference = zero_cost - one_cost;
+					word_time_line->burst_start = starter;
+					word_time_line->burst_end = i;
+				}
+				i--;
+			}
+		}
+		return true;
 	}
 	static void FindBurstsForWordsTimeDifference(const vector<int> &time_gaps, string word, WordTimeLine *word_time_line) {
 		vector<int> par[2];
