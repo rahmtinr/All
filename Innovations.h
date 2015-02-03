@@ -324,7 +324,7 @@ public:
 		double ret = 0;
 		ret += log(alpha) * r + log(1 - alpha) * (d - r);
 		if(d > Amazon::Global::sum_ln.size()) {
-			cerr << d << "   WE FUCKED UP!!" << endl;
+			cerr << d << "Something is wrong!!" << endl;
 			exit(0);
 		}
 		ret += Amazon::Global::sum_ln[d] - Amazon::Global::sum_ln[r];
