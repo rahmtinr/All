@@ -373,9 +373,9 @@ public:
 			v[1] = viterbi[1];
 			for(int j = 0; j < 2; j++) {
 				double same_state =
-						v[j] + ProbabilityFinderDocumentRatio(word_time_line->alpha[j], ratio_sequence[i], temp);
+						v[j] + ProbabilityFinderDocumentRatio(word_time_line->alpha[j], ratio_sequence[i], document_counter[i]);
 				double other_state = v[1-j] + log((1-p)/p) +
-						ProbabilityFinderDocumentRatio(word_time_line->alpha[1-j],ratio_sequence[i], temp); // it first transitions and then produces the output
+						ProbabilityFinderDocumentRatio(word_time_line->alpha[1-j],ratio_sequence[i], document_counter[i]); // it first transitions and then produces the output
 				if(same_state < other_state) {
 					viterbi[j] = same_state;
 					par[j].push_back(j);

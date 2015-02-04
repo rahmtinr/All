@@ -152,7 +152,9 @@ int main(int argc, char *argv[]) {
 			review.product_title = record.venue;
 			review.product_id = record.venue;
 			review.helpfulness = "0/1";
-			review.authors = record.authors;
+			for(string author : record.authors) {
+				review.authors.push_back(author);
+			}
 			reviews.push_back(review);
 			Amazon::Global::min_year = min(Amazon::Global::min_year, record.year);
 			Amazon::Global::max_year = max(Amazon::Global::max_year, record.year);
@@ -182,7 +184,6 @@ int main(int argc, char *argv[]) {
 	cerr << "Number of edges: " << edges.size() << endl;
 	cerr << "Number of authors: " << author_id.size() << endl;
 	Components(&edges, author_id.size() + 1);
-
 	sort(reviews.begin(), reviews.end());
 	reviews[0].index = 0;
 	for(int i = 1; i < (int) reviews.size(); i++) {
@@ -192,11 +193,13 @@ int main(int argc, char *argv[]) {
 			reviews[i].index = i;
 		}
 	}
-
 	for(int i = 0; i < (int)reviews.size(); i++){
 		int cur_exp = -1;
 		int nominated_author = 0;
-		for(int j = 0; j < reviews[i].authors.size(); j++) {
+		if(reviews[i].authors.size() == 0 ) {
+			reviews[i].authors.push_back("Dummy Author" + SimpleIntToString(i));
+		}
+		for(int j = 0; j < (int)reviews[i].authors.size(); j++) {
 			string author = reviews[i].authors[j];
 			if(experience_level.find(author) == experience_level.end()) {
 				experience_level[author] = 0;
@@ -264,57 +267,58 @@ int main(int argc, char *argv[]) {
 		if(Amazon::Global::state_machine_doc_ratio == true && longest_one > 3){
 			burst_innovation.insert(word_states);
 		}
-		ofstream fout(Amazon::Global::output_directory + "timeline.txt");
-		cerr << "Size of innovations found: " << burst_innovation.size() << endl;
-		int x = 0;
-		for(WordTimeLine word_time_line : burst_innovation) {
-			//		cerr << word_time_line.word << " " << word_time_line.difference << endl;
-			x++;
-			if (x == 1000) {
-				break;
+	}
+	ofstream fout(Amazon::Global::output_directory + "timeline.txt");
+	cerr << "Size of innovations found: " << burst_innovation.size() << endl;
+	int x = 0;
+	for(WordTimeLine word_time_line : burst_innovation) {
+		//		cerr << word_time_line.word << " " << word_time_line.difference << endl;
+		x++;
+		if (x == 1000) {
+			break;
+		}
+		string word = word_time_line.word;
+		vector<MyTime> dates;
+		vector<int> times;
+		for(int index : *(word_time_line.review_index)) {
+			if(Amazon::Global::real_time == true) { // Gap is based on real time
+				times.push_back(reviews[index].time.Day(Amazon::Global::earliest));
+			} else { // Gap is based on the review number
+				// The index here is the day by day index not their index in the reviews array
+				times.push_back(reviews[index].index);
 			}
-			string word = word_time_line.word;
-			vector<MyTime> dates;
-			vector<int> times;
-			for(int index : *(word_time_line.review_index)) {
-				if(Amazon::Global::real_time == true) { // Gap is based on real time
-					times.push_back(reviews[index].time.Day(Amazon::Global::earliest));
-				} else { // Gap is based on the review number
-					// The index here is the day by day index not their index in the reviews array
-					times.push_back(reviews[index].index);
-				}
-				dates.push_back(reviews[index].time);
+			dates.push_back(reviews[index].time);
+		}
+
+		for(int index : *(word_time_line.review_index)) {
+			dates.push_back(reviews[index].time);
+		}
+
+		vector<bool> states = *(word_time_line.states);
+		top_innovations.push_back(word_time_line);
+
+		if(Amazon::Global::state_machine_doc_ratio == true) {
+			for(int j = 0; j < (int)states.size(); j++) {
+				fout << word << " " << 0 << " " << j+1  << " " << states[j] << " " << j + 1935 << endl;
+			}
+		} else {
+			for(int j = 0; j < (int)states.size(); j++) {
+				fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].year + dates[j].month/(double)12 << endl;
 			}
 
-			for(int index : *(word_time_line.review_index)) {
-				dates.push_back(reviews[index].time);
-			}
-
-			vector<bool> states = *(word_time_line.states);
-			top_innovations.push_back(word_time_line);
-
-			if(Amazon::Global::state_machine_doc_ratio == true) {
-				for(int j = 0; j < (int)states.size(); j++) {
-					fout << word << " " << 0 << " " << j+1  << " " << states[j] << " " << j + 1935 << endl;
-				}
-			} else {
-				for(int j = 0; j < (int)states.size(); j++) {
-					fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].year + dates[j].month/(double)12 << endl;
-				}
-
-			}
 		}
 	}
 	map<string, vector<Review>*> innovators_reviews;
 	ofstream innovators_out(Amazon::Global::output_directory + "distribution.txt");
+	vector<Review> reviews_have_word[2000];
 	if(Amazon::Global::state_machine_doc_ratio == false) {
 		Innovations::FindInnovationsBursts(&reviews, &top_innovations, &innovators_reviews);
 	} else {
-		vector<Review> v;
-		for(auto temp : words_states) {
-			v.clear();
+		int word_counter = 0;
+		for(auto temp : top_innovations) {
+			reviews_have_word[word_counter].clear();
 			int index = temp.burst_start + 1;
-			for(int j = 0 ; j < reviews.size(); j++) {
+			for(int j = 0 ; j < (int)reviews.size(); j++) {
 				if(reviews[j].time.day < index) {
 					continue;
 				}
@@ -326,16 +330,15 @@ int main(int argc, char *argv[]) {
 					string s;
 					ss >> s;
 					if(s == temp.word) {
-						v.push_back(reviews[j]);
+						reviews_have_word[word_counter].push_back(reviews[j]);
 					}
 				}
 			}
-			innovators_reviews.insert(make_pair(temp.word,v));
+			innovators_reviews.insert(make_pair(temp.word, &reviews_have_word[word_counter]));
+			word_counter++;
 		}
 	}
 	int num_of_innovation_reviews = 0;
-	double upvotes_of_reviews = 0;
-	double fraction_helpfulness = 0;
 	map<string, int> innovator_ids;
 
 	map<int, int> pdf_current_experience;
@@ -354,7 +357,13 @@ int main(int argc, char *argv[]) {
 					}
 				}
 				first = true;
-				innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
+				innovators_out << review.current_experience_level << " " << review.final_experience_level << " ";
+				for(int i = 0; i < review.authors.size(); i++) {
+					innovators_out << review.authors[i] << ", ";
+				}
+				innovators_out <<" ::::: " << p.first << endl;
+				innovators_out << endl;
+
 				num_of_innovation_reviews ++;
 				pdf_current_experience[review.current_experience_level] ++;
 				pdf_final_experience[review.final_experience_level] ++;
