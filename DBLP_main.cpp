@@ -217,6 +217,10 @@ int main(int argc, char *argv[]) {
 		reviews[i].current_experience_level = cur_exp;
 		swap(reviews[i].authors[0], reviews[i].authors[nominated_author]);
 	}
+	for(int i = 0; i < (int) reviews.size(); i++) {
+		reviews[i].final_experience_level = experience_level[reviews[i].authors[0]];
+	}
+
 	/*
 	// CountMonthlyAccumulatedReviews(&reviews);
 	// CountYearlyReviews(&reviews);
@@ -349,6 +353,9 @@ int main(int argc, char *argv[]) {
 		for(auto p : innovators_reviews) {
 			bool first = false;
 			for(Review review : *(p.second)) {
+				if(Amazon::Global::state_machine_doc_ratio == true) {
+					review.final_experience_level = review.authors[0]
+				}
 				if(first == false) {
 					if(Amazon::Global::state_machine_doc_ratio == false) {
 						innovator_ids[review.user_id] ++;
@@ -357,13 +364,14 @@ int main(int argc, char *argv[]) {
 					}
 				}
 				first = true;
-				innovators_out << review.current_experience_level << " " << review.final_experience_level << " ";
+				innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
+			/*
 				for(int i = 0; i < review.authors.size(); i++) {
 					innovators_out << review.authors[i] << ", ";
 				}
 				innovators_out <<" ::::: " << p.first << endl;
 				innovators_out << endl;
-
+			*/
 				num_of_innovation_reviews ++;
 				pdf_current_experience[review.current_experience_level] ++;
 				pdf_final_experience[review.final_experience_level] ++;
