@@ -217,8 +217,11 @@ int main(int argc, char *argv[]) {
 		reviews[i].current_experience_level = cur_exp;
 		swap(reviews[i].authors[0], reviews[i].authors[nominated_author]);
 	}
+	ofstream entire_dataset_distribution_fout("../Output_All/DBLP/Bursts/DocRatio/distribution.txt");
 	for(int i = 0; i < (int) reviews.size(); i++) {
 		reviews[i].final_experience_level = experience_level[reviews[i].authors[0]];
+		entire_dataset_distribution_fout << reviews[i].current_experience_level << " "
+				<< reviews[i].final_experience_level << endl;
 	}
 
 	/*
@@ -388,6 +391,7 @@ int main(int argc, char *argv[]) {
 	data_facts_out << "Average number of helpfulness in innovations: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
 	data_facts_out << "Average fraction of helpfulness in innovations: " << fraction_helpfulness / num_of_innovation_reviews << endl;
 	*/
+	cerr << " RESIDAM " << endl;
 	{ // Innovation final
 		ofstream innovators_cdf_out2(Amazon::Global::output_directory + "innovator_final_cdf.txt");
 		sum_cdf = 0;
@@ -398,7 +402,7 @@ int main(int argc, char *argv[]) {
 			innovators_cdf_out2 << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 		}
 	}
-
+	cerr << "RESIDAM 2 " << endl;
 	{ // All reviews present
 		pdf_current_experience.clear();
 		pdf_final_experience.clear();
@@ -415,6 +419,7 @@ int main(int argc, char *argv[]) {
 			all_cdf_out << it->first << " " << sum_cdf / (double)reviews.size() << endl;
 		}
 	}
+	cerr << "Residam 3" << endl;
 	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "distribution.txt");
 	for(Review review : reviews) {
 		input_distribution_out << review.current_experience_level << " " << review.final_experience_level << endl;
@@ -432,7 +437,8 @@ int main(int argc, char *argv[]) {
 		pdf_current_experience.clear();
 		pdf_final_experience.clear();
 	}
-
+	cerr << " residam 4 " << endl;
+	/*
 	{ // Usage after innovation
 		if(real_time == "RealTime") {
 			int sum = 0;
@@ -509,6 +515,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+	*/
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);
