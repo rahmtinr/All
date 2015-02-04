@@ -353,9 +353,6 @@ int main(int argc, char *argv[]) {
 		for(auto p : innovators_reviews) {
 			bool first = false;
 			for(Review review : *(p.second)) {
-				if(Amazon::Global::state_machine_doc_ratio == true) {
-					review.final_experience_level = review.authors[0]
-				}
 				if(first == false) {
 					if(Amazon::Global::state_machine_doc_ratio == false) {
 						innovator_ids[review.user_id] ++;
@@ -390,6 +387,7 @@ int main(int argc, char *argv[]) {
 	data_facts_out << "number of innovation words: " << innovators_reviews.size() << endl;
 	data_facts_out << "Average number of helpfulness in innovations: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
 	data_facts_out << "Average fraction of helpfulness in innovations: " << fraction_helpfulness / num_of_innovation_reviews << endl;
+	*/
 	{ // Innovation final
 		ofstream innovators_cdf_out2(Amazon::Global::output_directory + "innovator_final_cdf.txt");
 		sum_cdf = 0;
@@ -402,13 +400,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	{ // All reviews present
-		upvotes_of_reviews = 0;
-		fraction_helpfulness = 0;
 		pdf_current_experience.clear();
 		pdf_final_experience.clear();
 		for(Review review: reviews) {
-			upvotes_of_reviews += SimpleStringToDouble(review.helpfulness);
-			fraction_helpfulness += SimpleStringFractionToDouble(review.helpfulness);
 			pdf_current_experience[review.current_experience_level] ++;
 			pdf_final_experience[review.final_experience_level] ++;
 		}
@@ -514,7 +508,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
-	}*/
+	}
 	// UserDistributionBasedOnNumberOfReviews(&reviews, &distribution_for_entire_data_set);
 	/**/
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);
