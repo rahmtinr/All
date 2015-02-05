@@ -55,7 +55,7 @@ string MODE;
 string filename;
 string burst_mode;
 string real_time;
-
+int SIZE_OF_TOP_INNOVATIONS;
 void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
@@ -71,6 +71,8 @@ void initialize(char *argv[]) {
 	}
 	real_time = "RealTime";
 	Global::NAMEOFDATASET = "DBLP";
+
+	SIZE_OF_TOP_INNOVATIONS = 500;
 
 	if(burst_mode == "Longest") {
 		Amazon::Global::burst_mode = LONGBURST;
@@ -183,9 +185,17 @@ int main(int argc, char *argv[]) {
 	cerr << "Max year: " << Amazon::Global::max_year << endl;
 	cerr << "Number of edges: " << edges.size() << endl;
 	cerr << "Number of authors: " << author_id.size() << endl;
+	RemoveFakeNodes(&edges, author_id.size() + 1);
 	Components(&edges, author_id.size() + 1);
 	sort(reviews.begin(), reviews.end());
 	reviews[0].index = 0;
+	for(int i = 0; i < (int) reviews.size(); i++) {
+		for(int j = 0; j < reviews[i].authors.size(); j++) {
+			if(fake_nodes.find(author_id[reviews[i].authors[j]]) != fake_nodes.end()) {
+				reviews[i].authors.erase(reviews[i].authors.begin() + j);
+			}
+		}
+	}
 	for(int i = 1; i < (int) reviews.size(); i++) {
 		if(reviews[i].time == reviews[i-1].time) {
 			reviews[i].index = reviews[i-1].index;
@@ -223,7 +233,6 @@ int main(int argc, char *argv[]) {
 		entire_dataset_distribution_fout << reviews[i].current_experience_level << " "
 				<< reviews[i].final_experience_level << endl;
 	}
-
 	/*
 	// CountMonthlyAccumulatedReviews(&reviews);
 	// CountYearlyReviews(&reviews);
@@ -281,7 +290,7 @@ int main(int argc, char *argv[]) {
 	for(WordTimeLine word_time_line : burst_innovation) {
 		//		cerr << word_time_line.word << " " << word_time_line.difference << endl;
 		x++;
-		if (x == 1000) {
+		if (x == SIZE_OF_TOP_INNOVATIONS) {
 			break;
 		}
 		string word = word_time_line.word;
@@ -317,7 +326,7 @@ int main(int argc, char *argv[]) {
 	}
 	map<string, vector<Review>*> innovators_reviews;
 	ofstream innovators_out(Amazon::Global::output_directory + "distribution.txt");
-	vector<Review> reviews_have_word[2000];
+	vector<Review> reviews_have_word[SIZE_OF_TOP_INNOVATIONS + 10];
 	if(Amazon::Global::state_machine_doc_ratio == false) {
 		Innovations::FindInnovationsBursts(&reviews, &top_innovations, &innovators_reviews);
 	} else {
@@ -351,17 +360,17 @@ int main(int argc, char *argv[]) {
 	map<int, int> pdf_current_experience;
 	map<int,int> pdf_final_experience;
 	int sum_cdf = 0;
-
+	cerr << "! " << endl;
 	{ // Innovation present
 		for(auto p : innovators_reviews) {
 			bool first = false;
 			for(Review review : *(p.second)) {
-				if(first == false) {
-					if(Amazon::Global::state_machine_doc_ratio == false) {
+				if(Amazon::Global::state_machine_doc_ratio == false) {
+					if(first == false) {
 						innovator_ids[review.user_id] ++;
-					} else {
-						innovator_ids[review.authors[0]] ++;
 					}
+				} else {
+					innovator_ids[review.authors[0]] ++;
 				}
 				first = true;
 				innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
@@ -391,7 +400,6 @@ int main(int argc, char *argv[]) {
 	data_facts_out << "Average number of helpfulness in innovations: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
 	data_facts_out << "Average fraction of helpfulness in innovations: " << fraction_helpfulness / num_of_innovation_reviews << endl;
 	*/
-	cerr << " RESIDAM " << endl;
 	{ // Innovation final
 		ofstream innovators_cdf_out2(Amazon::Global::output_directory + "innovator_final_cdf.txt");
 		sum_cdf = 0;
@@ -402,7 +410,6 @@ int main(int argc, char *argv[]) {
 			innovators_cdf_out2 << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 		}
 	}
-	cerr << "RESIDAM 2 " << endl;
 	{ // All reviews present
 		pdf_current_experience.clear();
 		pdf_final_experience.clear();
@@ -419,7 +426,6 @@ int main(int argc, char *argv[]) {
 			all_cdf_out << it->first << " " << sum_cdf / (double)reviews.size() << endl;
 		}
 	}
-	cerr << "Residam 3" << endl;
 	ofstream input_distribution_out("../Output_All/" + Global::NAMEOFDATASET + "_bursts/" + "distribution.txt");
 	for(Review review : reviews) {
 		input_distribution_out << review.current_experience_level << " " << review.final_experience_level << endl;
@@ -437,7 +443,18 @@ int main(int argc, char *argv[]) {
 		pdf_current_experience.clear();
 		pdf_final_experience.clear();
 	}
-	cerr << " residam 4 " << endl;
+	set<int> different_components;
+	ofstream correlation_innovations_final_exp(Amazon::Global::output_directory + "innovation_final_exp.txt");
+	for(auto p : innovator_ids) {
+		string author = p.first;
+		if(author.substr(0,5) == "Dummy") {
+			continue;
+		}
+		int num_of_innovations = p.second;
+		correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << "\t" << author	 << endl;
+		different_components.insert(author_component[author_id[author]]);
+	}
+	cerr << "Different components: " << different_components.size() << endl;
 	/*
 	{ // Usage after innovation
 		if(real_time == "RealTime") {

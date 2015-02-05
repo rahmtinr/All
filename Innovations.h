@@ -317,7 +317,6 @@ public:
 			}
 			FindBurstsForWordsTimeDifference(time_gaps, word, &time_line);
 		}
-		exit(0);
 	}
 
 	static double ProbabilityFinderDocumentRatio (double alpha, double r, double d) {
