@@ -84,16 +84,16 @@ void ReadAllRecords(std::ifstream& fin, vector<DBLPRecord> *records,
 
 		for(int i = 0 ; i < (int)record.authors.size(); i++) {
 			if(author_id->find(record.authors[i]) == author_id->end()) {
-				author_id[record.authors[i]] = counter ++;
-				rev_author_id[counter - 1] = record.authors[i];
+				(*author_id)[record.authors[i]] = counter ++;
+				(*rev_author_id)[counter - 1] = record.authors[i];
 			}
-			int x = author_id[record.authors[i]];
+			int x = (*author_id)[record.authors[i]];
 			for (int j = i + 1; j < (int)record.authors.size(); j++) {
 				if(author_id->find(record.authors[j]) == author_id->end()) {
-					author_id[record.authors[j]] = counter++;
-					rev_author_id[counter - 1] = record.authors[j];
+					(*author_id)[record.authors[j]] = counter++;
+					(*rev_author_id)[counter - 1] = record.authors[j];
 				}
-				int y = author_id[record.authors[j]];
+				int y = (*author_id)[record.authors[j]];
 				if(y < x) {
 					swap(x,y);
 				}

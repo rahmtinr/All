@@ -194,14 +194,14 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	int cur_max = 0;
-	for(int j = 1; j < reviews.size(); j++) {
+	for(int j = 1; j < (int)reviews.size(); j++) {
 		if(most_innovative[j] > most_innovative[cur_max]) {
 			cur_max = j;
 		}
 	}
 	cerr << "------> most innovative paper " << endl;
 	cerr << reviews[cur_max].text << endl;
-	for(int i = 0; i < reviews[cur_max].authors.size(); i++) {
+	for(int i = 0; i < (int)reviews[cur_max].authors.size(); i++) {
 		cerr << reviews[cur_max].authors[i] << " " ;
 	}
 	cerr << reviews[cur_max].time.day + 1935 << endl;
@@ -312,12 +312,12 @@ int main(int argc, char *argv[]) {
 		// DFS over authors of a word
 		set<int> valid_nodes;
 		int index = -1;
-		for (int i = 0; i < top_innovations.size(); i++) {
+		for (int i = 0; i < (int)top_innovations.size(); i++) {
 			if(top_innovations[i].word == "quantum") {
 				index = top_innovations[i].burst_start + 1;
 			}
 		}
-		for(int i = 0; i < reviews.size(); i++) {
+		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(reviews[i].time.day < index) {
 				continue;
 			}
