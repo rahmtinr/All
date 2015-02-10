@@ -1,22 +1,26 @@
 CC = g++ 
 CFLAGS = -g -std=c++11 -Wall -O2
 LDFLAGS = -lm
+
 all : main.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
 	${CC} -o main main.o ${CFLAGS}
 
+DBLPFindInnovation : DBLPFindInnovation.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
+	${CC} -o dblpInnovation DBLP_main.o ${CFLAGS}
 
-DBLP : DBLPFindInnovationMain.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
-	${CC} -o dblp DBLP_main.o ${CFLAGS}
-
-DBLPAnalysis: DBLPAnalysisMain.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
+DBLPAnalysis: DBLPAnalysis.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
         ${CC} -o dblpAnalysis DBLPAnalysisMain.o ${CFLAGS}
 
 main.o : main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c main.cpp ${CFLAGS}
 
 
-DBLP_main.o : DBLP_main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
-	${CC} -c DBLP_main.cpp ${CFLAGS}
+DBLP_main.o : DBLPFindInnovationMain.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
+	${CC} -c DBLPFindInnovationMain.cpp ${CFLAGS}
+
+DBLPAnalysis.o : DBLPAnalysisMain.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
+	${CC} -c DBLPAnalysisMain.cpp ${CFLAGS}
+
 
 ReviewReader.o : ReviewReader.h AmazonUtility.h
 	${CC} -c ReviewReader.h ${CFLAGS}
