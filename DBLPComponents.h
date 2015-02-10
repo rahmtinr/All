@@ -28,6 +28,7 @@ int num_of_nodes = 0;
 int author_component[2 * 1000 * 1000];
 int current_comp;
 set<int> fake_nodes;
+
 void dfs(int x) {
 	author_component[x]  = current_comp;
 	num_of_nodes ++;
@@ -66,15 +67,19 @@ void RemoveFakeNodes(set<pair<int,int>> *edges, int counter){
 			}
 		}
 		if(neighbors.size() < 50) {
-			coeff = 0;
+			coeff = 1;
 		} else {
 			coeff = (double)local_edge / (double)(neighbors.size() * (neighbors.size() - 1));
 		}
-		if(coeff < (1e-3)) {
+		if(i == 108504) { // Jon.
+			cerr << "Jon: " << coeff << endl;
+		}
+		if(coeff < 1.2 * (1e-2)) {
 			fake_nodes.insert(i);
 			mark[i] = 1;
 		}
 	}
+	cerr << "Fake nodes size: " <<  fake_nodes.size() << endl;
 }
 
 void Components(set<pair<int, int> > *edges, int counter){
@@ -97,5 +102,29 @@ void Components(set<pair<int, int> > *edges, int counter){
 	cerr << "Min component size: " << min_component << endl;
 }
 
+void DfsOverValid(set<int> *valid_nodes) {
+	memset(mark,-1,sizeof mark);
+	for(int x : *valid_nodes) {
+		mark[x] = 0;
+	}
+	int innovators_comp = 0;
+	int biggest_comp = 0;
+	int second_comp = 0;
+	for(int x : *valid_nodes) {
+		if(mark[x] == 0) {
+			num_of_nodes = 0;
+			dfs(x);
+			if(num_of_nodes >= biggest_comp) {
+				second_comp = biggest_comp;
+				biggest_comp = num_of_nodes;
+			} else if(num_of_nodes > second_comp) {
+				second_comp = num_of_nodes;
+			}
+			innovators_comp++;
+		}
+	}
+	cerr << "Ratio of biggest components: " << biggest_comp / (double)valid_nodes->size() << " " << second_comp / (double)valid_nodes->size() << endl;
+	cerr << "The number of components on the induced graph of innovators is: " << innovators_comp << endl;
+}
 #endif /* DBLPCOMPONENTS_H_ */
 

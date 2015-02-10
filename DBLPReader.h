@@ -51,6 +51,62 @@ bool ReadOneRecord(std::ifstream& fin, vector<DBLPRecord> *Records) {
 	return FAIL;
 }
 
+void ReadAllRecords(std::ifstream& fin, vector<DBLPRecord> *records,
+		vector<Review> *reviews, set<pair<int, int> > *edges, map<string, int> *author_id,
+		map<int, string> *rev_author_id) {
+	int counter = 1;
+	// Read input.
+	while (true) {
+		if(!ReadOneRecord(fin, records)) {
+			break;
+		}
+		if(records->size() == 0) {
+			continue;
+		}
+		Review review;
+		DBLPRecord record = records->back();
+		review.time.year = 0;
+		review.time.month = 0;
+		// Changing years to days
+		review.time.day = (record.year - 1935); // 1936 is the first paper so we change
+
+		review.time.epoch_time = (record.year - 1935) * 60 * 60 * 24;
+		review.text = record.title;
+		review.product_title = record.venue;
+		review.product_id = record.venue;
+		review.helpfulness = "0/1";
+		for(string author : record.authors) {
+			review.authors.push_back(author);
+		}
+		reviews->push_back(review);
+		Amazon::Global::min_year = min(Amazon::Global::min_year, record.year);
+		Amazon::Global::max_year = max(Amazon::Global::max_year, record.year);
+
+		for(int i = 0 ; i < (int)record.authors.size(); i++) {
+			if(author_id->find(record.authors[i]) == author_id->end()) {
+				author_id[record.authors[i]] = counter ++;
+				rev_author_id[counter - 1] = record.authors[i];
+			}
+			int x = author_id[record.authors[i]];
+			for (int j = i + 1; j < (int)record.authors.size(); j++) {
+				if(author_id->find(record.authors[j]) == author_id->end()) {
+					author_id[record.authors[j]] = counter++;
+					rev_author_id[counter - 1] = record.authors[j];
+				}
+				int y = author_id[record.authors[j]];
+				if(y < x) {
+					swap(x,y);
+				}
+				edges->insert(make_pair(x,y));
+			}
+		}
+	}
+	cerr << "Min year: " << Amazon::Global::min_year << endl;
+	cerr << "Max year: " << Amazon::Global::max_year << endl;
+	cerr << "Number of edges: " << edges->size() << endl;
+	cerr << "Number of authors: " << author_id->size() << endl;
+
+}
 
 #endif /* DBLPREADER_H_ */
 
