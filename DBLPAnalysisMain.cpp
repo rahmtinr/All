@@ -372,17 +372,16 @@ int main(int argc, char *argv[]) {
 		different_components.insert(author_component[author_id[author]]);
 	}
 	cerr << "Different components: " << different_components.size() << endl;
-/*
+
 	for(auto p : innovation_at_cur_exp) { // Each innovation is the end of that guy! We imagine that the guy dies after that
 		string author = p.first;
 		if(author.substr(0,5) == "Dummy") {
 			continue;
 		}
 		int num_of_innovations = p.second;
-		//		correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << "\t" << author << endl;
 		correlation_innovations_current_exp << num_of_innovations << "\t" << experience_level[author] << endl;
 	}
-*/
+
 	{
 		// DFS over authors of a word
 		set<int> valid_nodes;
