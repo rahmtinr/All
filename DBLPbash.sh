@@ -1,10 +1,17 @@
 make DBLPFindInnovation
+if [ $? -ne 0 ]
+then
+    echo "Compilation error!"
+    exit 0
+fi
+echo "________________________________________"
 make DBLPAnalysis
 if [ $? -ne 0 ]
 then
     echo "Compilation error!"
     exit 0
 fi
+
 input_directory="./DBLPparser/"
 InputFiles=("DBLP")
 TimeMode=("RealTime")
@@ -26,8 +33,9 @@ for x in ${InputFiles[*]}; do
 #            rm $output_directory* -rf
 #            mkdir $output_directory"BurstPlots"
 #            mkdir $output_directory"AggregationPlots"
-           ./DBLPFindInnovation $input $burst_mode $StateMachine 2>temp  #always real time
-           ./DBLPAnalysis $input $burst_mode $StateMachine 2>temp  #always real time
+#           ./dblpFindInnovation $input $burst_mode $StateMachine #always real time
+           echo "Done with finding innovations, Starting Analysis ..." 
+           ./dblpAnalysis $input $burst_mode $StateMachine #always real time
            time_line_txt=$output_directory$x"_timeline.txt"
            awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory"words"
            Rscript "RScripts/innovation_correlation_final_exp.R" $output_directory$x"_innovation_final_exp.txt"

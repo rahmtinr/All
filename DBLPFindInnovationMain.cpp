@@ -136,8 +136,7 @@ int main(int argc, char *argv[]) {
 	ifstream fin(argv[1]);
 	ReadAllRecords(fin, &records, &reviews, &edges, &author_id, &rev_author_id);
 	RemoveFakeNodes(&edges, author_id.size() + 1);
-//	cerr << fake_nodes.size() << endl;
-//	return 0;
+
 	Components(&edges, author_id.size() + 1);
 	sort(reviews.begin(), reviews.end());
 	reviews[0].index = 0;
@@ -180,51 +179,12 @@ int main(int argc, char *argv[]) {
 		reviews[i].current_experience_level = cur_exp;
 		swap(reviews[i].authors[0], reviews[i].authors[nominated_author]);
 	}
-	// Random shuffle of nominated authors.
-	{
-		if(CREATE_RANDOM_BASELINE == true) {
-			vector<string> baseline_authors;
-			for(int i = 0; i < (int) reviews.size(); i++) {
-				if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
-					continue;
-				}
-				baseline_authors.push_back(reviews[i].authors[0]);
-			}
-			random_shuffle(baseline_authors.begin(), baseline_authors.end());
-			int last_unused = 0;
-			for(int i = 0; i < (int) reviews.size(); i++) {
-				if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
-					continue;
-				}
-				reviews[i].authors[0] = baseline_authors[last_unused++];
-			}
-		}
-	}
 	ofstream entire_dataset_distribution_fout("../Output_All/DBLP/Bursts/DocRatio/distribution.txt");
 	for(int i = 0; i < (int) reviews.size(); i++) {
 		reviews[i].final_experience_level = experience_level[reviews[i].authors[0]];
 		entire_dataset_distribution_fout << reviews[i].current_experience_level << " "
 				<< reviews[i].final_experience_level << endl;
 	}
-	/*
-	// CountMonthlyAccumulatedReviews(&reviews);
-	// CountYearlyReviews(&reviews);
-	// PerItemPerMonth(&reviews);
-	// PerItemPerYear(&reviews);
-	// Top products.
-	// int size_of_list = 40;
-	// TopProducts(size_of_list, &reviews);
-	// Video Average vs All average.
-	// ReviewsWithVideo(&reviews);
-	// StarAveragePerYear(&reviews);
-	// Time in Day is useless! The timestamp is on a daily basis
-	// StarAveragePerTimeInTheDay(&reviews);
-	//
-	// sort(reviews.begin(), reviews.end());
-	// Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
-	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
-	// Innovations::AnalyseInnovation(innovations, &reviews);
-	 */
 	cerr << "Review size: " << reviews.size() << endl;
 	if(Amazon::Global::state_machine_doc_ratio == true) {
 		Innovations::FindBurstsDocumentRatio(&words_states, &reviews);
@@ -294,7 +254,6 @@ int main(int argc, char *argv[]) {
 			for(int j = 0; j < (int)states.size(); j++) {
 				fout << word << " " << times[j] << " " << j+1  << " " << states[j] << " " << dates[j].year + dates[j].month/(double)12 << endl;
 			}
-
 		}
 	}
 	ofstream innovation_burst_year_out("./DBLPparser/words_start_burst.txt");
