@@ -265,6 +265,7 @@ int main(int argc, char *argv[]) {
 
 	map<int, int> pdf_current_experience;
 	map<int,int> pdf_final_experience;
+	map<string, int> innovation_at_cur_exp;
 	int sum_cdf = 0;
 	{ // Innovation present
 		for(auto p : innovators_reviews) {
@@ -275,7 +276,14 @@ int main(int argc, char *argv[]) {
 						innovator_ids[review.user_id] ++;
 					}
 				} else {
+					//Final experience
 					innovator_ids[review.authors[0]] ++;
+
+					//Current experience
+					innovation_at_cur_exp[review.authors[0] + SimpleIntToString(review.index)] =
+							innovator_ids[review.authors[0]];
+					experience_level[review.authors[0] + SimpleIntToString(review.index)] = review.current_experience_level;
+
 				}
 				first = true;
 				innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
@@ -352,6 +360,8 @@ int main(int argc, char *argv[]) {
 	// Correlation between experience and # of innovations + counting the number of components.
 	set<int> different_components;
 	ofstream correlation_innovations_final_exp(Amazon::Global::output_directory + "innovation_final_exp.txt");
+	ofstream correlation_innovations_current_exp(Amazon::Global::output_directory + "innovation_current_exp.txt");
+
 	for(auto p : innovator_ids) {
 		string author = p.first;
 		if(author.substr(0,5) == "Dummy") {
@@ -364,6 +374,16 @@ int main(int argc, char *argv[]) {
 	}
 	cerr << "Different components: " << different_components.size() << endl;
 
+	for(auto p : innovation_at_cur_exp) { // Each innovation is the end of that guy! We imagine that the guy dies after that
+		string author = p.first;
+		if(author.substr(0,5) == "Dummy") {
+			continue;
+		}
+		int num_of_innovations = p.second;
+		//		correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << "\t" << author << endl;
+		correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << endl;
+		different_components.insert(author_component[author_id[author]]);
+	}
 	{
 		// DFS over authors of a word
 		set<int> valid_nodes;
