@@ -277,12 +277,12 @@ int main(int argc, char *argv[]) {
 				} else {
 					//Final experience
 					innovator_ids[review.authors[0]] ++;
-/*
+
 					//Current experience
 					innovation_at_cur_exp[review.authors[0] + SimpleIntToString(review.index)] =
 							innovator_ids[review.authors[0]];
 				experience_level[review.authors[0] + SimpleIntToString(review.index)] = review.current_experience_level;
-*/
+
 				}
 				first = true;
 				innovators_out << review.current_experience_level << " " << review.final_experience_level << endl;
@@ -372,7 +372,7 @@ int main(int argc, char *argv[]) {
 		different_components.insert(author_component[author_id[author]]);
 	}
 	cerr << "Different components: " << different_components.size() << endl;
-
+/*
 	for(auto p : innovation_at_cur_exp) { // Each innovation is the end of that guy! We imagine that the guy dies after that
 		string author = p.first;
 		if(author.substr(0,5) == "Dummy") {
@@ -382,7 +382,7 @@ int main(int argc, char *argv[]) {
 		//		correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << "\t" << author << endl;
 		correlation_innovations_current_exp << num_of_innovations << "\t" << experience_level[author] << endl;
 	}
-
+*/
 	{
 		// DFS over authors of a word
 		set<int> valid_nodes;
