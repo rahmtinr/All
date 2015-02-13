@@ -3,4 +3,6 @@ all = read.table(paste(input_file, sep=""), header=FALSE)
 #jpeg('random_shuffle.jpg')
 #plot(all)
 #dev.off()
-cat("Correlation: ", cor(all$V1, all$V2), "\n")
+for (k in 0:498) {
+	cat("Correlation k: ", cor(all$V1[all$V3==k], all$V2[all$V3==k]), "\n")
+}
