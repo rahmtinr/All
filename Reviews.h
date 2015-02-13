@@ -30,6 +30,8 @@ public:
 	int index;
 	int current_experience_level; // how many reviews written before this one
 	int final_experience_level; // how many reviews written.
+	string current_exp_best_author;
+	string final_exp_best_author;
 	vector<string> authors;
 	friend ostream& operator << (ostream& out, const Review &review);
 	bool operator < (const Review &other) const { // this is based on time!

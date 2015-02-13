@@ -124,6 +124,16 @@ void initialize(char *argv[]) {
 	} else {
 		Amazon::Global::output_directory = "../Output_All/DBLP/Bursts/Appearance/" + Global::NAMEOFDATASET + "_";
 	}
+
+	//Read StopWords
+	ifstream fin_stop_words("stopwords.txt");
+	string s;
+	while(getline(fin_stop_words, s)) {
+		if(s == "") {
+			continue;
+		}
+		stop_words.insert(s);
+	}
 }
 
 int main(int argc, char *argv[]) {

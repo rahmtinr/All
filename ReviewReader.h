@@ -11,11 +11,14 @@
 #include<ctime>
 #include<cstdlib>
 #include<fstream>
+#include<set>
 #include<string>
 
 #include "AmazonUtility.h"
 
 using namespace std;
+
+set<string> stop_words;
 
 string GetField(string raw_input) {
 	int delimeter = raw_input.find(":");
