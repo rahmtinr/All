@@ -102,7 +102,7 @@ void Components(set<pair<int, int> > *edges, int counter){
 	cerr << "Min component size: " << min_component << endl;
 }
 
-void DfsOverValid(set<int> *valid_nodes) {
+void DfsOverValid(string word, set<int> *valid_nodes, double &best_ratio, double &worst_ratio, string &best_word, string &worst_word) {
 	memset(mark,-1,sizeof mark);
 	for(int x : *valid_nodes) {
 		mark[x] = 0;
@@ -123,8 +123,17 @@ void DfsOverValid(set<int> *valid_nodes) {
 			innovators_comp++;
 		}
 	}
-	cerr << "Ratio of biggest components: " << biggest_comp / (double)valid_nodes->size() << " " << second_comp / (double)valid_nodes->size() << endl;
-	cerr << "The number of components on the induced graph of innovators is: " << innovators_comp << endl;
+	double ratio = biggest_comp / (double) valid_nodes->size();
+	if(ratio < worst_ratio) {
+		worst_ratio = ratio;
+		worst_word = word;
+	}
+	if(ratio > best_ratio) {
+		best_ratio = ratio;
+		best_word = word;
+	}
+//	cerr << "Ratio of biggest components: " << biggest_comp / (double)valid_nodes->size() << " " << second_comp / (double)valid_nodes->size() << endl;
+//	cerr << "The number of components on the induced graph of innovators is: " << innovators_comp << endl;
 }
 #endif /* DBLPCOMPONENTS_H_ */
 

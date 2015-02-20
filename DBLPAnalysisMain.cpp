@@ -72,7 +72,7 @@ void initialize(char *argv[]) {
 	Global::NAMEOFDATASET = "DBLP";
 
 	SIZE_OF_TOP_INNOVATIONS = 500;
-	CREATE_RANDOM_BASELINE = false;
+	CREATE_RANDOM_BASELINE = true;
 	if(burst_mode == "Longest") {
 		Amazon::Global::burst_mode = LONGBURST;
 	} else if(burst_mode == "MaxBenefit") {
@@ -242,6 +242,10 @@ int main(int argc, char *argv[]) {
 			top_innovations.push_back(word_time_line);
 		}
 	}
+
+
+#if 0
+
 	map<string, vector<Review>*> innovators_reviews;
 	//	ofstream innovators_out(Amazon::Global::output_directory + "distribution.txt");
 	vector<Review> reviews_have_word[SIZE_OF_TOP_INNOVATIONS + 10];
@@ -254,9 +258,8 @@ int main(int argc, char *argv[]) {
 		most_innovative[j].first = 0;
 		most_innovative[j].second = j;
 	}
-	ofstream correlation_innovations_final_exp(Amazon::Global::output_directory + "innovation_final_exp.txt");
-	ofstream correlation_innovations_current_exp(Amazon::Global::output_directory + "innovation_current_exp.txt");
-	for(int k = 0; k < top_innovations.size(); k++) {
+
+	for(int k = 0; k < (int)top_innovations.size(); k++) {
 		WordTimeLine temp = top_innovations[k];
 		reviews_have_word[word_counter].clear();
 		int index = temp.burst_start + 1;
@@ -274,18 +277,24 @@ int main(int argc, char *argv[]) {
 				if(s == temp.word) {
 					most_innovative[j].first++;
 					reviews_have_word[word_counter].push_back(reviews[j]);
+					break;
 				}
 			}
 		}
 		innovators_reviews.insert(make_pair(temp.word, &reviews_have_word[word_counter]));
 		word_counter++;
-		//	}
-		//	sort(most_innovative.begin(), most_innovative.end());
-		//	reverse(most_innovative.begin(), most_innovative.end());
-		//	cerr << "------> most innovative paper " << endl;
-		//	for(int i = 0; i < 100; i++) {
-		//		cerr << most_innovative[i].first << "\t" << reviews[most_innovative[i].second].time.day + 1935 << "\t" <<reviews[most_innovative[i].second].text << endl;
-		//	}
+	}
+	/*	sort(most_innovative.begin(), most_innovative.end());
+	reverse(most_innovative.begin(), most_innovative.end());
+	cerr << "------> most innovative paper " << endl;
+	for(int i = 0; i < 100; i++) {
+		cerr << most_innovative[i].first << "\t" << reviews[most_innovative[i].second].time.day + 1935 << "\t" <<reviews[most_innovative[i].second].text << endl;
+	}
+	return 0;
+	 */
+	ofstream correlation_innovations_final_exp(Amazon::Global::output_directory + "innovation_final_exp.txt");
+	ofstream correlation_innovations_current_exp(Amazon::Global::output_directory + "innovation_current_exp.txt");
+	for(int k = 0; k < (int)top_innovations.size(); k += 20) {
 		int num_of_innovation_reviews = 0;
 		map<string, int> innovator_ids;
 		map<int, int> pdf_current_experience;
@@ -392,10 +401,10 @@ int main(int argc, char *argv[]) {
 			}
 			int num_of_innovations = p.second;
 			//		correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << "\t" << author << endl;
-			correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << endl;
+			correlation_innovations_final_exp << num_of_innovations << "\t" << experience_level[author] << " " << k << endl;
 			different_components.insert(author_component[author_id[author]]);
 		}
-//		cerr << "Different components: " << different_components.size() << endl;
+		//		cerr << "Different components of innovative authors: " << different_components.size() << endl;
 
 		for(auto p : innovation_at_cur_exp) { // Each innovation is the end of that guy! We imagine that the guy dies after that
 			string author = p.first;
@@ -407,38 +416,44 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	{
+		double best_ratio = 0;
+		double worst_ratio = 1;
+		string best_word, worst_word;
 		// DFS over authors of a word
-		set<int> valid_nodes;
-		int index = -1;
-		for (int i = 0; i < (int)top_innovations.size(); i++) {
-			if(top_innovations[i].word == "neural") {
-				index = top_innovations[i].burst_start + 1;
-			}
-		}
-		for(int i = 0; i < (int)reviews.size(); i++) {
-			if(reviews[i].time.day < index) {
-				continue;
-			}
-			if(reviews[i].time.day > index) {
-				break;
-			}
-			if(reviews[i].authors[0].substr(0,5) == "Dummy") {
-				continue;
-			}
-			stringstream ss(reviews[i].text);
-			while(!ss.eof()) {
-				string s;
-				ss >> s;
-				if(s == "algorithm") {
-					for(int j = 0; j < (int)reviews[i].authors.size(); j++) {
-						valid_nodes.insert(author_id[reviews[i].authors[j]]);
-					}
+		for(int k = 0; k <(int) top_innovations.size(); k++) {
+			set<int> valid_nodes;
+			int index = top_innovations[k].burst_start + 1;
+			for(int i = 0; i < (int)reviews.size(); i++) {
+				if(reviews[i].time.day < index - 1) {
+					continue;
+				}
+				if(reviews[i].time.day > index + 1) {
 					break;
 				}
+				if(reviews[i].authors[0].substr(0,5) == "Dummy") {
+					continue;
+				}
+				stringstream ss(reviews[i].text);
+				while(!ss.eof()) {
+					string s;
+					ss >> s;
+					if(s == top_innovations[k].word) {
+						for(int j = 0; j < (int)reviews[i].authors.size(); j++) {
+							valid_nodes.insert(author_id[reviews[i].authors[j]]);
+						}
+						break;
+					}
+				}
 			}
+			//			cerr << top_innovations[k].word << ":::: " << endl;
+			DfsOverValid(top_innovations[k].word, &valid_nodes, best_ratio, worst_ratio, best_word, worst_word);
 		}
-		DfsOverValid(&valid_nodes);
+		cerr << "Biggest giant component: " << best_word << " " << best_ratio << endl;
+		cerr << "Smallest giant component: " << worst_word << " " << worst_ratio << endl;
 	}
+
+#endif
+
 	/*
 	{ // Usage after innovation
 		if(real_time == "RealTime") {
@@ -522,4 +537,79 @@ int main(int argc, char *argv[]) {
 	//	UserAngrinessBasedOnNumberOfReviews(&reviews);
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
+
+
+	// Richard Feynman trace back
+	for(int k = 0; k < (int)top_innovations.size(); k++) {
+		WordTimeLine word_time_line = top_innovations[k];
+		int burst_start = word_time_line.burst_start;
+		string word = word_time_line.word;
+		if(word != "networks") {
+			continue;
+		}
+		cerr << word << " " << 1935 + burst_start << endl;
+		word = " " + word + " ";
+		vector<int> indecies_contain_word;
+		set<int> good_nodes, bad_nodes;
+		set<int> current_good_nodes, current_bad_nodes;
+		int current_year = burst_start - 3;
+		for(int i = 0; i < (int)reviews.size(); i++) {
+			if(reviews[i].text.find(word) == reviews[i].text.npos) {
+				continue;
+			}
+			indecies_contain_word.push_back(i);
+		}
+		for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
+			string author;
+			int index = indecies_contain_word[i];
+			if(reviews[index].time.day < burst_start - 3) { // Before our seeds
+				continue;
+			}
+			if(current_year != reviews[index].time.day) {
+				for(int x : current_bad_nodes) {
+					bad_nodes.insert(x);
+				}
+				for(int x : current_good_nodes) {
+					good_nodes.insert(x);
+				}
+				current_bad_nodes.clear();
+				current_good_nodes.clear();
+				current_year = reviews[index].time.day;
+			}
+			if(reviews[index].time.day == burst_start - 3) { // Set our seeds
+				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
+					author = reviews[index].authors[j];
+					good_nodes.insert(author_id[author]);
+				}
+			} else if(reviews[index].time.day < burst_start + 3){
+				bool check = false;
+				for(int j = 0; j < (int)reviews[index].authors.size(); j++) { // Find if they are connected or not
+					author = reviews[index].authors[j];
+					int id = author_id[author];
+					if(good_nodes.find(id) != good_nodes.end()) {
+						check = true;
+						break;
+					}
+				}
+				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
+					author = reviews[index].authors[j];
+					int id = author_id[author];
+					if(check == false) {
+						bad_nodes.insert(id);
+					} else {
+						if(bad_nodes.find(id) != bad_nodes.end()) {
+							continue;
+						} else {
+							good_nodes.insert(id);
+						}
+					}
+				}
+			} else {
+				break;
+			}
+		}
+		cout << word << " " << (double)good_nodes.size() / (good_nodes.size() + bad_nodes.size()) << endl;
+	}
+	return 0;
 }
+
