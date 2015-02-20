@@ -594,20 +594,32 @@ int main(int argc, char *argv[]) {
 				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
 					author = reviews[index].authors[j];
 					int id = author_id[author];
+					if(bad_nodes.find(id) != bad_nodes.end() || good_nodes.find(id) != good_nodes.end()) {
+						continue;
+					}
 					if(check == false) {
-						bad_nodes.insert(id);
-					} else {
-						if(bad_nodes.find(id) != bad_nodes.end()) {
-							continue;
-						} else {
-							good_nodes.insert(id);
+						if(current_good_nodes.find(id) == current_good_nodes.end()) {
+							current_bad_nodes.insert(id);
 						}
+					} else {
+						if(current_bad_nodes.find(id) == current_bad_nodes.end()) { // here we are being optimistic
+							current_bad_nodes.erase(id);
+						}
+						current_good_nodes.insert(id);
 					}
 				}
 			} else {
 				break;
 			}
 		}
+		for(int x : current_bad_nodes) {
+			bad_nodes.insert(x);
+		}
+		for(int x : current_good_nodes) {
+			good_nodes.insert(x);
+		}
+		current_bad_nodes.clear();
+		current_good_nodes.clear();
 		cout << word << " " << (double)good_nodes.size() / (good_nodes.size() + bad_nodes.size()) << endl;
 	}
 	return 0;
