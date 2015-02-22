@@ -56,6 +56,41 @@ int SIZE_OF_TOP_INNOVATIONS;
 bool CREATE_RANDOM_BASELINE;
 vector<bool> is_innovative;
 
+bool inc_dec_cmp(const pair<int, int> &x, const pair<int, int> &y) {
+	if(x.first == y.first) {
+		return x.second >  y.second;
+	}
+	return x.first < y.first;
+}
+
+long long inversion(vector<pair<int,int> > *v, int left, int right) { // v needs to be sorted by the first element
+	if(right - left == 1) {
+		return 0;
+	}
+	long long ret = 0;
+	int mid = (right + left) / 2;
+	ret += inversion(v, left, mid);
+	ret += inversion(v, mid, right);
+	vector<pair<int, int> > temp;
+	int p = left;
+	int q = mid;
+	while(p < mid && q < right) {
+		if((*v)[p].second <= (*v)[q].second) {
+			temp.push_back((*v)[p]);
+			p++;
+		} else {
+			temp.push_back((*v)[q]);
+			ret += mid - p;
+			q++;
+		}
+	}
+	for(int i = 0; i < temp.size(); i++) {
+		v[left++] = temp[i];
+	}
+	temp.clear();
+	return ret;
+}
+
 void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
@@ -644,13 +679,20 @@ int main(int argc, char *argv[]) {
 			if(prediction_tuple[i].size() == 0) {
 				continue;
 			}
-			cerr << prediction_tuple[1].size() << endl;
-			return 0;
-			for(int j = 0; j < (int)prediction_tuple[i].size(); j++) {
-				for(int k = j + 1; k < (int)prediction_tuple[i].size(); k++) {
-
-				}
+			for(int j = 0; j < prediction_tuple[i].size(); j++) {
+				prediction_tuple[i][j].second = -prediction_tuple[i][j].second;
 			}
+			sort(prediction_tuple[i].begin(), prediction_tuple[i].end(), inc_dec_cmp);
+			int bef = 0;
+			long long total = 0;
+			for(int j = 0; j < prediction_tuple[i].size(); j++) {
+				if(prediction_tuple[i][j] == prediction_tuple[i][bef]) {
+					continue;
+				}
+				total += (long long)(prediction_tuple[i].size() - j) * (j - bef);
+				bef = j;
+			}
+			cerr << "#inversion: " << total - inversion(&(prediction_tuple)[i], 0, prediction_tuple[i].size()) << "  total: " << total << endl;
 		}
 	}
 	return 0;
