@@ -54,6 +54,7 @@ string burst_mode;
 string real_time;
 int SIZE_OF_TOP_INNOVATIONS;
 bool CREATE_RANDOM_BASELINE;
+vector<bool> is_innovative;
 
 void initialize(char *argv[]) {
 	filename = argv[1];
@@ -243,9 +244,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-
-#if 0
-
 	map<string, vector<Review>*> innovators_reviews;
 	//	ofstream innovators_out(Amazon::Global::output_directory + "distribution.txt");
 	vector<Review> reviews_have_word[SIZE_OF_TOP_INNOVATIONS + 10];
@@ -258,12 +256,14 @@ int main(int argc, char *argv[]) {
 		most_innovative[j].first = 0;
 		most_innovative[j].second = j;
 	}
-
 	for(int k = 0; k < (int)top_innovations.size(); k++) {
 		WordTimeLine temp = top_innovations[k];
 		reviews_have_word[word_counter].clear();
 		int index = temp.burst_start + 1;
 		for(int j = 0 ; j < (int)reviews.size(); j++) {
+			if(k == 0) {
+				is_innovative.push_back(false);
+			}
 			if(reviews[j].time.day < index - 1) {
 				continue;
 			}
@@ -277,6 +277,7 @@ int main(int argc, char *argv[]) {
 				if(s == temp.word) {
 					most_innovative[j].first++;
 					reviews_have_word[word_counter].push_back(reviews[j]);
+					is_innovative[j] = true;
 					break;
 				}
 			}
@@ -284,7 +285,9 @@ int main(int argc, char *argv[]) {
 		innovators_reviews.insert(make_pair(temp.word, &reviews_have_word[word_counter]));
 		word_counter++;
 	}
-	/*	sort(most_innovative.begin(), most_innovative.end());
+#if 0
+	/*	sort(most_
+	 * innovative.begin(), most_innovative.end());
 	reverse(most_innovative.begin(), most_innovative.end());
 	cerr << "------> most innovative paper " << endl;
 	for(int i = 0; i < 100; i++) {
@@ -544,25 +547,22 @@ int main(int argc, char *argv[]) {
 		WordTimeLine word_time_line = top_innovations[k];
 		int burst_start = word_time_line.burst_start;
 		string word = word_time_line.word;
-		if(word != "networks") {
-			continue;
-		}
-		cerr << word << " " << 1935 + burst_start << endl;
 		word = " " + word + " ";
 		vector<int> indecies_contain_word;
 		set<int> good_nodes, bad_nodes;
 		set<int> current_good_nodes, current_bad_nodes;
 		int current_year = burst_start - 3;
 		for(int i = 0; i < (int)reviews.size(); i++) {
-			if(reviews[i].text.find(word) == reviews[i].text.npos) {
+			if(reviews[i].text.find(word) == reviews[i].text.npos || reviews[i].authors[0].substr(0, 5) == "Dummy") {
 				continue;
 			}
 			indecies_contain_word.push_back(i);
 		}
+		int c = 0;
 		for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
 			string author;
 			int index = indecies_contain_word[i];
-			if(reviews[index].time.day < burst_start - 3) { // Before our seeds
+			if(reviews[index].time.day < burst_start - c) { // Before our seeds
 				continue;
 			}
 			if(current_year != reviews[index].time.day) {
@@ -576,14 +576,14 @@ int main(int argc, char *argv[]) {
 				current_good_nodes.clear();
 				current_year = reviews[index].time.day;
 			}
-			if(reviews[index].time.day == burst_start - 3) { // Set our seeds
+			if(reviews[index].time.day == burst_start - c) { // Set our seeds
 				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
 					author = reviews[index].authors[j];
 					good_nodes.insert(author_id[author]);
 				}
-			} else if(reviews[index].time.day < burst_start + 3){
+			} else if(reviews[index].time.day < burst_start + 3){ // Find if they are connected or not
 				bool check = false;
-				for(int j = 0; j < (int)reviews[index].authors.size(); j++) { // Find if they are connected or not
+				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
 					author = reviews[index].authors[j];
 					int id = author_id[author];
 					if(good_nodes.find(id) != good_nodes.end()) {
@@ -621,6 +621,37 @@ int main(int argc, char *argv[]) {
 		current_bad_nodes.clear();
 		current_good_nodes.clear();
 		cout << word << " " << (double)good_nodes.size() / (good_nodes.size() + bad_nodes.size()) << endl;
+	}
+	{
+		map<string, int> present_exp;
+		map<string, int> present_innovations;
+		// Comparing innovations with final xp
+		vector<pair<int, int> >prediction_tuple[2000]; // In each row we have a tuple of # innovation #final xp
+		for(int i = 0; i < (int)reviews.size(); i++) {
+			if(is_innovative[i] == true) {
+				present_innovations[reviews[i].current_exp_best_author]++;
+			}
+			if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
+				continue;
+			}
+			for(int j = 0; j < (int)reviews[i].authors.size(); j++) {
+				string author = reviews[i].authors[j];
+				present_exp[author]++;
+				prediction_tuple[present_exp[author]].push_back(make_pair(present_innovations[author] , experience_level[author]));
+			}
+		}
+		for(int i = 0; i < 1000; i++) {
+			if(prediction_tuple[i].size() == 0) {
+				continue;
+			}
+			cerr << prediction_tuple[1].size() << endl;
+			return 0;
+			for(int j = 0; j < (int)prediction_tuple[i].size(); j++) {
+				for(int k = j + 1; k < (int)prediction_tuple[i].size(); k++) {
+
+				}
+			}
+		}
 	}
 	return 0;
 }
