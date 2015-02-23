@@ -48,7 +48,6 @@ map<string, int> experience_level;
 set<WordTimeLine> burst_innovation;
 string MODE;
 
-
 string filename;
 string burst_mode;
 string real_time;
@@ -84,8 +83,16 @@ long long inversion(vector<pair<int,int> > *v, int left, int right) { // v needs
 			q++;
 		}
 	}
-	for(int i = 0; i < temp.size(); i++) {
-		v[left++] = temp[i];
+	while(p < mid) {
+		temp.push_back((*v)[p]);
+		p++;
+	}
+	while(q < right) {
+		temp.push_back((*v)[q]);
+		q++;
+	}
+	for(int i = 0; i <(int) temp.size(); i++) {
+		(*v)[left++] = temp[i];
 	}
 	temp.clear();
 	return ret;
@@ -107,8 +114,8 @@ void initialize(char *argv[]) {
 	real_time = "RealTime";
 	Global::NAMEOFDATASET = "DBLP";
 
-	SIZE_OF_TOP_INNOVATIONS = 500;
-	CREATE_RANDOM_BASELINE = true;
+	SIZE_OF_TOP_INNOVATIONS = 2000;
+	CREATE_RANDOM_BASELINE = false;
 	if(burst_mode == "Longest") {
 		Amazon::Global::burst_mode = LONGBURST;
 	} else if(burst_mode == "MaxBenefit") {
@@ -236,7 +243,6 @@ int main(int argc, char *argv[]) {
 		entire_dataset_distribution_fout << reviews[i].current_experience_level << " "
 				<< reviews[i].final_experience_level << endl;
 	}
-
 	// Random shuffle of nominated authors.
 	{
 		if(CREATE_RANDOM_BASELINE == true) {
@@ -278,7 +284,6 @@ int main(int argc, char *argv[]) {
 			top_innovations.push_back(word_time_line);
 		}
 	}
-
 	map<string, vector<Review>*> innovators_reviews;
 	//	ofstream innovators_out(Amazon::Global::output_directory + "distribution.txt");
 	vector<Review> reviews_have_word[SIZE_OF_TOP_INNOVATIONS + 10];
@@ -290,15 +295,13 @@ int main(int argc, char *argv[]) {
 	for(int j = 0; j < (int)reviews.size(); j++) {
 		most_innovative[j].first = 0;
 		most_innovative[j].second = j;
+		is_innovative.push_back(false);
 	}
 	for(int k = 0; k < (int)top_innovations.size(); k++) {
 		WordTimeLine temp = top_innovations[k];
 		reviews_have_word[word_counter].clear();
 		int index = temp.burst_start + 1;
 		for(int j = 0 ; j < (int)reviews.size(); j++) {
-			if(k == 0) {
-				is_innovative.push_back(false);
-			}
 			if(reviews[j].time.day < index - 1) {
 				continue;
 			}
@@ -586,14 +589,14 @@ int main(int argc, char *argv[]) {
 		vector<int> indecies_contain_word;
 		set<int> good_nodes, bad_nodes;
 		set<int> current_good_nodes, current_bad_nodes;
-		int current_year = burst_start - 3;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(reviews[i].text.find(word) == reviews[i].text.npos || reviews[i].authors[0].substr(0, 5) == "Dummy") {
 				continue;
 			}
 			indecies_contain_word.push_back(i);
 		}
-		int c = 0;
+		int c = 1;
+		int current_year = burst_start - c;
 		for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
 			string author;
 			int index = indecies_contain_word[i];
@@ -655,8 +658,11 @@ int main(int argc, char *argv[]) {
 		}
 		current_bad_nodes.clear();
 		current_good_nodes.clear();
-		cout << word << " " << (double)good_nodes.size() / (good_nodes.size() + bad_nodes.size()) << endl;
+		cout << word << " " << burst_start + 1935 << " " << (double)good_nodes.size() / (good_nodes.size() + bad_nodes.size()) << " good: " << good_nodes.size() << " bad: " << bad_nodes.size() << endl;
 	}
+
+
+	/*
 	{
 		map<string, int> present_exp;
 		map<string, int> present_innovations;
@@ -675,26 +681,34 @@ int main(int argc, char *argv[]) {
 				prediction_tuple[present_exp[author]].push_back(make_pair(present_innovations[author] , experience_level[author]));
 			}
 		}
+		ofstream pairwise_comparison_fout(Amazon::Global::output_directory + "pairwise_comparison.txt");
+		// first present exp for this author,second column is inversion, third column is the total number of pairs
+		// forth column is accuracy
 		for(int i = 0; i < 1000; i++) {
-			if(prediction_tuple[i].size() == 0) {
+			if(prediction_tuple[i].size() < 2) {
 				continue;
 			}
-			for(int j = 0; j < prediction_tuple[i].size(); j++) {
+			for(int j = 0; j < (int)prediction_tuple[i].size(); j++) {
 				prediction_tuple[i][j].second = -prediction_tuple[i][j].second;
 			}
-			sort(prediction_tuple[i].begin(), prediction_tuple[i].end(), inc_dec_cmp);
+			sort(prediction_tuple[i].begin(), prediction_tuple[i].end());
 			int bef = 0;
-			long long total = 0;
-			for(int j = 0; j < prediction_tuple[i].size(); j++) {
-				if(prediction_tuple[i][j] == prediction_tuple[i][bef]) {
+			long long wrong = 0;
+			for(int j = 0; j < (int)prediction_tuple[i].size(); j++) {
+				if(prediction_tuple[i][j].first == prediction_tuple[i][bef].first) {
 					continue;
 				}
-				total += (long long)(prediction_tuple[i].size() - j) * (j - bef);
+//				total += (long long)(prediction_tuple[i].size() - j) * (j - bef);
+				wrong += ((long long)(j - bef) * (j - bef - 1)) / 2;
 				bef = j;
 			}
-			cerr << "#inversion: " << total - inversion(&(prediction_tuple)[i], 0, prediction_tuple[i].size()) << "  total: " << total << endl;
+			wrong += ((long long)(prediction_tuple[i].size() - bef) * (prediction_tuple[i].size() - bef - 1)) / 2;
+			long long total = ((long long)prediction_tuple[i].size() * (prediction_tuple[i].size() - 1)) / 2 - wrong;
+			long long correct = inversion(&(prediction_tuple[i]), 0, prediction_tuple[i].size());
+			pairwise_comparison_fout << i << " " << correct << " " << total << " " << (double)correct / total << endl;
 		}
 	}
+	*/
 	return 0;
 }
 
