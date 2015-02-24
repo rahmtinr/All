@@ -595,31 +595,48 @@ int main(int argc, char *argv[]) {
 			}
 			indecies_contain_word.push_back(i);
 		}
-		int c = 1;
-		int current_year = burst_start - c;
-		for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
+		if(indecies_contain_word.size() < 500) { // the word needs to be there at least 500 times.
+			continue;
+		}
+		int current_year;
+		int best_paper = -1;
+		int best_number_nodes = 0;
+		int all_nodes = 0;
+		for(int l = 0; l < (int) indecies_contain_word.size(); l++) {
 			string author;
-			int index = indecies_contain_word[i];
-			if(reviews[index].time.day < burst_start - c) { // Before our seeds
-				continue;
+
+			good_nodes.clear();
+			bad_nodes.clear();
+			int indexL = indecies_contain_word[l];
+			current_year = reviews[indexL].time.day;
+			for(int j = 0; j < (int)reviews[indexL].authors.size(); j++) {
+				author = reviews[indexL].authors[j];
+				good_nodes.insert(author_id[author]);
 			}
-			if(current_year != reviews[index].time.day) {
-				for(int x : current_bad_nodes) {
-					bad_nodes.insert(x);
+			for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
+				string author;
+				int index = indecies_contain_word[i];
+				if(reviews[index].time.day < reviews[indexL].time.day) {
+					for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
+						author = reviews[index].authors[j];
+						if(good_nodes.find(author_id[author]) == good_nodes.end()) {
+							bad_nodes.insert(author_id[author]);
+						}
+					}
+					continue;
 				}
-				for(int x : current_good_nodes) {
-					good_nodes.insert(x);
+				if(current_year != reviews[index].time.day) {
+					for(int x : current_bad_nodes) {
+						bad_nodes.insert(x);
+					}
+					for(int x : current_good_nodes) {
+						good_nodes.insert(x);
+					}
+					current_bad_nodes.clear();
+					current_good_nodes.clear();
+					current_year = reviews[index].time.day;
 				}
-				current_bad_nodes.clear();
-				current_good_nodes.clear();
-				current_year = reviews[index].time.day;
-			}
-			if(reviews[index].time.day == burst_start - c) { // Set our seeds
-				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
-					author = reviews[index].authors[j];
-					good_nodes.insert(author_id[author]);
-				}
-			} else if(reviews[index].time.day < burst_start + 3){ // Find if they are connected or not
+				// Find if they are connected or not
 				bool check = false;
 				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
 					author = reviews[index].authors[j];
@@ -646,21 +663,30 @@ int main(int argc, char *argv[]) {
 						current_good_nodes.insert(id);
 					}
 				}
-			} else {
-				break;
+			}
+			for(int x : current_bad_nodes) {
+				bad_nodes.insert(x);
+			}
+			for(int x : current_good_nodes) {
+				good_nodes.insert(x);
+			}
+			current_bad_nodes.clear();
+			current_good_nodes.clear();
+			if((int)good_nodes.size() > best_number_nodes) {
+				best_number_nodes = good_nodes.size();
+				all_nodes = good_nodes.size() + bad_nodes.size();
+				best_paper = indexL;
 			}
 		}
-		for(int x : current_bad_nodes) {
-			bad_nodes.insert(x);
+		cerr << "Best paper for word " << top_innovations[k].word << ": " <<  reviews[best_paper].text
+				<< " " << reviews[best_paper].time.day + 1935 << " " << burst_start + 1935<< endl;
+		cerr << best_number_nodes << " " << best_number_nodes / (double)all_nodes << endl;
+		for(int j = 0; j < (int)reviews[best_paper].authors.size(); j++) {
+			cerr << reviews[best_paper].authors[j] << " ";
 		}
-		for(int x : current_good_nodes) {
-			good_nodes.insert(x);
-		}
-		current_bad_nodes.clear();
-		current_good_nodes.clear();
-		cout << word << " " << burst_start + 1935 << " " << (double)good_nodes.size() / (good_nodes.size() + bad_nodes.size()) << " good: " << good_nodes.size() << " bad: " << bad_nodes.size() << endl;
+		cerr << endl;
+		cerr <<" _______________________ " <<endl;
 	}
-
 
 	/*
 	{
@@ -708,7 +734,7 @@ int main(int argc, char *argv[]) {
 			pairwise_comparison_fout << i << " " << correct << " " << total << " " << (double)correct / total << endl;
 		}
 	}
-	*/
+	 */
 	return 0;
 }
 
