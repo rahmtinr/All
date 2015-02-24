@@ -579,113 +579,102 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 
-
+	cerr << "STARTING FEYNMAN" << endl;
 	// Richard Feynman trace back
 	for(int k = 0; k < (int)top_innovations.size(); k++) {
 		WordTimeLine word_time_line = top_innovations[k];
 		int burst_start = word_time_line.burst_start;
 		string word = word_time_line.word;
-		word = " " + word + " ";
 		vector<int> indecies_contain_word;
-		set<int> good_nodes, bad_nodes;
-		set<int> current_good_nodes, current_bad_nodes;
+		map<string, int> local_author_id;
+		int local_counter = 0;
+		map<int, int> graph[300 * 1000]; // (author,t)
+		map<int, int> tree[300 * 1000];
+		int local_earliest[300 * 1000];
+		int Q[300 * 1000];
 		for(int i = 0; i < (int)reviews.size(); i++) {
-			if(reviews[i].text.find(word) == reviews[i].text.npos || reviews[i].authors[0].substr(0, 5) == "Dummy") {
+			if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
+				continue;
+			}
+			stringstream ss(reviews[i].text);
+			bool check = false;
+			while(!ss.eof()) {
+				string s;
+				ss >> s;
+				if(s == word) {
+					check = true;
+					break;
+				}
+			}
+			if(check == false) {
 				continue;
 			}
 			indecies_contain_word.push_back(i);
+			for(string author : reviews[i].authors) {
+				if(local_author_id.find(author) == local_author_id.end()){
+					local_author_id[author] = local_counter++;
+					local_earliest[local_counter - 1] = reviews[i].time.day;
+				}
+			}
+			for(string author1 : reviews[i].authors) {
+				for(string author2 : reviews[i].authors) {
+					if(author1 == author2) {
+						continue;
+					}
+					int x = local_author_id[author1];
+					int y = local_author_id[author2];
+					if(graph[x].find(y) == graph[x].end()) {
+						graph[x][y] = reviews[i].time.day;
+					}
+				}
+			}
 		}
 		if(indecies_contain_word.size() < 500) { // the word needs to be there at least 500 times.
 			continue;
 		}
-		int current_year;
-		int best_paper = -1;
-		int best_number_nodes = 0;
-		int all_nodes = 0;
-		for(int l = 0; l < (int) indecies_contain_word.size(); l++) {
-			string author;
+		//MST STARTS
 
-			good_nodes.clear();
-			bad_nodes.clear();
+		//MST ENDS
+		// BFS STARTS
+		vector<bool> local_mark(local_counter);
+		int max_people = 0;
+		string best_author;
+		int best_index;
+		for(int l = 0; l < (int)indecies_contain_word.size(); l++) {
 			int indexL = indecies_contain_word[l];
-			current_year = reviews[indexL].time.day;
-			for(int j = 0; j < (int)reviews[indexL].authors.size(); j++) {
-				author = reviews[indexL].authors[j];
-				good_nodes.insert(author_id[author]);
-			}
-			for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
-				string author;
-				int index = indecies_contain_word[i];
-				if(reviews[index].time.day < reviews[indexL].time.day) {
-					for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
-						author = reviews[index].authors[j];
-						if(good_nodes.find(author_id[author]) == good_nodes.end()) {
-							bad_nodes.insert(author_id[author]);
+			for(string author : reviews[indexL].authors) {
+				if(local_mark[local_author_id[author]] == false) {
+					int head = 0;
+					int tail = 0;
+					Q[tail++] = local_author_id[author];
+					while(head < tail) {
+						int temp = Q[head];
+						for(pair<int, int> p : graph[temp]) {
+							if(local_mark[p.first] == true) {
+								continue;
+							}
+							if(p.second != local_earliest[p.first]) {
+								continue;
+							}
+							Q[tail++] = p.first;
+							local_mark[p.first] = true;
 						}
+						head++;
 					}
-					continue;
-				}
-				if(current_year != reviews[index].time.day) {
-					for(int x : current_bad_nodes) {
-						bad_nodes.insert(x);
-					}
-					for(int x : current_good_nodes) {
-						good_nodes.insert(x);
-					}
-					current_bad_nodes.clear();
-					current_good_nodes.clear();
-					current_year = reviews[index].time.day;
-				}
-				// Find if they are connected or not
-				bool check = false;
-				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
-					author = reviews[index].authors[j];
-					int id = author_id[author];
-					if(good_nodes.find(id) != good_nodes.end()) {
-						check = true;
-						break;
+					if(max_people < tail) {
+						max_people = tail;
+						best_author = author;
+						best_index = indexL;
 					}
 				}
-				for(int j = 0; j < (int)reviews[index].authors.size(); j++) {
-					author = reviews[index].authors[j];
-					int id = author_id[author];
-					if(bad_nodes.find(id) != bad_nodes.end() || good_nodes.find(id) != good_nodes.end()) {
-						continue;
-					}
-					if(check == false) {
-						if(current_good_nodes.find(id) == current_good_nodes.end()) {
-							current_bad_nodes.insert(id);
-						}
-					} else {
-						if(current_bad_nodes.find(id) == current_bad_nodes.end()) { // here we are being optimistic
-							current_bad_nodes.erase(id);
-						}
-						current_good_nodes.insert(id);
-					}
-				}
-			}
-			for(int x : current_bad_nodes) {
-				bad_nodes.insert(x);
-			}
-			for(int x : current_good_nodes) {
-				good_nodes.insert(x);
-			}
-			current_bad_nodes.clear();
-			current_good_nodes.clear();
-			if((int)good_nodes.size() > best_number_nodes) {
-				best_number_nodes = good_nodes.size();
-				all_nodes = good_nodes.size() + bad_nodes.size();
-				best_paper = indexL;
 			}
 		}
-		cerr << "Best paper for word " << top_innovations[k].word << ": " <<  reviews[best_paper].text
-				<< " " << reviews[best_paper].time.day + 1935 << " " << burst_start + 1935<< endl;
-		cerr << best_number_nodes << " " << best_number_nodes / (double)all_nodes << endl;
-		for(int j = 0; j < (int)reviews[best_paper].authors.size(); j++) {
-			cerr << reviews[best_paper].authors[j] << " ";
+		// BFS ENDS
+		cerr << word << " :: " << max_people << " " << reviews[best_index].text << endl;
+		for(string author : reviews[best_index].authors) {
+			cerr << author << " ";
 		}
-		cerr << endl;
-		cerr <<" _______________________ " <<endl;
+		cerr << endl << "________________________________________" << endl;
 	}
 
 	/*
