@@ -43,7 +43,7 @@ set<WordTimeLine> words_states;
 vector<WordTimeLine> top_innovations;
 // Langauge innovations
 vector<pair<string, vector<Review> > >  innovations[100];
-map<int,int> distribution_for_entire_data_set;
+map<int, int> distribution_for_entire_data_set;
 map<string, int> experience_level;
 set<WordTimeLine> burst_innovation;
 string MODE;
@@ -55,11 +55,25 @@ int SIZE_OF_TOP_INNOVATIONS;
 bool CREATE_RANDOM_BASELINE;
 vector<bool> is_innovative;
 
-bool inc_dec_cmp(const pair<int, int> &x, const pair<int, int> &y) {
-	if(x.first == y.first) {
-		return x.second >  y.second;
+struct Edge{
+	int x, y, t;
+	bool operator < (const Edge &other) const {
+		if(t == other.t) {
+			if(x == other.x){
+				return y < other.y;
+			}
+			return x < other.x;
+		}
+		return t < other.t;
 	}
-	return x.first < y.first;
+};
+
+int FindPar(int x, vector<int> *par) {
+	if((*par)[x] == x) {
+		return x;
+	}
+	(*par)[x] = FindPar((*par)[x], par);
+	return (*par)[x];
 }
 
 long long inversion(vector<pair<int,int> > *v, int left, int right) { // v needs to be sorted by the first element
@@ -579,19 +593,24 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 
+
 	cerr << "STARTING FEYNMAN" << endl;
 	// Richard Feynman trace back
+	ofstream feynman_fout(Amazon::Global::output_directory + "Feynman.txt");
 	for(int k = 0; k < (int)top_innovations.size(); k++) {
 		WordTimeLine word_time_line = top_innovations[k];
-		int burst_start = word_time_line.burst_start;
 		string word = word_time_line.word;
+		cerr << "starting " << k << " " << word << endl;
 		vector<int> indecies_contain_word;
 		map<string, int> local_author_id;
 		int local_counter = 0;
-		map<int, int> graph[300 * 1000]; // (author,t)
-		map<int, int> tree[300 * 1000];
-		int local_earliest[300 * 1000];
-		int Q[300 * 1000];
+		const int H = 1000 * 1000;
+		vector<map<int, int>> graph(H); // (author,t)
+		vector<map<int, int>> tree(H);
+		vector<int> local_earliest(H);
+		vector<Edge> edges;
+		vector<int> Q(H);
+		cerr << "BUILDING GRAPH " << endl;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
 				continue;
@@ -625,21 +644,55 @@ int main(int argc, char *argv[]) {
 					int y = local_author_id[author2];
 					if(graph[x].find(y) == graph[x].end()) {
 						graph[x][y] = reviews[i].time.day;
+						if(x < y) {
+							Edge edge;
+							edge.x = x;
+							edge.y = y;
+							edge.t = reviews[i].time.day;
+							edges.push_back(edge);
+						}
 					}
 				}
 			}
 		}
 		if(indecies_contain_word.size() < 500) { // the word needs to be there at least 500 times.
+			cerr << "GOING UP " << endl;
 			continue;
 		}
+		cerr << "MST STARTS " << endl;
 		//MST STARTS
-
+		{
+			sort(edges.begin(), edges.end());
+			vector<int> par(local_counter);
+			vector<int> size_comp(local_counter);
+			for(int i = 0; i < local_counter; i++) {
+				par[i] = i;
+			}
+			for(int i = 0; i < (int)edges.size(); i++) {
+				int parx = FindPar(edges[i].x, &par);
+				int pary = FindPar(edges[i].y, &par);
+				if(parx == pary) {
+					continue;
+				}
+				if(size_comp[parx] < size_comp[pary]) {
+					par[parx] = pary;
+				} else if(size_comp[parx] > size_comp[pary]) {
+					par[pary] = parx;
+				} else {
+					par[pary] = parx;
+					size_comp[parx]++;
+				}
+				tree[edges[i].x][edges[i].y] = edges[i].t;
+				tree[edges[i].y][edges[i].x] = edges[i].t;
+			}
+		}
 		//MST ENDS
+		cerr << "BFS STARTS" << endl;
 		// BFS STARTS
-		vector<bool> local_mark(local_counter);
+		vector<bool> local_mark(H);
 		int max_people = 0;
 		string best_author;
-		int best_index;
+		int best_index= 0;
 		for(int l = 0; l < (int)indecies_contain_word.size(); l++) {
 			int indexL = indecies_contain_word[l];
 			for(string author : reviews[indexL].authors) {
@@ -670,11 +723,12 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		// BFS ENDS
-		cerr << word << " :: " << max_people << " " << reviews[best_index].text << endl;
+		feynman_fout << word << " :: " << max_people  << " " << indecies_contain_word.size() << " " << reviews[best_index].text << endl;
+		feynman_fout << "Best paper year: " << reviews[best_index].time.day + 1935 << " Burst start: " << word_time_line.burst_start + 1935 << endl;
 		for(string author : reviews[best_index].authors) {
-			cerr << author << " ";
+			feynman_fout << author << " ";
 		}
-		cerr << endl << "________________________________________" << endl;
+		feynman_fout << endl << "________________________________________" << endl;
 	}
 
 	/*
