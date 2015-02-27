@@ -350,7 +350,7 @@ int main(int argc, char *argv[]) {
 		innovators_reviews.insert(make_pair(temp.word, &reviews_have_word[word_counter]));
 		word_counter++;
 	}
-#if true
+#if 0
 	/*	sort(most_
 	 * innovative.begin(), most_innovative.end());
 	reverse(most_innovative.begin(), most_innovative.end());
