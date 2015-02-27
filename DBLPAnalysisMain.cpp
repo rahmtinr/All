@@ -55,26 +55,37 @@ int SIZE_OF_TOP_INNOVATIONS;
 bool CREATE_RANDOM_BASELINE;
 vector<bool> is_innovative;
 
-struct Edge{
-	int x, y, t;
-	bool operator < (const Edge &other) const {
-		if(t == other.t) {
-			if(x == other.x){
-				return y < other.y;
-			}
-			return x < other.x;
+void StrongDfs(int x, vector<vector<int> >*graph, vector<int> *local_mark, vector<int> *fin_time) {
+	(*local_mark)[x] = 1;
+	for(int temp : (*graph)[x]) {
+		if((*local_mark)[temp] == 0) {
+			StrongDfs(temp, graph, local_mark, fin_time);
 		}
-		return t < other.t;
 	}
-};
-
-int FindPar(int x, vector<int> *par) {
-	if((*par)[x] == x) {
-		return x;
-	}
-	(*par)[x] = FindPar((*par)[x], par);
-	return (*par)[x];
+	fin_time->push_back(x);
 }
+
+void StrongDfsRev(int x, vector<vector<int> >*graph, vector<int> *local_mark, vector<int> *comp, int comp_num) {
+	(*local_mark)[x] = comp_num;
+	for(int temp : (*graph)[x]) {
+		if((*local_mark)[temp] == 0) {
+			StrongDfsRev(temp, graph, local_mark, comp, comp_num);
+		}
+	}
+	comp->push_back(x);
+}
+
+int CountDfs(int x, vector<vector<int> >*graph, vector<int> *local_mark) {
+	(*local_mark)[x] = 1;
+	int ret = 1;
+	for(int temp : (*graph)[x]) {
+		if((*local_mark)[temp] == 0) {
+			ret += CountDfs(temp, graph, local_mark);
+		}
+	}
+	return ret;
+}
+
 
 long long inversion(vector<pair<int,int> > *v, int left, int right) { // v needs to be sorted by the first element
 	if(right - left == 1) {
@@ -284,6 +295,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+	map<string, int> innovation_words;
 	{
 		string s;
 		int x;
@@ -294,6 +306,7 @@ int main(int argc, char *argv[]) {
 			}
 			WordTimeLine word_time_line;
 			word_time_line.word = s;
+			innovation_words[s] = top_innovations.size();
 			word_time_line.burst_start = x;
 			top_innovations.push_back(word_time_line);
 		}
@@ -337,7 +350,7 @@ int main(int argc, char *argv[]) {
 		innovators_reviews.insert(make_pair(temp.word, &reviews_have_word[word_counter]));
 		word_counter++;
 	}
-#if 0
+#if true
 	/*	sort(most_
 	 * innovative.begin(), most_innovative.end());
 	reverse(most_innovative.begin(), most_innovative.end());
@@ -349,14 +362,14 @@ int main(int argc, char *argv[]) {
 	 */
 	ofstream correlation_innovations_final_exp(Amazon::Global::output_directory + "innovation_final_exp.txt");
 	ofstream correlation_innovations_current_exp(Amazon::Global::output_directory + "innovation_current_exp.txt");
-	for(int k = 0; k < (int)top_innovations.size(); k += 20) {
+	for(int k = top_innovations.size() - 1; k < (int)top_innovations.size(); k += 20) {
 		int num_of_innovation_reviews = 0;
 		map<string, int> innovator_ids;
 		map<int, int> pdf_current_experience;
 		map<int,int> pdf_final_experience;
 		map<string, int> innovation_at_cur_exp;
 		int sum_cdf = 0;
-		{ // Innovation present
+		{
 			for(auto p : innovators_reviews) {
 				bool first = false;
 				for(Review review : *(p.second)) {
@@ -388,6 +401,9 @@ int main(int argc, char *argv[]) {
 					pdf_final_experience[review.final_experience_level] ++;
 				}
 			}
+
+		}
+		{ // Innovation present
 			ofstream innovators_cdf_out(Amazon::Global::output_directory + "innovator_present_cdf.txt");
 			innovators_cdf_out << (--pdf_current_experience.end())->first + 1 << " " << 0 << endl;
 			for(map<int,int>::iterator it = pdf_current_experience.end(); it != pdf_current_experience.begin();) {
@@ -396,12 +412,6 @@ int main(int argc, char *argv[]) {
 				innovators_cdf_out << it->first << " " << sum_cdf / (double)num_of_innovation_reviews << endl;
 			}
 		}
-		/*
-	ofstream data_facts_out(Amazon::Global::output_directory + "random_facts.txt");
-	data_facts_out << "number of innovation words: " << innovators_reviews.size() << endl;
-	data_facts_out << "Average number of helpfulness in innovations: " << upvotes_of_reviews / num_of_innovation_reviews << endl;
-	data_facts_out << "Average fraction of helpfulness in innovations: " << fraction_helpfulness / num_of_innovation_reviews << endl;
-		 */
 		{ // Innovation final experience
 			ofstream innovators_cdf_out2(Amazon::Global::output_directory + "innovator_final_cdf.txt");
 			sum_cdf = 0;
@@ -593,7 +603,7 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 
-
+	/*
 	cerr << "STARTING FEYNMAN" << endl;
 	// Richard Feynman trace back
 	ofstream feynman_fout(Amazon::Global::output_directory + "Feynman.txt");
@@ -603,13 +613,14 @@ int main(int argc, char *argv[]) {
 		cerr << "starting " << k << " " << word << endl;
 		vector<int> indecies_contain_word;
 		map<string, int> local_author_id;
-		int local_counter = 0;
 		const int H = 1000 * 1000;
-		vector<map<int, int>> graph(H); // (author,t)
-		vector<map<int, int>> tree(H);
+		vector<string> rev_local_author_id(H);
+		int local_counter = 0;
+		vector<vector<int> > graph(H);
 		vector<int> local_earliest(H);
-		vector<Edge> edges;
-		vector<int> Q(H);
+		vector<int> fin_time;
+		vector<int> local_mark(H);
+		vector<vector<int> > comp(H);
 		cerr << "BUILDING GRAPH " << endl;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
@@ -631,6 +642,7 @@ int main(int argc, char *argv[]) {
 			indecies_contain_word.push_back(i);
 			for(string author : reviews[i].authors) {
 				if(local_author_id.find(author) == local_author_id.end()){
+					rev_local_author_id[local_counter] = author;
 					local_author_id[author] = local_counter++;
 					local_earliest[local_counter - 1] = reviews[i].time.day;
 				}
@@ -642,96 +654,82 @@ int main(int argc, char *argv[]) {
 					}
 					int x = local_author_id[author1];
 					int y = local_author_id[author2];
-					if(graph[x].find(y) == graph[x].end()) {
-						graph[x][y] = reviews[i].time.day;
-						if(x < y) {
-							Edge edge;
-							edge.x = x;
-							edge.y = y;
-							edge.t = reviews[i].time.day;
-							edges.push_back(edge);
-						}
+					if(local_earliest[x] == local_earliest[y] && local_earliest[x] == reviews[i].time.day) {
+						graph[x].push_back(y);
+					} else if (local_earliest[x] < local_earliest[y] && local_earliest[y] == reviews[i].time.day) {
+						graph[x].push_back(y);
 					}
 				}
 			}
 		}
-		if(indecies_contain_word.size() < 500) { // the word needs to be there at least 500 times.
-			cerr << "GOING UP " << endl;
-			continue;
-		}
-		cerr << "MST STARTS " << endl;
-		//MST STARTS
-		{
-			sort(edges.begin(), edges.end());
-			vector<int> par(local_counter);
-			vector<int> size_comp(local_counter);
-			for(int i = 0; i < local_counter; i++) {
-				par[i] = i;
-			}
-			for(int i = 0; i < (int)edges.size(); i++) {
-				int parx = FindPar(edges[i].x, &par);
-				int pary = FindPar(edges[i].y, &par);
-				if(parx == pary) {
-					continue;
-				}
-				if(size_comp[parx] < size_comp[pary]) {
-					par[parx] = pary;
-				} else if(size_comp[parx] > size_comp[pary]) {
-					par[pary] = parx;
-				} else {
-					par[pary] = parx;
-					size_comp[parx]++;
-				}
-				tree[edges[i].x][edges[i].y] = edges[i].t;
-				tree[edges[i].y][edges[i].x] = edges[i].t;
+		cerr << "STARTED SCC" << endl;
+		// strongly connected component
+		for(int i = 0 ; i < local_counter; i++) {
+			if(local_mark[i] == 0) {
+				StrongDfs(i, &graph, &local_mark, &fin_time);
 			}
 		}
-		//MST ENDS
-		cerr << "BFS STARTS" << endl;
-		// BFS STARTS
-		vector<bool> local_mark(H);
+		cerr << "FINISHING TIME IS DONE" << endl;
+		fill(local_mark.begin(), local_mark.end(), 0);
+		int comp_num = 1;
+		set<int> comps_to_check;
+		for(int i = 0; i < local_counter; i++) {
+			if(local_mark[fin_time[i]] == 0) {
+				comps_to_check.insert(comp_num);
+				StrongDfsRev(fin_time[i], &graph, &local_mark, &comp[comp_num], comp_num);
+				comp_num++;
+			}
+		}
+		cerr <<"GOT THE COMPONENTS" << endl;
+		for(int i = 0; i < local_counter; i++) {
+			for(int x : graph[i]) {
+				if(local_mark[x] != local_mark[i])
+					comps_to_check.erase(local_mark[x]);
+			}
+		}
+		cerr << "FIND THE BEST COMPONENT" << endl;
 		int max_people = 0;
-		string best_author;
-		int best_index= 0;
-		for(int l = 0; l < (int)indecies_contain_word.size(); l++) {
-			int indexL = indecies_contain_word[l];
-			for(string author : reviews[indexL].authors) {
-				if(local_mark[local_author_id[author]] == false) {
-					int head = 0;
-					int tail = 0;
-					Q[tail++] = local_author_id[author];
-					while(head < tail) {
-						int temp = Q[head];
-						for(pair<int, int> p : graph[temp]) {
-							if(local_mark[p.first] == true) {
-								continue;
-							}
-							if(p.second != local_earliest[p.first]) {
-								continue;
-							}
-							Q[tail++] = p.first;
-							local_mark[p.first] = true;
-						}
-						head++;
-					}
-					if(max_people < tail) {
-						max_people = tail;
-						best_author = author;
-						best_index = indexL;
-					}
+		int best_comp = 0;
+		for(int x : comps_to_check) {
+			fill(local_mark.begin(), local_mark.end(), 0);
+			int temp = comp[x][0];
+			int num = CountDfs(temp, &graph, &local_mark);
+			if(max_people < num) {
+				max_people = num;
+				best_comp = x;
+			}
+		}
+		cerr << " LOOK INTO THE BEST COMPONENT" << endl;
+		set<string> seed_authors;
+		set<string> seed_authors_copy;
+		set<int> seed_paper_indecies;
+		for(int i = 0; i < (int)comp[best_comp].size() ; i++) {
+			seed_authors.insert(rev_local_author_id[comp[best_comp][i]]);
+			seed_authors_copy.insert(rev_local_author_id[comp[best_comp][i]]);
+		}
+		set<string> all_people;
+		for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
+			int index = indecies_contain_word[i];
+			for(string author : reviews[index].authors) {
+				all_people.insert(author);
+				if(seed_authors.find(author) != seed_authors.end()) {
+					seed_paper_indecies.insert(index);
+					seed_authors.erase(author);
 				}
 			}
 		}
-		// BFS ENDS
-		feynman_fout << word << " :: " << max_people  << " " << indecies_contain_word.size() << " " << reviews[best_index].text << endl;
+		int best_index = *seed_paper_indecies.begin();
+		feynman_fout << word << " :: " << max_people  << " " << all_people.size() << " " << reviews[best_index].text << endl;
 		feynman_fout << "Best paper year: " << reviews[best_index].time.day + 1935 << " Burst start: " << word_time_line.burst_start + 1935 << endl;
-		for(string author : reviews[best_index].authors) {
-			feynman_fout << author << " ";
+		for(string author : seed_authors_copy) {
+			feynman_fout << author << ", ";
 		}
 		feynman_fout << endl << "________________________________________" << endl;
 	}
+	 */
 
 	/*
+	//Pairwise prediction, equal current exp, different #innovative reviews ->
 	{
 		map<string, int> present_exp;
 		map<string, int> present_innovations;
@@ -778,6 +776,79 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	 */
+	{
+		// [a,b]
+		cerr << "STARTING  [a,b]" << endl;
+		vector<int> num_of_innovative_reviews_relative_to_burst(510);
+		vector<int> sum_of_innovative_reviews_relative_to_burst(510);
+		vector<int> half_num_of_innovative_reviews_relative_to_burst(510);
+		vector<int> half_sum_of_innovative_reviews_relative_to_burst(510);
+		fill(num_of_innovative_reviews_relative_to_burst.begin(), num_of_innovative_reviews_relative_to_burst.end(), 0);
+		fill(sum_of_innovative_reviews_relative_to_burst.begin(), sum_of_innovative_reviews_relative_to_burst.end(), 0);
+		fill(half_num_of_innovative_reviews_relative_to_burst.begin(), half_num_of_innovative_reviews_relative_to_burst.end(), 0);
+		fill(half_sum_of_innovative_reviews_relative_to_burst.begin(), half_sum_of_innovative_reviews_relative_to_burst.end(), 0);
+		int K;
+		int alpha = 0;
+		// find K, where K is the least final_exp which half the reviews come from them
+		cerr << " FINDING K " << endl;
+		{
+			vector<int> counter_exp(510);
+			fill(counter_exp.begin(), counter_exp.end(), 0);
+			for(int i = 0; i <(int) reviews.size(); i++) {
+				if(reviews[i].final_experience_level > 500) {
+					continue;
+				}
+				counter_exp[reviews[i].final_experience_level]++;
+			}
+			int index = -1;
+			cerr << " GOING INTO THE LOOP" << endl;
+			while(2 * alpha < (int)reviews.size()) {
+				index++;
+				alpha += counter_exp[index];
+			}
+			K = index;
+		}
+		cerr <<"------>" << K << " " << alpha << " " << reviews.size() << endl;
+		cerr << "COMPUTING NUM" << endl;
+		for(int i = 0; i < (int)reviews.size(); i++) {
+			stringstream ss(reviews[i].text);
+			string s;
+			while(!ss.eof()) {
+				ss >> s;
+				if(innovation_words.find(s) == innovation_words.end()) {
+					continue;
+				}
+				int start = top_innovations[innovation_words[s]].burst_start;
+				num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++; // make the burst the origin and shift it for negative indicies
+			}
+			if(reviews[i].time.day > K) {
+				continue;
+			}
+			stringstream sss(reviews[i].text);
+			while(!sss.eof()) {
+				sss >> s;
+				if(innovation_words.find(s) == innovation_words.end()) {
+					continue;
+				}
+				int start = top_innovations[innovation_words[s]].burst_start;
+				half_num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++;
+			}
+		}
+		cerr << "COMPUTING SUM" << endl;
+		for(int i = 1; i < 210; i++) {
+			sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
+			half_sum_of_innovative_reviews_relative_to_burst[i] =
+					half_sum_of_innovative_reviews_relative_to_burst[i - 1] + half_num_of_innovative_reviews_relative_to_burst[i];
+		}
+		// Does the smaller half side of the papers in the final experience create more than half of the innovation?
+		for(int a = 1 ; a < 200; a++) {
+			for(int b = a + 1; b < 200; b++) {
+				int half_sum_a_b = half_sum_of_innovative_reviews_relative_to_burst[b] - half_sum_of_innovative_reviews_relative_to_burst[a - 1];
+				int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
+				cerr << (a-100) << " " << (b-100) << " " << half_sum_a_b / (double)alpha << " " << sum_a_b /(double)reviews.size() << endl;
+			}
+		}
+	}
 	return 0;
 }
 
