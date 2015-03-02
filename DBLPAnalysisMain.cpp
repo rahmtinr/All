@@ -602,7 +602,7 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 
-	/*
+
 	cerr << "STARTING FEYNMAN" << endl;
 	// Richard Feynman trace back
 	ofstream feynman_fout(Amazon::Global::output_directory + "Feynman.txt");
@@ -653,9 +653,7 @@ int main(int argc, char *argv[]) {
 					}
 					int x = local_author_id[author1];
 					int y = local_author_id[author2];
-					if(local_earliest[x] == local_earliest[y] && local_earliest[x] == reviews[i].time.day) {
-						graph[x].push_back(y);
-					} else if (local_earliest[x] < local_earliest[y] && local_earliest[y] == reviews[i].time.day) {
+					if(local_earliest[x] <= local_earliest[y] && local_earliest[y] == reviews[i].time.day) {
 						graph[x].push_back(y);
 					}
 				}
@@ -686,9 +684,12 @@ int main(int argc, char *argv[]) {
 					comps_to_check.erase(local_mark[x]);
 			}
 		}
+		cerr << "Num of candidate components to check: " << comps_to_check.size() << endl;
 		cerr << "FIND THE BEST COMPONENT" << endl;
 		int max_people = 0;
 		int best_comp = 0;
+		int second_max_people = 0;
+		int second_best_comp = 0;
 		for(int x : comps_to_check) {
 			fill(local_mark.begin(), local_mark.end(), 0);
 			int temp = comp[x][0];
@@ -696,6 +697,9 @@ int main(int argc, char *argv[]) {
 			if(max_people < num) {
 				max_people = num;
 				best_comp = x;
+			} else if (second_best_comp < num) {
+				second_max_people = num;
+				second_best_comp = x;
 			}
 		}
 		cerr << " LOOK INTO THE BEST COMPONENT" << endl;
@@ -723,9 +727,9 @@ int main(int argc, char *argv[]) {
 		for(string author : seed_authors_copy) {
 			feynman_fout << author << ", ";
 		}
+		feynman_fout << max_people << " " << second_max_people << endl;
 		feynman_fout << endl << "________________________________________" << endl;
 	}
-	 */
 
 	/*
 	//Pairwise prediction, equal current exp, different #innovative reviews ->
@@ -775,6 +779,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	 */
+#if 0
 	{
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
@@ -809,48 +814,38 @@ int main(int argc, char *argv[]) {
 		}
 		cerr <<"------>" << K << " " << alpha << " " << reviews.size() << endl;
 		cerr << "COMPUTING NUM" << endl;
-		for(K = 1; K < 100; K++) {
-			fill(num_of_innovative_reviews_relative_to_burst.begin(), num_of_innovative_reviews_relative_to_burst.end(), 0);
-			fill(sum_of_innovative_reviews_relative_to_burst.begin(), sum_of_innovative_reviews_relative_to_burst.end(), 0);
-			fill(half_num_of_innovative_reviews_relative_to_burst.begin(), half_num_of_innovative_reviews_relative_to_burst.end(), 0);
-			fill(half_sum_of_innovative_reviews_relative_to_burst.begin(), half_sum_of_innovative_reviews_relative_to_burst.end(), 0);
 
-			for(int i = 0; i < (int)reviews.size(); i++) {
-				stringstream ss(reviews[i].text);
-				string s;
-				while(!ss.eof()) {
-					ss >> s;
-					if(innovation_words.find(s) == innovation_words.end()) {
-						continue;
-					}
-					int start = top_innovations[innovation_words[s]].burst_start;
-					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++; // make the burst the origin and shift it for negative indicies
-				}
-				if(reviews[i].time.day > K) {
+		for(int i = 0; i < (int)reviews.size(); i++) {
+			stringstream ss(reviews[i].text);
+			string s;
+			while(!ss.eof()) {
+				ss >> s;
+				if(innovation_words.find(s) == innovation_words.end()) {
 					continue;
 				}
-				stringstream sss(reviews[i].text);
-				while(!sss.eof()) {
-					sss >> s;
-					if(innovation_words.find(s) == innovation_words.end()) {
-						continue;
-					}
-					int start = top_innovations[innovation_words[s]].burst_start;
-					half_num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++;
+				int start = top_innovations[innovation_words[s]].burst_start;
+				num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++; // make the burst the origin and shift it for negative indicies
+			}
+			if(reviews[i].time.day > K) {
+				continue;
+			}
+			stringstream sss(reviews[i].text);
+			while(!sss.eof()) {
+				sss >> s;
+				if(innovation_words.find(s) == innovation_words.end()) {
+					continue;
 				}
+				int start = top_innovations[innovation_words[s]].burst_start;
+				half_num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++;
 			}
-	//		cerr << "COMPUTING SUM" << endl;
-			for(int i = 1; i < 210; i++) {
-				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
-				half_sum_of_innovative_reviews_relative_to_burst[i] =
-						half_sum_of_innovative_reviews_relative_to_burst[i - 1] + half_num_of_innovative_reviews_relative_to_burst[i];
-			}
-			int half_sum_a_b = half_sum_of_innovative_reviews_relative_to_burst[101] - half_sum_of_innovative_reviews_relative_to_burst[98];
-			int sum_a_b = sum_of_innovative_reviews_relative_to_burst[101] - sum_of_innovative_reviews_relative_to_burst[98];
-			cerr << K << " :::: " << half_sum_a_b / (double)alpha << " " << sum_a_b /(double)reviews.size() << endl;
+		}
+		//		cerr << "COMPUTING SUM" << endl;
+		for(int i = 1; i < 210; i++) {
+			sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
+			half_sum_of_innovative_reviews_relative_to_burst[i] =
+					half_sum_of_innovative_reviews_relative_to_burst[i - 1] + half_num_of_innovative_reviews_relative_to_burst[i];
 		}
 		// Does the smaller half side of the papers in the final experience create more than half of the innovation?
-		/*
 		ofstream temp_fout("temphalf2.txt");
 		for(int a = 1 ; a < 200; a++) {
 			for(int b = a + 1; b < 200; b++) {
@@ -859,8 +854,8 @@ int main(int argc, char *argv[]) {
 				temp_fout << (a-100) << " " << (b-100) << " " << half_sum_a_b / (double)alpha << " " << sum_a_b /(double)reviews.size() << endl;
 			}
 		}
-		*/
 	}
+#endif
 	return 0;
 }
 
