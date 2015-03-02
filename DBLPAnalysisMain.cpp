@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
 	//	if(Amazon::Global::state_machine_doc_ratio == false) {
 	//		Innovations::FindInnovationsBursts(&reviews, &top_innovations, &innovators_reviews);
 	//	} else {
-	int word_counter = 0;
+#if 0
 	for(int j = 0; j < (int)reviews.size(); j++) {
 		most_innovative[j].first = 0;
 		most_innovative[j].second = j;
@@ -326,8 +326,8 @@ int main(int argc, char *argv[]) {
 	}
 	for(int k = 0; k < (int)top_innovations.size(); k++) {
 		WordTimeLine temp = top_innovations[k];
-		reviews_have_word[word_counter].clear();
-		int index = temp.burst_start + 1;
+		reviews_have_word[k].clear();
+		int index = temp.burst_start;
 		for(int j = 0 ; j < (int)reviews.size(); j++) {
 			if(reviews[j].time.day < index - 1) {
 				continue;
@@ -341,16 +341,15 @@ int main(int argc, char *argv[]) {
 				ss >> s;
 				if(s == temp.word) {
 					most_innovative[j].first++;
-					reviews_have_word[word_counter].push_back(reviews[j]);
+					reviews_have_word[k].push_back(reviews[j]);
 					is_innovative[j] = true;
 					break;
 				}
 			}
 		}
-		innovators_reviews.insert(make_pair(temp.word, &reviews_have_word[word_counter]));
-		word_counter++;
+		innovators_reviews.insert(make_pair(temp.word, &reviews_have_word[k]));
+		k++;
 	}
-#if 0
 	/*	sort(most_
 	 * innovative.begin(), most_innovative.end());
 	reverse(most_innovative.begin(), most_innovative.end());
@@ -820,7 +819,6 @@ int main(int argc, char *argv[]) {
 				}
 				int start = top_innovations[innovation_words[s]].burst_start;
 				num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++; // make the burst the origin and shift it for negative indicies
-				break;
 			}
 			if(reviews[i].time.day > K) {
 				continue;
@@ -833,7 +831,6 @@ int main(int argc, char *argv[]) {
 				}
 				int start = top_innovations[innovation_words[s]].burst_start;
 				half_num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++;
-				break;
 			}
 		}
 		cerr << "COMPUTING SUM" << endl;
@@ -843,7 +840,7 @@ int main(int argc, char *argv[]) {
 					half_sum_of_innovative_reviews_relative_to_burst[i - 1] + half_num_of_innovative_reviews_relative_to_burst[i];
 		}
 		// Does the smaller half side of the papers in the final experience create more than half of the innovation?
-		ofstream temp_fout("temp1.txt");
+		ofstream temp_fout("temphalf2.txt");
 		for(int a = 1 ; a < 200; a++) {
 			for(int b = a + 1; b < 200; b++) {
 				int half_sum_a_b = half_sum_of_innovative_reviews_relative_to_burst[b] - half_sum_of_innovative_reviews_relative_to_burst[a - 1];
