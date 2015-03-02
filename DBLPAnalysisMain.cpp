@@ -839,27 +839,27 @@ int main(int argc, char *argv[]) {
 					half_num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++;
 				}
 			}
+	//		cerr << "COMPUTING SUM" << endl;
+			for(int i = 1; i < 210; i++) {
+				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
+				half_sum_of_innovative_reviews_relative_to_burst[i] =
+						half_sum_of_innovative_reviews_relative_to_burst[i - 1] + half_num_of_innovative_reviews_relative_to_burst[i];
+			}
+			int half_sum_a_b = half_sum_of_innovative_reviews_relative_to_burst[101] - half_sum_of_innovative_reviews_relative_to_burst[98];
+			int sum_a_b = sum_of_innovative_reviews_relative_to_burst[101] - sum_of_innovative_reviews_relative_to_burst[98];
+			cerr << K << " :::: " << half_sum_a_b / (double)alpha << " " << sum_a_b /(double)reviews.size() << endl;
 		}
-		cerr << "COMPUTING SUM" << endl;
-		for(int i = 1; i < 210; i++) {
-
-			sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
-			half_sum_of_innovative_reviews_relative_to_burst[i] =
-					half_sum_of_innovative_reviews_relative_to_burst[i - 1] + half_num_of_innovative_reviews_relative_to_burst[i];
-		}
-		int half_sum_a_b = half_sum_of_innovative_reviews_relative_to_burst[101] - half_sum_of_innovative_reviews_relative_to_burst[98];
-		int sum_a_b = sum_of_innovative_reviews_relative_to_burst[101] - sum_of_innovative_reviews_relative_to_burst[98];
-		cerr << K << " :::: " << half_sum_a_b / (double)alpha << " " << sum_a_b /(double)reviews.size() << endl;
 		// Does the smaller half side of the papers in the final experience create more than half of the innovation?
+		/*
 		ofstream temp_fout("temphalf2.txt");
-		/*	for(int a = 1 ; a < 200; a++) {
+		for(int a = 1 ; a < 200; a++) {
 			for(int b = a + 1; b < 200; b++) {
 				int half_sum_a_b = half_sum_of_innovative_reviews_relative_to_burst[b] - half_sum_of_innovative_reviews_relative_to_burst[a - 1];
 				int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
 				temp_fout << (a-100) << " " << (b-100) << " " << half_sum_a_b / (double)alpha << " " << sum_a_b /(double)reviews.size() << endl;
 			}
 		}
-		 */
+		*/
 	}
 	return 0;
 }
