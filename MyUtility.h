@@ -115,6 +115,14 @@ int SimpleStringToInt(string input) {
 	return ret;
 }
 
+string SimpleDoubleToString(double x) {
+	string ret;
+	stringstream ss;
+	ss << x;
+	ss >> ret;
+	return ret;
+}
+
 class MyTime {
 public:
 	int year;
