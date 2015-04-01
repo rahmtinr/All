@@ -12,9 +12,14 @@ DBLPFindInnovation : DBLPFindInnovation.o MyUtility.o Reviews.o AmazonUtility.o 
 DBLPAnalysis: DBLPAnalysis.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
 	${CC} -o dblpAnalysis DBLPAnalysisMain.o ${CFLAGS}
 
+AmazonAnalysis: AmazonAnalysis.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
+	${CC} -o amazonAnalysis AmazonAnalysisMain.o ${CFLAGS}
+
 main.o : main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c main.cpp ${CFLAGS}
 
+AmazonAnalysis.o : AmazonAnalysisMain.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
+	${CC} -c AmazonAnalysisMain.cpp ${CFLAGS}
 
 DBLPFindInnovation.o : DBLPFindInnovationMain.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c DBLPFindInnovationMain.cpp ${CFLAGS}

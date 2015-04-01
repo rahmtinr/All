@@ -29,23 +29,6 @@ public:
 	int year;
 };
 
-string RemoveStopWords(string s) {
-	string ret = "";
-	stringstream ss(s);
-	while(!ss.eof()){
-		ss >> s;
-		if(s == "") {
-			continue;
-		}
-		if(stop_words.find(s) != stop_words.end()) {
-			continue;
-		}
-		ret += s + " ";
-		s = "";
-	}
-	return ret;
-}
-
 bool ReadOneRecord(std::ifstream& fin, vector<DBLPRecord> *Records) {
 	string raw_input;
 	DBLPRecord record;

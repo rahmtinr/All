@@ -10,13 +10,14 @@ colnames(innovator_present_cdf) = c("Num", "Probability")
 colnames(innovator_final_cdf) = c("Num", "Probability")
 
 
+head(innovator_final_cdf)
 review_present_cdf$Probability = log(review_present_cdf$Probability)
 review_final_cdf$Probability = log(review_final_cdf$Probability)
 innovator_present_cdf$Probability = log(innovator_present_cdf$Probability)
 innovator_final_cdf$Probability = log(innovator_final_cdf$Probability)
-
-
-jpeg(paste(directory,"AggregationPlots/", dataset, "_cdf_ending_experience_level.jpg",sep=""))
+head(innovator_final_cdf)
+head(review_final_cdf)
+jpeg(paste(directory,"AggregationPlots/", dataset, "_cdf_present_experience_level.jpg",sep=""))
 plot(review_present_cdf, col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 #lines(review_present_cdf, col = "blue")
 #points(innovator_present_cdf, col = "red")
@@ -28,7 +29,7 @@ legend("topright",
 )
 dev.off()
 
-jpeg(paste(directory,"AggregationPlots/", dataset, "_cdf_present_experience_level.jpg",sep=""))
+jpeg(paste(directory,"AggregationPlots/", dataset, "_cdf_final_experience_level.jpg",sep=""))
 plot(review_final_cdf, col = "blue", xlab = "Experience level", ylab = "Frequency", type="l")
 #lines(review_final_cdf , col = "blue")
 #points(innovator_final_cdf , col = "red")

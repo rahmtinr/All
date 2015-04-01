@@ -20,6 +20,23 @@ using namespace std;
 
 set<string> stop_words;
 
+string RemoveStopWords(string s) {
+	string ret = "";
+	stringstream ss(s);
+	while(!ss.eof()){
+		ss >> s;
+		if(s == "") {
+			continue;
+		}
+		if(stop_words.find(s) != stop_words.end()) {
+			continue;
+		}
+		ret += s + " ";
+		s = "";
+	}
+	return ret;
+}
+
 string GetField(string raw_input) {
 	int delimeter = raw_input.find(":");
 	if (delimeter == std::string::npos) {
@@ -47,7 +64,7 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 	if (getline(fin, raw_input)) {
 		review.product_id = GetField(raw_input);
 		getline(fin, raw_input);
-		review.product_title = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
+		review.product_title = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
 		getline(fin, raw_input);
 		review.price = GetField(raw_input);
 		getline(fin, raw_input);
@@ -71,9 +88,9 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		}
 		review.time = MyTime(localtime(&review_time));
 		getline(fin, raw_input);
-		review.summary = RemoveAllSymbols(SimpleToLower(GetField(raw_input)));
+		review.summary = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
 		getline(fin, raw_input);
-		review.text = review.product_title + " " + RemoveAllSymbols(SimpleToLower(GetField(raw_input))) + " ";
+		review.text = review.product_title + " " + RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input)))) + " ";
 		getline(fin, raw_input);
 		if(Amazon::Global::remove_unknown == false ||
 				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {

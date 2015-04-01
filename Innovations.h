@@ -214,13 +214,14 @@ public:
 	}
 
 	static void FindBurstsDocumentRatio(set<WordTimeLine> *word_states, vector<Review> *reviews) {
-		int document_counter[100];
-		for(int i = 0; i < 100 ; i++) {
-			document_counter[i] = 0;
+		int document_counter[10000];
+		for(int i = 0; i < 10000 ; i++) {
+			document_counter[i] = 1;
 		}
 		set<WordTimeLine> temp;
 		sort(reviews->begin(), reviews->end());
 		string text, word;
+		cerr << " GOT IN " << endl;
 		for(int i = 0; i < (int)reviews->size(); i++) {
 			Review review = (*reviews)[i];
 			text = review.text;
@@ -244,6 +245,7 @@ public:
 				word_states->insert(word_time_line);
 			}
 		}
+		cerr << " I GOT HERE ! 1 " << endl;
 		vector<int> ratio_sequence;
 
 		for(auto time_line : *word_states) {
@@ -269,6 +271,7 @@ public:
 				temp.insert(time_line);
 			}
 		}
+		cerr << " HI2 " << endl;
 		word_states->clear();
 		for(auto time_line : temp) {
 			word_states->insert(time_line);
@@ -367,7 +370,7 @@ public:
 			temp += ratio_sequence[i];
 		}
 		p = Amazon::Global::probability_of_state_change;
-		for(int i = 1; i < (int)ratio_sequence.size(); i++) { // 1935!!!!
+		for(int i = 1; i < (int)ratio_sequence.size(); i++) {
 			v[0] = viterbi[0];
 			v[1] = viterbi[1];
 			for(int j = 0; j < 2; j++) {
@@ -415,7 +418,7 @@ public:
 				}
 				if(zero_cost - one_cost > word_time_line->difference) {
 					word_time_line->difference = zero_cost - one_cost;
-					word_time_line->burst_start = starter;
+					word_time_line->burst_start = starter; // burst_start is the year because we changed everything to the year and took the ratio! starter is not only the index
 					word_time_line->burst_end = i;
 				}
 				i--;
