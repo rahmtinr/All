@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 			burst_innovation.insert(word_states);
 		}
 	}
-	ofstream innovation_burst_year_out("./" + Global::NAMEOFDATASET + "_Amazon_words_start_burst.txt");
+	ofstream innovation_burst_year_out(Amazon::Global::output_directory + "words_start_burst.txt");
 	for(WordTimeLine word_time_line : burst_innovation) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
 	}

@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
 	{
 		string s;
 		int x;
-		ifstream fin_innovation_best_burst("./" + Global::NAMEOFDATASET + "_Amazon_words_start_burst.txt");
+		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst.txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
