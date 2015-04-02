@@ -170,16 +170,6 @@ int main(int argc, char *argv[]) {
 	for(int i = 0; i < (int) reviews.size(); i++) {
 		reviews[i].final_experience_level = experience_level[reviews[i].user_id];
 	}
-	int temp[10000];
-	memset(temp, 0, sizeof temp);
-	for(auto p : experience_level) {
-		temp[p.second]++;
-	}
-	ofstream fout("temp.txt");
-	for(int i = 0 ; i < 1000; i++) {
-		fout << i << " " << temp[i] << endl;
-	}
-	return 0;
 	for(int i = 0; i < (int)reviews.size(); i++) {
 		// This constant change should be same as the one that we used in finding the innovations
 		reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); // Setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
@@ -526,9 +516,15 @@ int main(int argc, char *argv[]) {
 		// Comparison with "No country for old men"
 		int K;
 		int K_bef = 0;
-		int num[5][2000];
-		int denom[5][2000];
+		int num[5][10000];
+		int denom[5][10000];
 		memset(num, 0, sizeof num);
+		int more_than_50_reviews = 0;
+		for(int i = 0; i < reviews.size(); i++) {
+			if(reviews[i].final_experience_level >= 50) {
+				more_than_50_reviews++;
+			}
+		}
 		for(int numerator = 1; numerator <= 4; numerator++) {
 			map<string, int> cur_exp;
 
@@ -544,9 +540,9 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // EXP - final
 				}
-				int index = -1;
+				int index = 49;
 				cerr << "GOING INTO THE LOOP" << endl;
-				while(fraction * alpha < (int)reviews.size()) {
+				while(fraction * alpha < more_than_50_reviews) {
 					index++;
 					alpha += counter_exp[index];
 				}
@@ -555,6 +551,9 @@ int main(int argc, char *argv[]) {
 			cerr <<"------>" << K_bef << " " << K << " " << alpha << " " << reviews.size() << endl;
 			cerr << "COMPUTING NUM" << endl;
 			for(int i = 0; i < (int)reviews.size(); i++) {
+				if(reviews[i].final_experience_level < 50) {
+					continue;
+				}
 				vector<int> relative_burst_times;
 				stringstream ss(reviews[i].text);
 				string s;
