@@ -511,7 +511,7 @@ int main(int argc, char *argv[]) {
 		 */
 	}
 #endif
-#if 1
+#if 0
 	{
 		// Comparison with "No country for old men"
 		int K;
@@ -574,7 +574,7 @@ int main(int argc, char *argv[]) {
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
 					num[numerator][reviews[i].current_experience_level]++; // Only the max final_exp added
-//					break;
+					break;
 				}
 			}
 			for(pair<string, int> p : experience_level) {
@@ -588,13 +588,75 @@ int main(int argc, char *argv[]) {
 			K_bef = K;
 		}
 
-		string filename = Amazon::Global::output_directory + "cristian_probability_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+		string filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
 		ofstream cristian_fout(filename.c_str());
 		for(int i = 1; i <= 4; i++) {
 			for(int j = 0; j < 1000; j++) {
 				cristian_fout << i << " " << j << " " << num[i][j] / ((double)denom[i][j] + 1) << endl;
 			}
 		}
+	}
+#endif
+
+#if 1 // innovations vs num of reviews for authors with more than 10 reviews
+	map<int, int> exp_innovoation_num;
+	map<int, int> exp_review_num;
+	int innovation_denom = 0;
+	int review_denom = 0;
+
+	bool binary = true;
+	bool final_exp = true;
+
+	for(int i = 0; i < reviews.size(); i++) {
+		if(reviews[i].final_experience_level < 10) {
+			continue;
+		}
+		review_denom++;
+		if(final_exp == true) {
+			exp_review_num[reviews[i].final_experience_level]++;
+		} else {
+			exp_review_num[reviews[i].current_experience_level]++;
+		}
+		stringstream ss(reviews[i].text);
+		string s;
+		while(!ss.eof()) {
+			ss >> s;
+			if(innovation_words.find(s) == innovation_words.end()) {
+				continue;
+			}
+			int innovation_index = innovation_words[s];
+			if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 1 <= reviews[i].time.day) { // the range where we count the word as an innovation
+				continue;
+			}
+			innovation_denom++;
+			if(final_exp == true) {
+				exp_innovoation_num[reviews[i].final_experience_level] ++;
+			} else {
+				exp_innovoation_num[reviews[i].current_experience_level] ++;
+			}
+			if(binary == true) {
+				break;
+			}
+		}
+	}
+	string filename = Amazon::Global::output_directory + "innovation_review_proportion_";
+	if(binary == true) {
+		filename += "binary_";
+	} else {
+		filename += "count_";
+	}
+	if(final_exp == true) {
+		filename += "final_";
+	} else {
+		filename += "present_";
+	}
+	filename += SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+	ofstream proportion_fout(filename.c_str());
+	for(pair<int, int> p : exp_innovoation_num) {
+		int exp_level = p.first;
+		int numerator = p.second;
+		double out;
+		proportion_fout << exp_level << " " << numerator / (double) review_denom << " " << exp_innovoation_num[exp_level] / (double) innovation_denom << endl;
 	}
 #endif
 	cerr << "trying to finish it!" << endl;
