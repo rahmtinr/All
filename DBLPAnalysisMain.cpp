@@ -793,7 +793,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	 */
-#if 0
+#if 1
 	{
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
@@ -861,7 +861,7 @@ int main(int argc, char *argv[]) {
 					}
 					 */
 					p = authors_exp_relative_to_burst[reviews[i].time.day - start + 100];
-					authors_exp_relative_to_burst[reviews[i].time.day - start + 100] = make_pair(p.first + experience_level[reviews[i].final_exp_best_author], p.second + 1); //  EXP - final
+					authors_exp_relative_to_burst[reviews[i].time.day - start + 100] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1); //  EXP - final
 					relative_burst_times.push_back(reviews[i].time.day - start + 100);
 					latest = max(latest, reviews[i].time.day - start + 100);
 					earliest = min(earliest, reviews[i].time.day - start + 100);
@@ -901,13 +901,12 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i < 200; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
 				}
-				string filename = Amazon::Global::output_directory + "final_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+				string filename = Amazon::Global::output_directory + "present_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
 				ofstream rel_year_fout(filename.c_str());
 				int temp1 = 0, temp2 = 1;
 				for(int i = 0; i < 200 ; i++) {
 					temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
-					temp2 += authors_exp_relative_to_burst[i].second; // divide
-					cerr << i << " " << temp1 << " " << temp2 << endl;
+					temp2 += authors_exp_relative_to_burst[i].second; // number of authors for denominator to divide
 					rel_year_fout << i - 100 << " " << temp1 / (double) temp2	 << " "<< sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
@@ -1050,7 +1049,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0
 	{
 		// Comparison with "No country for old men"
 		int K;

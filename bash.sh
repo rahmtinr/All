@@ -12,9 +12,9 @@ then
     exit 0
 fi
 input_directory=$1
-#InputFiles=("Music")
+InputFiles=("Software")
 #InputFiles=("Software" "Music" "Books" "Movies_and_TV")
-InputFiles=("Books" "Movies_and_TV")
+#InputFiles=("Books" "Movies_and_TV")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
