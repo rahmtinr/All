@@ -15,16 +15,10 @@ draw_heat_map <- function(dataset) {
         mat[a, b] = K$coefficients[2]
     }
     print("a_b_final_count")
-    for(i in -100:100){
-        cat(i, " " , i+1, " ", mat[i + 100,i + 101], "\n")
-    }
-    for(i in -100:95){
-        cat(i, " " , i+5, " ", mat[i + 100,i + 105], "\n")
-    }
 
     print("________________________________")
     smoothed = mat 
-
+    print(paste("~/Pictures/", dataset, "a_b_top_500_innovations.png", sep=""))
     png(file=paste("~/Pictures/", dataset, "a_b_top_500_innovations.png", sep=""), height = 1600, width = 1600, units="px", res = 150)
     dat <- melt(smoothed)
     colnames(dat) = c("a", "b", "value")
@@ -39,3 +33,4 @@ draw_heat_map <- function(dataset) {
 draw_heat_map("Music")
 draw_heat_map("Movies_and_TV")
 draw_heat_map("Books")
+
