@@ -18,8 +18,8 @@ draw_heat_map <- function(dataset) {
 
     print("________________________________")
     smoothed = mat 
-    print(paste("~/Pictures/", dataset, "_a_b_top_500_innovations.png", sep=""))
-#    png(file=paste("~/Pictures/", dataset, "_a_b_top_500_innovations.png", sep=""), height = 1600, width = 1600, units="px", res = 150)
+    print(paste("home/rahmtin/Pictures/", dataset, "_a_b_top_500_innovations.png", sep=""))
+#    png(file=paste("home/rahmtin/Pictures/", dataset, "_a_b_top_500_innovations.png", sep=""), height = 1600, width = 1600, units="px", res = 150)
     dat <- melt(smoothed)
     colnames(dat) = c("a", "b", "value")
     dat[dat$a >= dat$b, "value"] = -2 
