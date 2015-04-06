@@ -18,8 +18,8 @@ draw_heat_map <- function(dataset) {
 
     print("________________________________")
     smoothed = mat 
-    print(paste("~/Pictures/", dataset, "a_b_top_500_innovations.png", sep=""))
-    png(file=paste("~/Pictures/", dataset, "a_b_top_500_innovations.png", sep=""), height = 1600, width = 1600, units="px", res = 150)
+    print(paste("~/Pictures/", dataset, "_a_b_top_500_innovations.png", sep=""))
+#    png(file=paste("~/Pictures/", dataset, "_a_b_top_500_innovations.png", sep=""), height = 1600, width = 1600, units="px", res = 150)
     dat <- melt(smoothed)
     colnames(dat) = c("a", "b", "value")
     dat[dat$a >= dat$b, "value"] = -2 
@@ -27,7 +27,7 @@ draw_heat_map <- function(dataset) {
     geom_tile(aes(fill = value),colour='black') +
     scale_fill_gradientn(colours=c("green","yellow","red")) +  
     coord_equal() 
-    dev.off()
+#    dev.off()
 }
 
 draw_heat_map("Music")

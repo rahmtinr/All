@@ -115,7 +115,15 @@ void initialize(char *argv[]) {
 
 	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_";
 
-
+	//Read StopWords
+	ifstream fin_stop_words("stopwords.txt");
+	string s;
+	while(getline(fin_stop_words, s)) {
+		if(s == "") {
+			continue;
+		}
+		stop_words.insert(s);
+	}
 }
 
 int main(int argc, char *argv[]) {

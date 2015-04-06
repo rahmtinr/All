@@ -32,7 +32,7 @@ for x in ${InputFiles[*]}; do
 #            rm $output_directory* -rf
 #            mkdir $output_directory"BurstPlots"
 #            mkdir $output_directory"AggregationPlots"
-#           ./main $input $burst_mode $time_mode $StateMachine
+           ./main $input $burst_mode $time_mode $StateMachine
            echo "Done With finding the innovations"
            ./amazonAnalysis $input $burst_mode $time_mode $StateMachine
 #            time_line_txt=$output_directory$x"_timeline.txt"
