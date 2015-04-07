@@ -104,7 +104,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::earliest.year = 2030;
 
 	//State machine parameters.
-	Amazon::Global::state_coeffecient = 3;
+	Amazon::Global::state_coeffecient = SimpleStringToInt(argv[5]);
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
 //	Amazon::Global::state_machine_doc_ratio = false;
@@ -127,7 +127,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 5) {
+	if(argc != 6) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -238,7 +238,8 @@ int main(int argc, char *argv[]) {
 			burst_innovation.insert(word_states);
 		}
 	}
-	ofstream innovation_burst_year_out(Amazon::Global::output_directory + "words_start_burst.txt");
+	string filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+	ofstream innovation_burst_year_out(filename.c_str());
 	for(WordTimeLine word_time_line : burst_innovation) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
 	}
