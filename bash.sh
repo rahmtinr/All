@@ -38,7 +38,7 @@ for x in ${InputFiles[*]}; do
 #               mkdir $output_directory"AggregationPlots"
                 ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
                 echo "Done With finding the innovations"
-#               ./amazonAnalysis $input $burst_mode $time_mode $StateMachine
+               ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff
 #               time_line_txt=$output_directory$x"_timeline.txt"
 #               awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
 #               Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x

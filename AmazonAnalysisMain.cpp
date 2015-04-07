@@ -101,7 +101,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::earliest.year = 2030;
 
 	//State machine parameters.
-	Amazon::Global::state_coeffecient = 3;
+	Amazon::Global::state_coeffecient = SimpleStringToInt(argv[5]);
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
 	//	Amazon::Global::state_machine_doc_ratio = false;
@@ -123,7 +123,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 5) {
+	if(argc != 6) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
 	{
 		string s;
 		int x;
-		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst.txt");
+		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
@@ -512,9 +512,9 @@ int main(int argc, char *argv[]) {
 
 		string filename;
 		if(final == true) {
-			filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+			filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
 		} else {
-			filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+			filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
 		}
 		ofstream ab_fout(filename.c_str());
 		int temp_counter = 0;
