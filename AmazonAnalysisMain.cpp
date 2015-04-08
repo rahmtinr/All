@@ -397,7 +397,7 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 #endif
-#if 1
+#if 0
 	{
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
@@ -526,18 +526,20 @@ int main(int argc, char *argv[]) {
 
 	}
 #endif
-#if 0
+#if 1
 	{
 		// Comparison with "No country for old men"
 		int K;
 		int K_bef = 0;
 		int num[5][10000];
 		int denom[5][10000];
+		const int CUT_OFF_EXP = 20;
+		int num_of_reviews_more_than_cut_off = 0;
+		const bool binary = false;
 		memset(num, 0, sizeof num);
-		int more_than_50_reviews = 0;
 		for(int i = 0; i < reviews.size(); i++) {
-			if(reviews[i].final_experience_level >= 50) {
-				more_than_50_reviews++;
+			if(reviews[i].final_experience_level >= CUT_OFF_EXP) {
+				num_of_reviews_more_than_cut_off++;
 			}
 		}
 		for(int numerator = 1; numerator <= 4; numerator++) {
@@ -557,7 +559,7 @@ int main(int argc, char *argv[]) {
 				}
 				int index = 49;
 				cerr << "GOING INTO THE LOOP" << endl;
-				while(fraction * alpha < more_than_50_reviews) {
+				while(fraction * alpha < CUT_OFF_EXP) {
 					index++;
 					alpha += counter_exp[index];
 				}
@@ -566,7 +568,7 @@ int main(int argc, char *argv[]) {
 			cerr <<"------>" << K_bef << " " << K << " " << alpha << " " << reviews.size() << endl;
 			cerr << "COMPUTING NUM" << endl;
 			for(int i = 0; i < (int)reviews.size(); i++) {
-				if(reviews[i].final_experience_level < 50) {
+				if(reviews[i].final_experience_level < CUT_OFF_EXP) {
 					continue;
 				}
 				stringstream ss(reviews[i].text);
@@ -588,7 +590,9 @@ int main(int argc, char *argv[]) {
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
 					num[numerator][reviews[i].current_experience_level]++; // Only the max final_exp added
-					break;
+					if(binary == true) {
+						break;
+					}
 				}
 			}
 			for(pair<string, int> p : experience_level) {
@@ -602,7 +606,12 @@ int main(int argc, char *argv[]) {
 			K_bef = K;
 		}
 
-		string filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+		string filename;
+		if(binary == true) {
+			filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+		} else {
+			filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+		}
 		ofstream cristian_fout(filename.c_str());
 		for(int i = 1; i <= 4; i++) {
 			for(int j = 0; j < 1000; j++) {
