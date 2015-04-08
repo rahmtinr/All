@@ -526,7 +526,7 @@ int main(int argc, char *argv[]) {
 
 	}
 #endif
-#if 0
+#if 1
 	{
 		// Comparison with "No country for old men"
 		int K;
@@ -535,7 +535,7 @@ int main(int argc, char *argv[]) {
 		int denom[5][10000];
 		const int CUT_OFF_EXP = 20;
 		int num_of_reviews_more_than_cut_off = 0;
-		const bool binary = false;
+		const bool binary = true;
 		memset(num, 0, sizeof num);
 		for(int i = 0; i < reviews.size(); i++) {
 			if(reviews[i].final_experience_level >= CUT_OFF_EXP) {
@@ -621,7 +621,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 1
+#if 0
 	// innovations vs num of reviews for authors with more than 20 reviews
 	map<int, int> exp_innovoation_num;
 	map<int, int> exp_review_num;
