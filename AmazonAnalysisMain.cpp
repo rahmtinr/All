@@ -526,7 +526,7 @@ int main(int argc, char *argv[]) {
 
 	}
 #endif
-#if 1
+#if 0
 	{
 		// Comparison with "No country for old men"
 		int K;
@@ -557,9 +557,9 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // EXP - final
 				}
-				int index = 49;
+				int index = CUT_OFF_EXP - 1;
 				cerr << "GOING INTO THE LOOP" << endl;
-				while(fraction * alpha < CUT_OFF_EXP) {
+				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
 					index++;
 					alpha += counter_exp[index];
 				}
@@ -621,7 +621,8 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 0 // innovations vs num of reviews for authors with more than 10 reviews
+#if 1
+	// innovations vs num of reviews for authors with more than 20 reviews
 	map<int, int> exp_innovoation_num;
 	map<int, int> exp_review_num;
 	int innovation_denom = 0;
@@ -681,7 +682,10 @@ int main(int argc, char *argv[]) {
 		int exp_level = p.first;
 		int numerator = p.second;
 		double out;
-		proportion_fout << exp_level << " " << numerator / (double) review_denom << " " << exp_innovoation_num[exp_level] / (double) innovation_denom << endl;
+		if(innovation_denom == 0) {
+			innovation_denom = 1;
+		}
+		proportion_fout << exp_level << " " << numerator / (double) review_denom << " " << exp_innovoation_num[exp_level] / (double)innovation_denom << endl;
 	}
 #endif
 	cerr << "trying to finish it!" << endl;

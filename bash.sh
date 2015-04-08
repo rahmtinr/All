@@ -13,7 +13,7 @@ then
 fi
 input_directory=$1
 InputFiles=("Software")
-#InputFiles=("Software" "Music" "Books" "Movies_and_TV")
+#InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics")
 #InputFiles=("Books" "Movies_and_TV")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
