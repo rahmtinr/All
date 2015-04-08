@@ -626,12 +626,13 @@ int main(int argc, char *argv[]) {
 	map<int, int> exp_review_num;
 	int innovation_denom = 0;
 	int review_denom = 0;
+	const int CUT_OFF_EXP = 20;
 
-	bool binary = true;
-	bool final_exp = true;
+	const bool binary = true;
+	const bool final_exp = true;
 
 	for(int i = 0; i < reviews.size(); i++) {
-		if(reviews[i].final_experience_level < 10) {
+		if(reviews[i].final_experience_level < CUT_OFF_EXP) {
 			continue;
 		}
 		review_denom++;
@@ -673,7 +674,8 @@ int main(int argc, char *argv[]) {
 	} else {
 		filename += "present_";
 	}
-	filename += SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+	filename += SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations";
+	filename += "_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
 	ofstream proportion_fout(filename.c_str());
 	for(pair<int, int> p : exp_review_num) {
 		int exp_level = p.first;
