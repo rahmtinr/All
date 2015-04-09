@@ -401,7 +401,7 @@ int main(int argc, char *argv[]) {
 	{
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = true;
+		bool final = false;
 		string output_count[30000];
 		const int SHIFTER = 1100;
 		const int REL_SIZE = SHIFTER * 2;
