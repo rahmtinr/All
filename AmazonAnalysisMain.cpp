@@ -401,7 +401,7 @@ int main(int argc, char *argv[]) {
 	{
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = false;
+		bool final = true;
 		string output_count[30000];
 		const int SHIFTER = 1100;
 		const int REL_SIZE = SHIFTER * 2;
@@ -495,7 +495,12 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
 				}
-				string filename = Amazon::Global::output_directory + "final_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+				string filename;
+				if(final == true) {
+					filename = Amazon::Global::output_directory + "final_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+				} else {
+					filename = Amazon::Global::output_directory + "current_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+				}
 				ofstream rel_year_fout(filename.c_str());
 				int temp1 = 0, temp2 = 1;
 				for(int i = 0; i < REL_SIZE ; i++) {
