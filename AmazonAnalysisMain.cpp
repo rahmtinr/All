@@ -397,7 +397,7 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 #endif
-#if 0
+#if 1
 	{
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
@@ -416,7 +416,7 @@ int main(int argc, char *argv[]) {
 				num_of_reviews_more_than_cut_off++;
 			}
 		}
-		for (int numerator = 1; numerator <= 4; numerator++) {
+		for (int numerator = 4; numerator <= 4; numerator++) {  // TODO
 			vector<int> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<int> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<pair<int, int> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
 			fraction = 1 / fraction;
 			cerr << "FINDING K for " << fraction << endl;
 			{
-				vector<int> counter_exp(5010);
+				vector<int> counter_exp(10010);
 				fill(counter_exp.begin(), counter_exp.end(), 0);
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // We are dividing authors to 4 buckets by their final xp
@@ -491,7 +491,6 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
-			/*
 		 	if(numerator == 4) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
@@ -506,10 +505,11 @@ int main(int argc, char *argv[]) {
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
-			 */
+
 		}
 
 
+/*
 		string filename;
 		if(final == true) {
 			filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
@@ -523,10 +523,10 @@ int main(int argc, char *argv[]) {
 			ab_fout << output_count[temp_counter] << endl;
 			temp_counter++;
 		}
-
+*/
 	}
 #endif
-#if 1
+#if 0
 	{
 		// Comparison with "No country for old men"
 		int K;
