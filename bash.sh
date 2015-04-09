@@ -12,8 +12,8 @@ then
     exit 0
 fi
 input_directory=$1
-InputFiles=("Software")
-#InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics")
+#InputFiles=("Software")
+InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics")
 #InputFiles=("Books" "Movies_and_TV")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")

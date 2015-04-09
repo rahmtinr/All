@@ -501,7 +501,7 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i < REL_SIZE ; i++) {
 					temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
 					temp2 += authors_exp_relative_to_burst[i].second; // divide
-					cerr << i << " " << temp1 << " " << temp2 << endl;
+//					cerr << i << " " << temp1 << " " << temp2 << endl;
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
