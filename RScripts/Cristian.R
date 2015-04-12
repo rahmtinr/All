@@ -1,10 +1,16 @@
 draw_cristian_plot <- function(dataset, coeff, binary) {
     t = read.table(paste("~/Documents/Amazon/Output_All/",dataset,"_bursts/RealTime/MaxBenefit/", dataset, "_cristian_probability_", binary, "_comparison_top500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)    
     colnames(t) = c("V1", "V2", "V3")
-    t1 = t[(t$V1 == 1) & (t$V3 > 0),]
-    t2 = t[(t$V1 == 2) & (t$V3 > 0),]
-    t3 = t[(t$V1 == 3) & (t$V3 > 0),]
-    t4 = t[(t$V1 == 4) & (t$V3 > 0),]
+#    t1 = t[(t$V1 == 1) & (t$V3 > 0),]
+#    t2 = t[(t$V1 == 2) & (t$V3 > 0),]
+#    t3 = t[(t$V1 == 3) & (t$V3 > 0),]
+#    t4 = t[(t$V1 == 4) & (t$V3 > 0),]
+
+    t1 = t[(t$V1 == 1),]
+    t2 = t[(t$V1 == 2),]
+    t3 = t[(t$V1 == 3),]
+    t4 = t[(t$V1 == 4),]
+
     maxi = 0
     maxi = max(t1$V3, maxi)
     maxi = max(t2$V3, maxi)

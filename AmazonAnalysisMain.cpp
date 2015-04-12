@@ -417,8 +417,8 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		for (int numerator = 4; numerator <= 4; numerator++) {  // TODO
-			vector<int> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
-			vector<int> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
+			vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
+			vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<pair<int, int> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
 			for(int i = 0; i < REL_SIZE; i++) {
 				authors_exp_relative_to_burst[i] = make_pair(0, 0);
@@ -502,10 +502,12 @@ int main(int argc, char *argv[]) {
 					filename = Amazon::Global::output_directory + "current_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
 				}
 				ofstream rel_year_fout(filename.c_str());
-				int temp1 = 0, temp2 = 1;
+				double temp1 = 0, temp2 = 1;
 				for(int i = 0; i < REL_SIZE ; i++) {
 					temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
 					temp2 += authors_exp_relative_to_burst[i].second; // divide
+                 //   cerr << i << " " << authors_exp_relative_to_burst[i].first << " " << authors_exp_relative_to_burst[i].second << endl;
+                 //   cerr << temp1 << " " << temp2 << " " << temp1 / temp2 << endl;
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
