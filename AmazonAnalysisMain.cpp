@@ -408,6 +408,7 @@ int main(int argc, char *argv[]) {
 		double average[REL_SIZE];
 		const int CUT_OFF_EXP = 20;
 		int num_of_reviews_more_than_cut_off = 0;
+		int denominator = 2;
 		for(int i = 0; i < reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -416,7 +417,7 @@ int main(int argc, char *argv[]) {
 				num_of_reviews_more_than_cut_off++;
 			}
 		}
-		for (int numerator = 4; numerator <= 4; numerator++) {  // TODO
+		for (int numerator = 1; numerator <= denominator; numerator++) {  // TODO
 			vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<pair<int, int> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
@@ -429,7 +430,7 @@ int main(int argc, char *argv[]) {
 			int alpha = 0;
 			double fraction = 0;
 			// find K, where K is the least final_exp which half the reviews come from them
-			fraction = numerator / 4.0;
+			fraction = numerator / (double) denominator;
 			fraction = 1 / fraction;
 			cerr << "FINDING K for " << fraction << endl;
 			{
@@ -491,6 +492,7 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
+			/*
 		 	if(numerator == 4) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
@@ -511,25 +513,29 @@ int main(int argc, char *argv[]) {
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
-
+		 	*/
 		}
 
 
-/*
+
 		string filename;
 		if(final == true) {
-			filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+			filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleIntToString(denominator) + "parts.txt";
 		} else {
-			filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+			filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleDoubleToString(denominator)  + "parts.txt";
 		}
 		ofstream ab_fout(filename.c_str());
 		int temp_counter = 0;
-		ab_fout << "a\tb\tcq1\tcq2\tcq3\tcq4" << endl; //cq = count on quartile, binq = binary on quarter
+		ab_fout << "a\tb\t";
+		for(int i = 1; i <= denominator; i++) {
+			ab_fout << "cq"<< i << "\t";
+		}
+		ab_fout << endl;
 		while(output_count[temp_counter].size() != 0) {
 			ab_fout << output_count[temp_counter] << endl;
 			temp_counter++;
 		}
-*/
+
 	}
 #endif
 #if 0
