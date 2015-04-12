@@ -10,6 +10,9 @@ draw_heat_map <- function(dataset, final) {
     for(i in 1:nrow(a_b)) { 
         x = c(0, 0.25, 0.5, 0.75, 1) 
         y = c(0, a_b[i, ]$cq1, a_b[i, ]$cq2, a_b[i, ]$cq3, a_b[i, ]$cq4)
+        maxi = 0
+        maxi = max(y)
+        y = y / maxi
         K = lm(y ~ x)
         a = a_b[i, ]$a + 100
         b = a_b[i, ]$b + 100
@@ -33,13 +36,7 @@ draw_heat_map <- function(dataset, final) {
 #    dev.off()
 }
 
-draw_all <- function() {
-    draw_heat_map("Music", "final")
-
-    draw_heat_map("Movies_and_TV", "final")
-
-    draw_heat_map("Books", "final")
-}
-
-draw_all()
+draw_heat_map("Music", "final")
+draw_heat_map("Movies_and_TV", "final")
+draw_heat_map("Books", "final")
 
