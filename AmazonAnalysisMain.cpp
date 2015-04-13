@@ -481,7 +481,7 @@ int main(int argc, char *argv[]) {
 			}
 			cerr << "______________________" << endl;
 			for(int i = -10; i <= 10; i++) {
-				cerr << i << ": " << num_of_innovative_reviews_relative_to_burst[i] << endl;
+				cerr << i << ": " << num_of_innovative_reviews_relative_to_burst[i + SHIFTER] << endl;
 			}
 			cerr << "______________________" << endl;
 			// quantile wise analysis of the papers in the final/present experience create more than half of the innovation?
