@@ -401,7 +401,7 @@ int main(int argc, char *argv[]) {
 	{
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = false;
+		bool final = true;
 		string output_count[30000];
 		const int SHIFTER = 1100;
 		const int REL_SIZE = SHIFTER * 2;
@@ -420,7 +420,7 @@ int main(int argc, char *argv[]) {
 		for (int numerator = 1; numerator <= denominator; numerator++) {  // TODO
 			vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
-			vector<pair<int, int> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
+			vector<pair<long long, long long> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
 			for(int i = 0; i < REL_SIZE; i++) {
 				authors_exp_relative_to_burst[i] = make_pair(0, 0);
 			}
@@ -447,7 +447,7 @@ int main(int argc, char *argv[]) {
 				}
 				K = index;
 			}
-			cerr << "------>" << K << " " << alpha << " " << reviews.size() << endl;
+			cerr << "------>" << K << " " << alpha << " " << num_of_reviews_more_than_cut_off << endl;
 			cerr << "COMPUTING NUM" << endl;
 			for(int i = 0; i < (int)reviews.size(); i++) {
 				if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
@@ -484,10 +484,10 @@ int main(int argc, char *argv[]) {
 			for(int a = SHIFTER - 100; a < SHIFTER + 100; a++) {
 				for(int b = a + 1; b < SHIFTER + 100; b++) {
 					//cerr << a << " %%%%%% " << b << endl;
-					if(numerator == 1 ) {
+					if(numerator == 1) {
 						output_count[temp_counter] = SimpleIntToString(a - SHIFTER) + "\t" + SimpleIntToString(b - SHIFTER);
 					}
-					int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
+					long long sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
 					output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha);
 					temp_counter++;
 				}
@@ -535,7 +535,6 @@ int main(int argc, char *argv[]) {
 			ab_fout << output_count[temp_counter] << endl;
 			temp_counter++;
 		}
-
 	}
 #endif
 #if 0
