@@ -417,10 +417,10 @@ int main(int argc, char *argv[]) {
 				num_of_reviews_more_than_cut_off++;
 			}
 		}
-		for (int numerator = 1; numerator <= denominator; numerator++) {  // TODO
+		for (int numerator = 1; numerator <= denominator; numerator++) {
 			vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
-			vector<pair<long long, long long> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
+			vector<pair<long long, long long> > authors_exp_relative_to_burst(REL_SIZE); // (sum, number of authors)
 			for(int i = 0; i < REL_SIZE; i++) {
 				authors_exp_relative_to_burst[i] = make_pair(0, 0);
 			}
@@ -437,7 +437,7 @@ int main(int argc, char *argv[]) {
 				vector<int> counter_exp(10010);
 				fill(counter_exp.begin(), counter_exp.end(), 0);
 				for(int i = 0; i <(int) reviews.size(); i++) {
-					counter_exp[reviews[i].final_experience_level]++; // We are dividing authors to 4 buckets by their final xp
+					counter_exp[reviews[i].final_experience_level]++; // We are dividing authors to $denominator buckets by their final xp
 				}
 				int index = CUT_OFF_EXP - 1;
 				cerr << "GOING INTO THE LOOP" << endl;
@@ -465,7 +465,7 @@ int main(int argc, char *argv[]) {
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
 					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + SHIFTER]++;
-					pair<int, int> p;
+					pair<long long, long long> p;
 					p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
 					if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 						authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
@@ -479,6 +479,11 @@ int main(int argc, char *argv[]) {
 			for(int i = 1; i < REL_SIZE; i++) {
 				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
 			}
+			cerr << "______________________" << endl;
+			for(int i = -10; i <= 10; i++) {
+				cerr << i << ": " << num_of_innovative_reviews_relative_to_burst[i] << endl;
+			}
+			cerr << "______________________" << endl;
 			// quantile wise analysis of the papers in the final/present experience create more than half of the innovation?
 			int temp_counter = 0;
 			for(int a = SHIFTER - 100; a < SHIFTER + 100; a++) {
