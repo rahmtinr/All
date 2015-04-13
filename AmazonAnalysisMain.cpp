@@ -402,11 +402,12 @@ int main(int argc, char *argv[]) {
 		// [a,b]
 		cerr << "STARTING  [a,b]" << endl;
 		bool final = true;
+		int K_bef = 0;
 		string output_count[30000];
 		const int SHIFTER = 1100;
-		const int REL_SIZE = SHIFTER * 2;
+		const int REL_SIZE = SHIFTER * 2 + 10;
 		double average[REL_SIZE];
-		const int CUT_OFF_EXP = 20;
+		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
 		int denominator = 2;
 		for(int i = 0; i < reviews.size(); i++) {
@@ -417,6 +418,7 @@ int main(int argc, char *argv[]) {
 				num_of_reviews_more_than_cut_off++;
 			}
 		}
+		K_bef = CUT_OFF_EXP - 1;
 		for (int numerator = 1; numerator <= denominator; numerator++) {
 			vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
@@ -454,6 +456,9 @@ int main(int argc, char *argv[]) {
 					continue;
 				}
 				if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
+					continue;
+				}
+				if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) {
 					continue;
 				}
 				stringstream ss(reviews[i].text);
@@ -558,6 +563,7 @@ int main(int argc, char *argv[]) {
 				num_of_reviews_more_than_cut_off++;
 			}
 		}
+		K_bef = CUT_OFF_EXP - 1;
 		for(int numerator = 1; numerator <= 4; numerator++) {
 			map<string, int> cur_exp;
 
@@ -573,7 +579,7 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // EXP - final
 				}
-				int index = CUT_OFF_EXP - 1;
+				int index = CUT_OFF_EXP;
 				cerr << "GOING INTO THE LOOP" << endl;
 				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
 					index++;
