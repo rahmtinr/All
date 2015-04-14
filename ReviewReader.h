@@ -48,7 +48,7 @@ string GetField(string raw_input) {
 string RemoveAllSymbols(string raw_input) {
 	string ret = "";
 	for (int i = 0; i < (int)raw_input.size(); i++) {
-		if(raw_input[i] == '&' && i+5 < raw_input.size() && raw_input.substr(i,6) == "&quot;") {
+		if(raw_input[i] == '&' && i+5 < (int)raw_input.size() && raw_input.substr(i,6) == "&quot;") {
 			i += 5;
 			continue;
 		}
