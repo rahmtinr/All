@@ -18,7 +18,7 @@ InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-StateMachineCoeff=("3" "6" "12" "24")
+StateMachineCoeff=("3" "6" "12")
 #"Longest" "All")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;

@@ -3,3 +3,7 @@ grep product\/title ../research/SecondYear/Amazon/All/Clothing_\&_Accessories.tx
 grep -E -A7 'product\/title.*[Jj]acket.*' Clothing_\&_Accessories.txt  | grep 'review\/score' | awk '{count[$2]++;} END {for(x in count){sum += x*count[x];num+=count[x];} for(x in count) printf "%s\t%d\n",x,count[x]; print sum/num}'
 
 awk '{print $1 }' timeline.txt | sort | unique words
+
+$dataset1"_authors.txt" > $dataset1"_"$dataset2"_authors.txt" && cat $dataset2"_authors.txt" >> $dataset1"_"$dataset2"_authors.txt" && wc $dataset1"_"$dataset2"_authors.txt" &&  cat $dataset1"_"$dataset2"_authors.txt" | sort | uniq > $dataset1"_"$dataset2"_authors2.txt" && rm $dataset1"_"$dataset2"_authors.txt" && mv $dataset1"_"$dataset2"_authors2.txt" $dataset1"_"$dataset2"_authors.txt" && wc $dataset1"_"$dataset2"_authors.txt"
+
+grep "review/userId" ~/CurrentData/$dataset.txt | grep -v "unknown" | awk '{print $2'} | sort | uniq | cat > Authors/$dataset"_authors.txt"
