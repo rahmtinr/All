@@ -411,7 +411,7 @@ int main(int argc, char *argv[]) {
 		double average[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 2;
+		int denominator = 4;
 		for(int i = 0; i < reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
