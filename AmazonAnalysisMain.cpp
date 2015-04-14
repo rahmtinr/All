@@ -181,6 +181,7 @@ int main(int argc, char *argv[]) {
 		string s;
 		int x;
 		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
+		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
@@ -190,6 +191,7 @@ int main(int argc, char *argv[]) {
 			word_time_line.word = s;
 			innovation_words[s] = top_innovations.size();
 			word_time_line.burst_start = x;
+			fout_innovation_best_burst << x << endl;
 			top_innovations.push_back(word_time_line);
 			if((int)top_innovations.size() == SIZE_OF_TOP_INNOVATIONS) {
 				break;
@@ -399,7 +401,7 @@ int main(int argc, char *argv[]) {
 #endif
 #if 1
 	{
-		// [a,b]
+		// [a,b] and blue and black plot
 		cerr << "STARTING  [a,b]" << endl;
 		bool final = true;
 		int K_bef = 0;
@@ -523,193 +525,248 @@ int main(int argc, char *argv[]) {
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
-		 	*/
-		}
-
-
-
-		string filename;
-		if(final == true) {
-			filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleIntToString(denominator) + "parts.txt";
-		} else {
-			filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleDoubleToString(denominator)  + "parts.txt";
-		}
-		ofstream ab_fout(filename.c_str());
-		int temp_counter = 0;
-		ab_fout << "a\tb\t";
-		for(int i = 1; i <= denominator; i++) {
-			ab_fout << "cq"<< i << "\t";
-		}
-		ab_fout << endl;
-		while(output_count[temp_counter].size() != 0) {
-			ab_fout << output_count[temp_counter] << endl;
-			temp_counter++;
-		}
-	}
-#endif
-#if 0
-	{
-		// Comparison with "No country for old men"
-		int K;
-		int K_bef = 0;
-		int num[5][10000];
-		int denom[5][10000];
-		const int CUT_OFF_EXP = 20;
-		int num_of_reviews_more_than_cut_off = 0;
-		const bool binary = true;
-		memset(num, 0, sizeof num);
-		for(int i = 0; i < reviews.size(); i++) {
-			if(reviews[i].final_experience_level >= CUT_OFF_EXP) {
-				num_of_reviews_more_than_cut_off++;
-			}
-		}
-		K_bef = CUT_OFF_EXP - 1;
-		for(int numerator = 1; numerator <= 4; numerator++) {
-			map<string, int> cur_exp;
-
-			int alpha = 0;
-			double fraction = 0;
-			// find K, where K is the least final_exp which half the reviews come from them
-			fraction = numerator / 4.0;
-			fraction = 1 / fraction;
-			cerr << "FINDING K for " << fraction << endl;
-			{
-				vector<int> counter_exp(10010);
-				fill(counter_exp.begin(), counter_exp.end(), 0);
-				for(int i = 0; i <(int) reviews.size(); i++) {
-					counter_exp[reviews[i].final_experience_level]++; // EXP - final
+			 */
+			/**/
+			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
+			if(numerator == 4) {
+				authors_exp_relative_to_burst.clear();
+				int num_of_all_reviews = sum_of_innovative_reviews_relative_to_burst[REL_SIZE - 1];
+				int week[100 + 10];
+				int first_non_empty = 1;
+				week[0] = -1100;
+				int each_bucket = num_of_all_reviews / 100;
+				long long sum = 0;
+				for(int j = 0; j < REL_SIZE; j++) {
+					sum += num_of_all_reviews[j];
+					if(sum > each_bucket) {
+						week[first_non_empty++] = j + 1;
+						sum = 0;
+					}
 				}
-				int index = CUT_OFF_EXP;
-				cerr << "GOING INTO THE LOOP" << endl;
-				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
-					index++;
-					alpha += counter_exp[index];
-				}
-				K = index;
-			}
-			cerr <<"------>" << K_bef << " " << K << " " << alpha << " " << reviews.size() << endl;
-			cerr << "COMPUTING NUM" << endl;
-			for(int i = 0; i < (int)reviews.size(); i++) {
-				if(reviews[i].final_experience_level < CUT_OFF_EXP) {
-					continue;
-				}
-				stringstream ss(reviews[i].text);
-				string s;
-				for(string author : reviews[i].authors) {
-					cur_exp[author]++;
-				}
-				if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) { // Only the max final_exp added
-					continue;
-				}
-				while(!ss.eof()) {
-					ss >> s;
-					if(innovation_words.find(s) == innovation_words.end()) {
+				for(int i = 0; i < (int)reviews.size(); i++) {
+					if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
 						continue;
 					}
-					int innovation_index = innovation_words[s];
-					if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 1 <= reviews[i].time.day) { // the range where we count the word as an innovation
+					if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
 						continue;
 					}
-					int start = top_innovations[innovation_words[s]].burst_start;
-					num[numerator][reviews[i].current_experience_level]++; // Only the max final_exp added
-					if(binary == true) {
-						break;
+					stringstream ss(reviews[i].text);
+					string s;
+					while(!ss.eof()) {
+						ss >> s;
+						if(innovation_words.find(s) == innovation_words.end()) {
+							continue;
+						}
+						int start = top_innovations[innovation_words[s]].burst_start;
+
+						pair<long long, long long> p;
+						int bucket = upper_bound(week, week + first_non_empty,reviews[i].time.day - start + SHIFTER) - week;
+						p = authors_exp_relative_to_burst[bucket];
+						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
+							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+						} else {
+							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+						}
 					}
 				}
-			}
-			for(pair<string, int> p : experience_level) {
-				if(p.second > K || p.second <= K_bef) { // Only the max final_exp added
-					continue;
+				string filename;
+				if(final == true) {
+					filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+				} else {
+					filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
 				}
-				for(int j = 0; j <= p.second; j++) {
-					denom[numerator][j]++;
+				ofstream fout_bucket(filename.c_str());
+				fout_bucket << "Bucket_number\tStart_week\tAverage_experience" << endl;
+				for(int i = 0; i < first_non_empty; i++) {
+					fout_bucket << i << "\t" << week[i] << "\t" << authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second << endl;
 				}
+				/**/
 			}
-			K_bef = K;
-		}
 
-		string filename;
-		if(binary == true) {
-			filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
-		} else {
-			filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
-		}
-		ofstream cristian_fout(filename.c_str());
-		for(int i = 1; i <= 4; i++) {
-			for(int j = 0; j < 1000; j++) {
-				cristian_fout << i << " " << j << " " << num[i][j] / ((double)denom[i][j] + 1) << endl;
-			}
-		}
-	}
-#endif
 
-#if 0
-	// innovations vs num of reviews for authors with more than 20 reviews
-	map<int, int> exp_innovoation_num;
-	map<int, int> exp_review_num;
-	int innovation_denom = 0;
-	int review_denom = 0;
-	const int CUT_OFF_EXP = 20;
 
-	const bool binary = true;
-	const bool final_exp = true;
-
-	for(int i = 0; i < reviews.size(); i++) {
-		if(reviews[i].final_experience_level < CUT_OFF_EXP) {
-			continue;
-		}
-		review_denom++;
-		if(final_exp == true) {
-			exp_review_num[reviews[i].final_experience_level]++;
-		} else {
-			exp_review_num[reviews[i].current_experience_level]++;
-		}
-		stringstream ss(reviews[i].text);
-		string s;
-		while(!ss.eof()) {
-			ss >> s;
-			if(innovation_words.find(s) == innovation_words.end()) {
-				continue;
-			}
-			int innovation_index = innovation_words[s];
-			if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 1 <= reviews[i].time.day) { // the range where we count the word as an innovation
-				continue;
-			}
-			innovation_denom++;
-			if(final_exp == true) {
-				exp_innovoation_num[reviews[i].final_experience_level] ++;
+			string filename;
+			if(final == true) {
+				filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleIntToString(denominator) + "parts.txt";
 			} else {
-				exp_innovoation_num[reviews[i].current_experience_level] ++;
+				filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleDoubleToString(denominator)  + "parts.txt";
 			}
-			if(binary == true) {
-				break;
+			ofstream ab_fout(filename.c_str());
+			int temp_counter = 0;
+			ab_fout << "a\tb\t";
+			for(int i = 1; i <= denominator; i++) {
+				ab_fout << "cq"<< i << "\t";
+			}
+			ab_fout << endl;
+			while(output_count[temp_counter].size() != 0) {
+				ab_fout << output_count[temp_counter] << endl;
+				temp_counter++;
 			}
 		}
-	}
-	string filename = Amazon::Global::output_directory + "innovation_review_proportion_";
-	if(binary == true) {
-		filename += "binary_";
-	} else {
-		filename += "count_";
-	}
-	if(final_exp == true) {
-		filename += "final_";
-	} else {
-		filename += "present_";
-	}
-	filename += SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations";
-	filename += "_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
-	ofstream proportion_fout(filename.c_str());
-	for(pair<int, int> p : exp_review_num) {
-		int exp_level = p.first;
-		int numerator = p.second;
-		double out;
-		if(innovation_denom == 0) {
-			innovation_denom = 1;
-		}
-		proportion_fout << exp_level << " " << numerator / (double) review_denom << " " << exp_innovoation_num[exp_level] / (double)innovation_denom << endl;
-	}
 #endif
-	cerr << "trying to finish it!" << endl;
-	return 0;
-}
+#if 0
+		{
+			// Comparison with "No country for old men"
+			int K;
+			int K_bef = 0;
+			int num[5][10000];
+			int denom[5][10000];
+			const int CUT_OFF_EXP = 20;
+			int num_of_reviews_more_than_cut_off = 0;
+			const bool binary = true;
+			memset(num, 0, sizeof num);
+			for(int i = 0; i < reviews.size(); i++) {
+				if(reviews[i].final_experience_level >= CUT_OFF_EXP) {
+					num_of_reviews_more_than_cut_off++;
+				}
+			}
+			K_bef = CUT_OFF_EXP - 1;
+			for(int numerator = 1; numerator <= 4; numerator++) {
+				map<string, int> cur_exp;
+
+				int alpha = 0;
+				double fraction = 0;
+				// find K, where K is the least final_exp which half the reviews come from them
+				fraction = numerator / 4.0;
+				fraction = 1 / fraction;
+				cerr << "FINDING K for " << fraction << endl;
+				{
+					vector<int> counter_exp(10010);
+					fill(counter_exp.begin(), counter_exp.end(), 0);
+					for(int i = 0; i <(int) reviews.size(); i++) {
+						counter_exp[reviews[i].final_experience_level]++; // EXP - final
+					}
+					int index = CUT_OFF_EXP;
+					cerr << "GOING INTO THE LOOP" << endl;
+					while(fraction * alpha < num_of_reviews_more_than_cut_off) {
+						index++;
+						alpha += counter_exp[index];
+					}
+					K = index;
+				}
+				cerr <<"------>" << K_bef << " " << K << " " << alpha << " " << reviews.size() << endl;
+				cerr << "COMPUTING NUM" << endl;
+				for(int i = 0; i < (int)reviews.size(); i++) {
+					if(reviews[i].final_experience_level < CUT_OFF_EXP) {
+						continue;
+					}
+					stringstream ss(reviews[i].text);
+					string s;
+					for(string author : reviews[i].authors) {
+						cur_exp[author]++;
+					}
+					if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) { // Only the max final_exp added
+						continue;
+					}
+					while(!ss.eof()) {
+						ss >> s;
+						if(innovation_words.find(s) == innovation_words.end()) {
+							continue;
+						}
+						int innovation_index = innovation_words[s];
+						if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 1 <= reviews[i].time.day) { // the range where we count the word as an innovation
+							continue;
+						}
+						int start = top_innovations[innovation_words[s]].burst_start;
+						num[numerator][reviews[i].current_experience_level]++; // Only the max final_exp added
+						if(binary == true) {
+							break;
+						}
+					}
+				}
+				for(pair<string, int> p : experience_level) {
+					if(p.second > K || p.second <= K_bef) { // Only the max final_exp added
+						continue;
+					}
+					for(int j = 0; j <= p.second; j++) {
+						denom[numerator][j]++;
+					}
+				}
+				K_bef = K;
+			}
+
+			string filename;
+			if(binary == true) {
+				filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+			} else {
+				filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+			}
+			ofstream cristian_fout(filename.c_str());
+			for(int i = 1; i <= 4; i++) {
+				for(int j = 0; j < 1000; j++) {
+					cristian_fout << i << " " << j << " " << num[i][j] / ((double)denom[i][j] + 1) << endl;
+				}
+			}
+		}
+#endif
+
+#if 0
+		// innovations vs num of reviews for authors with more than 20 reviews
+		map<int, int> exp_innovoation_num;
+		map<int, int> exp_review_num;
+		int innovation_denom = 0;
+		int review_denom = 0;
+		const int CUT_OFF_EXP = 20;
+
+		const bool binary = true;
+		const bool final_exp = true;
+
+		for(int i = 0; i < reviews.size(); i++) {
+			if(reviews[i].final_experience_level < CUT_OFF_EXP) {
+				continue;
+			}
+			review_denom++;
+			if(final_exp == true) {
+				exp_review_num[reviews[i].final_experience_level]++;
+			} else {
+				exp_review_num[reviews[i].current_experience_level]++;
+			}
+			stringstream ss(reviews[i].text);
+			string s;
+			while(!ss.eof()) {
+				ss >> s;
+				if(innovation_words.find(s) == innovation_words.end()) {
+					continue;
+				}
+				int innovation_index = innovation_words[s];
+				if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 1 <= reviews[i].time.day) { // the range where we count the word as an innovation
+					continue;
+				}
+				innovation_denom++;
+				if(final_exp == true) {
+					exp_innovoation_num[reviews[i].final_experience_level] ++;
+				} else {
+					exp_innovoation_num[reviews[i].current_experience_level] ++;
+				}
+				if(binary == true) {
+					break;
+				}
+			}
+		}
+		string filename = Amazon::Global::output_directory + "innovation_review_proportion_";
+		if(binary == true) {
+			filename += "binary_";
+		} else {
+			filename += "count_";
+		}
+		if(final_exp == true) {
+			filename += "final_";
+		} else {
+			filename += "present_";
+		}
+		filename += SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations";
+		filename += "_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+		ofstream proportion_fout(filename.c_str());
+		for(pair<int, int> p : exp_review_num) {
+			int exp_level = p.first;
+			int numerator = p.second;
+			double out;
+			if(innovation_denom == 0) {
+				innovation_denom = 1;
+			}
+			proportion_fout << exp_level << " " << numerator / (double) review_denom << " " << exp_innovoation_num[exp_level] / (double)innovation_denom << endl;
+		}
+#endif
+		cerr << "trying to finish it!" << endl;
+		return 0;
+	}
