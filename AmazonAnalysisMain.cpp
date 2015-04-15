@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
 		string s;
 		int x;
 		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
-		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
+//		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
 			word_time_line.word = s;
 			innovation_words[s] = top_innovations.size();
 			word_time_line.burst_start = x;
-			fout_innovation_best_burst << x << endl;
+	//		fout_innovation_best_burst << x << endl;
 			top_innovations.push_back(word_time_line);
 			if((int)top_innovations.size() == SIZE_OF_TOP_INNOVATIONS) {
 				break;
@@ -403,7 +403,7 @@ int main(int argc, char *argv[]) {
 	{
 		// [a,b] and blue and black plot
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = true;
+		bool final = false;
 		int K_bef = 0;
 		string output_count[30000];
 		const int SHIFTER = 1100;
@@ -411,7 +411,7 @@ int main(int argc, char *argv[]) {
 		double average[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 2;
+		int denominator = 4;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
