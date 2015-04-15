@@ -411,7 +411,7 @@ int main(int argc, char *argv[]) {
 		double average[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 4;
+		int denominator = 2;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -560,7 +560,7 @@ int main(int argc, char *argv[]) {
 						int start = top_innovations[innovation_words[s]].burst_start;
 
 						pair<long long, long long> p;
-						int bucket = upper_bound(week, week + first_non_empty,reviews[i].time.day - start + SHIFTER) - week;
+						int bucket = upper_bound(week, week + first_non_empty,reviews[i].time.day - start + SHIFTER) - week - 1;
 						p = authors_exp_relative_to_burst[bucket];
 						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
