@@ -401,9 +401,11 @@ int main(int argc, char *argv[]) {
 #endif
 #if 1
 	{
+
+		bool silent_check = false;
 		// [a,b] and blue and black plot
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = false;
+		bool final = true;
 		int K_bef = 0;
 		string output_count[30000];
 		const int SHIFTER = 1100;
@@ -472,6 +474,11 @@ int main(int argc, char *argv[]) {
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
 					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + SHIFTER]++;
+					if(reviews[i].time.day - start < -1 && reviews[i].time.day > -6 && silent_check == false) {
+						cerr << " YAY there is no silence in this dataset with this coeff!" << endl;
+						cerr << Amazon::Global::state_coeffecient << " " << Global::NAMEOFDATASET << endl;
+						silent_check = true;
+					}
 					pair<long long, long long> p;
 					p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
 					if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
