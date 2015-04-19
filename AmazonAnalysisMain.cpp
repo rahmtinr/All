@@ -101,7 +101,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::earliest.year = 2030;
 
 	//State machine parameters.
-	Amazon::Global::state_coeffecient = SimpleStringToInt(argv[5]);
+	Amazon::Global::state_coeffecient = SimpleStringToDouble(argv[5]);
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
 	//	Amazon::Global::state_machine_doc_ratio = false;
@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
 		string s;
 		int x;
 		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
-//		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
+		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
@@ -191,13 +191,24 @@ int main(int argc, char *argv[]) {
 			word_time_line.word = s;
 			innovation_words[s] = top_innovations.size();
 			word_time_line.burst_start = x;
-	//		fout_innovation_best_burst << x << endl;
+			fout_innovation_best_burst << x << endl;
 			top_innovations.push_back(word_time_line);
 			if((int)top_innovations.size() == SIZE_OF_TOP_INNOVATIONS) {
 				break;
 			}
 		}
 	}
+    { // distribution of reviews over time - weekly bucketed! Now that day is based on week
+        map<int, int> dist;
+        for(int i = 0; i < reviews.size(); i++) {
+            dist[reviews[i].time.day]++;
+        }
+        ofstream fout_dist(("../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + Global::NAMEOFDATASET + "_distribution.txt").c_str());
+        fout_dist << "Week \t ReviewNumber" << endl;
+        for(pair<int, int> x : dist) {
+            fout_dist << x.first << " " << x.second << endl;
+        }
+    }
 #if 0
 
 	ofstream fout(Amazon::Global::output_directory + "timeline.txt");
@@ -405,7 +416,7 @@ int main(int argc, char *argv[]) {
 		bool silent_check = false;
 		// [a,b] and blue and black plot
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = true;
+		bool final = false;
 		int K_bef = 0;
 		string output_count[30000];
 		const int SHIFTER = 1100;
@@ -413,7 +424,7 @@ int main(int argc, char *argv[]) {
 		double average[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 4;
+		int denominator = 2;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -474,13 +485,14 @@ int main(int argc, char *argv[]) {
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
 					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + SHIFTER]++;
-					if(reviews[i].time.day - start < -1 && reviews[i].time.day > -6 && silent_check == false) {
+					if(reviews[i].time.day - start < -1 && reviews[i].time.day - start > -6 && silent_check == false) {
 						cerr << " YAY there is no silence in this dataset with this coeff!" << endl;
 						cerr << Amazon::Global::state_coeffecient << " " << Global::NAMEOFDATASET << endl;
+                        cerr << "----> " << reviews[i].time.day - start << endl;
 						silent_check = true;
 					}
 					pair<long long, long long> p;
-					p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
+    				p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
 					if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 						authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
 					} else {
