@@ -422,6 +422,7 @@ int main(int argc, char *argv[]) {
 		const int SHIFTER = 1100;
 		const int REL_SIZE = SHIFTER * 2 + 10;
 		double average[REL_SIZE];
+		vector<int> median_finder[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
 		int denominator = 2;
@@ -492,11 +493,18 @@ int main(int argc, char *argv[]) {
 						silent_check = true;
 					}
 					pair<long long, long long> p;
-    				p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
+					int index = reviews[i].time.day - start + SHIFTER;
+    				p = authors_exp_relative_to_burst[index];
 					if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
-						authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+						authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+						if(numerator == denominator) {
+							median_finder[index].push_back(reviews[i].final_experience_level);
+						}
 					} else {
-						authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+						authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+						if(numerator == denominator) {
+							median_finder[index].push_back(reviews[i].current_experience_level);
+						}
 					}
 				}
 			}
@@ -505,11 +513,6 @@ int main(int argc, char *argv[]) {
 			for(int i = 1; i < REL_SIZE; i++) {
 				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
 			}
-			cerr << "______________________" << endl;
-			for(int i = -10; i <= 10; i++) {
-				cerr << i << ": " << num_of_innovative_reviews_relative_to_burst[i + SHIFTER] << endl;
-			}
-			cerr << "______________________" << endl;
 			// quantile wise analysis of the papers in the final/present experience create more than half of the innovation?
 			int temp_counter = 0;
 			for(int a = SHIFTER - 100; a < SHIFTER + 100; a++) {
@@ -523,10 +526,10 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
-			/*
 		 	if(numerator == 4) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
+					sort(median_finder[i].begin(), median_finder[i].end());
 				}
 				string filename;
 				if(final == true) {
@@ -541,19 +544,24 @@ int main(int argc, char *argv[]) {
 					temp2 += authors_exp_relative_to_burst[i].second; // divide
                  //   cerr << i << " " << authors_exp_relative_to_burst[i].first << " " << authors_exp_relative_to_burst[i].second << endl;
                  //   cerr << temp1 << " " << temp2 << " " << temp1 / temp2 << endl;
-					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
+					if(median_finder[i].size() == 0) {
+						median_finder[i].push_back(0);
+					}
+					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << " " << median_finder[i][median_finder[i].size() / 2]<< endl;
 				}
 			}
-			 */
 			/**/
 			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 			if(numerator == 4) {
 				authors_exp_relative_to_burst.clear();
+				for(int i = 0; i < REL_SIZE; i++) {
+					median_finder[i].clear();
+				}
 				int num_of_all_reviews = sum_of_innovative_reviews_relative_to_burst[REL_SIZE - 1];
 				int week[100 + 10];
 				int first_non_empty = 1;
 				week[0] = -1100;
-				int each_bucket = num_of_all_reviews / 100;
+				int each_bucket = num_of_all_reviews / 50;
 				long long sum = 0;
 				for(int j = 0; j < REL_SIZE; j++) {
 					sum += num_of_innovative_reviews_relative_to_burst[j];
@@ -583,10 +591,15 @@ int main(int argc, char *argv[]) {
 						p = authors_exp_relative_to_burst[bucket];
 						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+							median_finder[bucket].push_back(reviews[i].final_experience_level);
 						} else {
 							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+							median_finder[bucket].push_back(reviews[i].current_experience_level);
 						}
 					}
+				}
+				for(int i = 0; i < REL_SIZE; i++) {
+					sort(median_finder[i].begin(), median_finder[i].end());
 				}
 				string filename;
 				if(final == true) {
@@ -595,9 +608,12 @@ int main(int argc, char *argv[]) {
 					filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
 				}
 				ofstream fout_bucket(filename.c_str());
-				fout_bucket << "Bucket_number\tStart_week\tAverage_experience" << endl;
+				fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
 				for(int i = 0; i < first_non_empty; i++) {
-					fout_bucket << i << "\t" << week[i] << "\t" << authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second << endl;
+					if(median_finder[i].size() == 0) {
+						median_finder[i].push_back(0);
+					}
+					fout_bucket << i << "\t" << week[i] << "\t" << authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second << " " << median_finder[i][median_finder[i].size() / 2] << endl;
 				}
 				/**/
 			}
