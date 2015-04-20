@@ -416,7 +416,7 @@ int main(int argc, char *argv[]) {
 		bool silent_check = false;
 		// [a,b] and blue and black plot
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = false;
+		bool final = true;
 		int K_bef = 0;
 		string output_count[30000];
 		const int SHIFTER = 1100;
@@ -425,7 +425,7 @@ int main(int argc, char *argv[]) {
 		vector<int> median_finder[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 2;
+		int denominator = 4;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
