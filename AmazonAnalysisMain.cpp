@@ -45,11 +45,21 @@ void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
 	real_time = argv[3];
-	string temp(argv[4]);
-	if(temp == "DocRatio") {
-		Amazon::Global::state_machine_doc_ratio = true;
-	} else {
-		Amazon::Global::state_machine_doc_ratio = false;
+	{
+		string temp(argv[4]);
+		if(temp == "DocRatio") {
+			Amazon::Global::state_machine_doc_ratio = true;
+		} else {
+			Amazon::Global::state_machine_doc_ratio = false;
+		}
+	}
+	{
+		string temp(argv[6]);
+		if(temp == "final") {
+			Amazon::Global::final = true;
+		} else {
+			Amazon::Global::final = false;
+		}
 	}
 	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
@@ -85,7 +95,7 @@ void initialize(char *argv[]) {
 	}
 
 	cerr << Global::NAMEOFDATASET <<endl;
-
+	cerr << "Final = " << argv[6] << " " << Amazon::Global::final << endl;
 	// Preprocess
 	int bound = 20 * 1000 * 1000;
 	Amazon::Global::sum_ln.push_back(0);
@@ -105,7 +115,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
 	//	Amazon::Global::state_machine_doc_ratio = false;
-	//Remove unknown reviews
+	// Remove unknown reviews
 	Amazon::Global::remove_unknown = true;
 
 	//Output Directory
@@ -123,7 +133,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 6) {
+	if(argc != 7) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -198,17 +208,17 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-    { // distribution of reviews over time - weekly bucketed! Now that day is based on week
-        map<int, int> dist;
-        for(int i = 0; i < reviews.size(); i++) {
-            dist[reviews[i].time.day]++;
-        }
-        ofstream fout_dist(("../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + Global::NAMEOFDATASET + "_distribution.txt").c_str());
-        fout_dist << "Week \t ReviewNumber" << endl;
-        for(pair<int, int> x : dist) {
-            fout_dist << x.first << " " << x.second << endl;
-        }
-    }
+	{ // distribution of reviews over time - weekly bucketed! Now that day is based on week
+		map<int, int> dist;
+		for(int i = 0; i < reviews.size(); i++) {
+			dist[reviews[i].time.day]++;
+		}
+		ofstream fout_dist(("../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + Global::NAMEOFDATASET + "_distribution.txt").c_str());
+		fout_dist << "Week \t ReviewNumber" << endl;
+		for(pair<int, int> x : dist) {
+			fout_dist << x.first << " " << x.second << endl;
+		}
+	}
 #if 0
 
 	ofstream fout(Amazon::Global::output_directory + "timeline.txt");
@@ -412,11 +422,9 @@ int main(int argc, char *argv[]) {
 #endif
 #if 1
 	{
-
-		bool silent_check = false;
+		bool final = Amazon::Global::final;
 		// [a,b] and blue and black plot
 		cerr << "STARTING  [a,b]" << endl;
-		bool final = true;
 		int K_bef = 0;
 		string output_count[30000];
 		const int SHIFTER = 1100;
@@ -486,15 +494,9 @@ int main(int argc, char *argv[]) {
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
 					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + SHIFTER]++;
-					if(reviews[i].time.day - start < -1 && reviews[i].time.day - start > -6 && silent_check == false) {
-						cerr << " YAY there is no silence in this dataset with this coeff!" << endl;
-						cerr << Amazon::Global::state_coeffecient << " " << Global::NAMEOFDATASET << endl;
-                        cerr << "----> " << reviews[i].time.day - start << endl;
-						silent_check = true;
-					}
 					pair<long long, long long> p;
 					int index = reviews[i].time.day - start + SHIFTER;
-    				p = authors_exp_relative_to_burst[index];
+					p = authors_exp_relative_to_burst[index];
 					if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 						authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
 						if(numerator == denominator) {
@@ -526,7 +528,7 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
-		 	if(numerator == 4) {
+			if(numerator == 4) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
 					sort(median_finder[i].begin(), median_finder[i].end());
@@ -542,8 +544,8 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i < REL_SIZE ; i++) {
 					temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
 					temp2 += authors_exp_relative_to_burst[i].second; // divide
-                 //   cerr << i << " " << authors_exp_relative_to_burst[i].first << " " << authors_exp_relative_to_burst[i].second << endl;
-                 //   cerr << temp1 << " " << temp2 << " " << temp1 / temp2 << endl;
+					//   cerr << i << " " << authors_exp_relative_to_burst[i].first << " " << authors_exp_relative_to_burst[i].second << endl;
+					//   cerr << temp1 << " " << temp2 << " " << temp1 / temp2 << endl;
 					if(median_finder[i].size() == 0) {
 						median_finder[i].push_back(0);
 					}

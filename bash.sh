@@ -12,13 +12,13 @@ then
     exit 0
 fi
 input_directory=$1
-#InputFiles=("Software")
-InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics")
-#InputFiles=("Books" "Movies_and_TV")
+InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+InputFiles=("Software")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-StateMachineCoeff=("4.5" "5.3")
+StateMachineCoeff=("3" "4.5" "5.3" "6" "12")
+ExperienceState=("final" "current")
 #"Longest" "All")
 rm temp
 touch temp
@@ -31,30 +31,33 @@ for x in ${InputFiles[*]}; do
             burst_mode=$z;
             for t in ${StateMachineCoeff[*]}; do
                 state_machine_coeff=$t;
-                echo $burst_mode
-                echo $time_mode
-                echo $state_machine_coeff
-                output_directory="../Output_All/"$x"_bursts/"$time_mode"/"$burst_mode"/" 
-#               rm $output_directory* -rf
-#               mkdir $output_directory"BurstPlots"
-#               mkdir $output_directory"AggregationPlots"
-#                ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
-                echo "Done With finding the innovations"
-               ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff 2>>temp
-#               time_line_txt=$output_directory$x"_timeline.txt"
-#               awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
-#               Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x
-#               mv *.jpg $output_directory"BurstPlots"
-#               Rscript "RScripts/innovators_distribution.R" $output_directory "../Output_All/"$x"_bursts/" $x
-#               Rscript "RScripts/innovators_cdf.R" $output_directory $x
-#               if [[ "$time_mode" == "RealTime" ]]
-#               then
-#                       Rscript "RScripts/usage_after_innovation_pdf.R" $output_directory $x
-#                fi
-#               Rscript "RScripts/repeated_innovator.R" $output_directory $x
-#               Rscript "RScripts/baseline_boxplot.R" $output_directory $x
-#               Rscript "RScripts/xp_showing_up_on_timeline.R" $output_directory $x
-                echo "________________________________"
+                for q in ${ExperienceState[*]}; do
+                    experience_state=$q;
+                    echo $burst_mode
+                    echo $time_mode
+                    echo $state_machine_coeff
+                    output_directory="../Output_All/"$x"_bursts/"$time_mode"/"$burst_mode"/" 
+#                      rm $output_directory* -rf
+#                      mkdir $output_directory"BurstPlots"
+#                      mkdir $output_directory"AggregationPlots"
+#                      ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
+                       echo "Done With finding the innovations"
+                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
+#                      time_line_txt=$output_directory$x"_timeline.txt"
+#                      awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
+#                      Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x
+#                      mv *.jpg $output_directory"BurstPlots"
+#                      Rscript "RScripts/innovators_distribution.R" $output_directory "../Output_All/"$x"_bursts/" $x
+#                      Rscript "RScripts/innovators_cdf.R" $output_directory $x
+#                      if [[ "$time_mode" == "RealTime" ]]
+#                      then
+#                              Rscript "RScripts/usage_after_innovation_pdf.R" $output_directory $x
+#                      fi
+#                      Rscript "RScripts/repeated_innovator.R" $output_directory $x
+#                      Rscript "RScripts/baseline_boxplot.R" $output_directory $x
+#                      Rscript "RScripts/xp_showing_up_on_timeline.R" $output_directory $x
+                       echo "________________________________"
+                done
             done
         done
     done

@@ -76,6 +76,7 @@ public:
 	static string output_directory;
 	static bool state_machine_doc_ratio;
 	static vector<double> sum_ln;
+	static bool final;
 };
 }
 
@@ -152,6 +153,7 @@ bool Amazon::Global::real_time;
 bool Amazon::Global::remove_unknown;
 string Amazon::Global::output_directory;
 bool Amazon::Global::state_machine_doc_ratio;
+bool Amazon::Global::final;
 vector<double> Amazon::Global::sum_ln;
 
 #endif /* AMAZONUTILITY_H_ */
