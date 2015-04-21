@@ -30,7 +30,7 @@ vector<Review> reviews;
 set<WordTimeLine> words_states;
 vector<WordTimeLine> top_innovations;
 // Langauge innovations
-vector<pair<string, vector<Review> > >  innovations[100];
+vector<pair<string, vector<Review> > >  innovations;
 map<int,int> distribution_for_entire_data_set;
 map<string, int> experience_level;
 set<WordTimeLine> burst_innovation;
@@ -107,7 +107,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::state_coeffecient = SimpleStringToDouble(argv[5]);
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
-//	Amazon::Global::state_machine_doc_ratio = false;
+	//	Amazon::Global::state_machine_doc_ratio = false;
 	//Remove unknown reviews
 	Amazon::Global::remove_unknown = true;
 
@@ -189,10 +189,19 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerTimeInTheDay(&reviews);
 	//
 	// sort(reviews.begin(), reviews.end());
-	// Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
-	// Innovations::FindInnovations(reviews.size() / 2, &reviews, innovations); // returns pair of word and review it was started.
-	// Innovations::AnalyseInnovation(innovations, &reviews);
 	 */
+	{ // No country for old members paper
+		Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
+		Innovations::FindCristianInnovations(reviews.size() / 2, &reviews, &innovations); // returns pair of word and review it was started.
+		string filename = Amazon::Global::output_directory + "words_start_burst_cristian.txt";
+		ofstream fout_cristian_method(filename.c_str());
+		cerr << "# of innovations: " << innovations.size() << endl;
+		for(int i = 0; i < innovations.size(); i++) {
+			int week_that_burst_started = (((innovations[i].second)[0]).time.epoch_time / (24 * 60 * 60) - (25 * 365)) / 7;
+			fout_cristian_method << innovations[i].first << " " << week_that_burst_started << endl;
+		}
+		// Innovations::AnalyseInnovation(innovations, &reviews);
+	}
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
 		for(int i = 0; i < reviews.size(); i++) {
 			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); //setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
@@ -238,10 +247,56 @@ int main(int argc, char *argv[]) {
 			burst_innovation.insert(word_states);
 		}
 	}
-	string filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+	string filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 	ofstream innovation_burst_year_out(filename.c_str());
+
+	string filename2 = Amazon::Global::output_directory + "words_start_burst_freq_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+	ofstream innovation_burst_year_freq_out(filename2.c_str());
+
 	for(WordTimeLine word_time_line : burst_innovation) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
+		innovation_burst_year_freq_out << word_time_line.word << "   " << word_time_line.burst_start << " " << word_time_line.review_index->size() << endl;
+	}
+
+	{
+		string filename = Amazon::Global::output_directory + "innovation_words_summary_different_coeff.txt";
+		map<string, string> saved;
+		if(EqDouble(Amazon::Global::state_coeffecient, 3) == false) {
+			ifstream fin_append(filename.c_str());
+			string s1;
+			string s2;
+			getline(fin_append, s2);
+			while(fin_append.good()) {
+				fin_append >> s1;
+				getline(fin_append, s2);
+				saved[s1] = s2;
+			}
+			fin_append.close();
+		}
+		ofstream fout_append(filename.c_str());
+		fout_append << "Coeff\tAverage_Freq\tMedian_Freq" << endl;
+		int num = 0;
+		double average = 0;
+		int median;
+		vector<int> median_finder;
+		for(WordTimeLine word_time_line : burst_innovation) { // Find average and median.
+			average += word_time_line.review_index->size();
+			median_finder.push_back(word_time_line.review_index->size());
+			num++;
+			if(num == 500) {
+				break;
+			}
+			if(num == 0) {
+				num++;
+				median_finder.push_back(0);
+			}
+			average /= num;
+			median = median_finder[median_finder.size() / 2];
+		}
+		for(pair<string, string> p : saved) {
+			fout_append << p.first << " " << p.second << endl;
+		}
+		fout_append << Amazon::Global::state_coeffecient << " " << average << " " << median << endl;
 	}
 #if 0
 

@@ -13,15 +13,13 @@ then
 fi
 input_directory=$1
 InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
-InputFiles=("Software")
+#InputFiles=("Beer_Advocate" "Rate_Beer")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
 StateMachineCoeff=("3" "4.5" "5.3" "6" "12")
+StateMachineCoeff=("3" "3.1" "3.2" "3.3" "3.4" "3.5" "3.6" "3.7" "3.8" "3.9" "4" "4.1" "4.2" "4.3" "4.4" "4.5")
 ExperienceState=("final" "current")
-#"Longest" "All")
-rm temp
-touch temp
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
     echo $input_directory
@@ -31,18 +29,18 @@ for x in ${InputFiles[*]}; do
             burst_mode=$z;
             for t in ${StateMachineCoeff[*]}; do
                 state_machine_coeff=$t;
-                for q in ${ExperienceState[*]}; do
-                    experience_state=$q;
+#               for q in ${ExperienceState[*]}; do
+#                    experience_state=$q;
                     echo $burst_mode
                     echo $time_mode
                     echo $state_machine_coeff
-                    output_directory="../Output_All/"$x"_bursts/"$time_mode"/"$burst_mode"/" 
+                    output_directory="../Output_All/"$x"_bursts/"$time_mode"/"$burst_mode"/"
 #                      rm $output_directory* -rf
 #                      mkdir $output_directory"BurstPlots"
 #                      mkdir $output_directory"AggregationPlots"
-#                      ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
-                       echo "Done With finding the innovations"
-                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
+                      ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
+#                       echo "Done With finding the innovations"
+#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
 #                      time_line_txt=$output_directory$x"_timeline.txt"
 #                      awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
 #                      Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x
@@ -57,9 +55,15 @@ for x in ${InputFiles[*]}; do
 #                      Rscript "RScripts/baseline_boxplot.R" $output_directory $x
 #                      Rscript "RScripts/xp_showing_up_on_timeline.R" $output_directory $x
                        echo "________________________________"
-                done
+#                done
             done
         done
     done
 #    Rscript "RScripts/compare_timing.R" "../Output_All/"$x"_bursts/" $x
 done
+~                                                                                                                                                                                                                                                                                   
+~                                                                                                                                                                                                                                                                                   
+~                                                                                                                                                                                                                                                                                   
+~                                                                                                                                                                                                                                                                                   
+~                                                                                                                                                                                                                                                                                   
+~                                               

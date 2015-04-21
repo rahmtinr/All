@@ -190,8 +190,8 @@ int main(int argc, char *argv[]) {
 	{
 		string s;
 		int x;
-		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
-		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt");
+		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
+		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
@@ -535,9 +535,9 @@ int main(int argc, char *argv[]) {
 				}
 				string filename;
 				if(final == true) {
-					filename = Amazon::Global::output_directory + "final_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+					filename = Amazon::Global::output_directory + "final_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 				} else {
-					filename = Amazon::Global::output_directory + "current_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+					filename = Amazon::Global::output_directory + "current_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 				}
 				ofstream rel_year_fout(filename.c_str());
 				double temp1 = 0, temp2 = 1;
@@ -605,9 +605,9 @@ int main(int argc, char *argv[]) {
 				}
 				string filename;
 				if(final == true) {
-					filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+					filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 				} else {
-					filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+					filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 				}
 				ofstream fout_bucket(filename.c_str());
 				fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
@@ -624,9 +624,9 @@ int main(int argc, char *argv[]) {
 
 			string filename;
 			if(final == true) {
-				filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleIntToString(denominator) + "parts.txt";
+				filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator) + "parts.txt";
 			} else {
-				filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + "_" + SimpleDoubleToString(denominator)  + "parts.txt";
+				filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator)  + "parts.txt";
 			}
 			ofstream ab_fout(filename.c_str());
 			temp_counter = 0;
@@ -725,9 +725,9 @@ int main(int argc, char *argv[]) {
 
 		string filename;
 		if(binary == true) {
-			filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+			filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		} else {
-			filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+			filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		}
 		ofstream cristian_fout(filename.c_str());
 		for(int i = 1; i <= 4; i++) {
@@ -793,7 +793,7 @@ int main(int argc, char *argv[]) {
 		filename += "present_";
 	}
 	filename += SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations";
-	filename += "_coeff" + SimpleIntToString(int(Amazon::Global::state_coeffecient + 0.2)) + ".txt";
+	filename += "_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 	ofstream proportion_fout(filename.c_str());
 	for(pair<int, int> p : exp_review_num) {
 		int exp_level = p.first;

@@ -63,32 +63,25 @@ public:
 
 	static void PopWordAddToDictionary(string word, vector<Review> *review_history,
 			vector<pair<string, vector<Review> > > *innovations) {
-		for(int i = 0; i < (int) numbers_for_appearances.size(); i++) {
-			for(int j = 0; j < (int) numbers_for_products.size(); j++) {
-				for(int k = 0; k < (int) numbers_for_authors.size(); k++) {
-					set<string> products_that_have_this_word;
-					set<string> users_that_have_used_this_word;
-					if ((int) review_history->size() < numbers_for_appearances[i]) {
-						continue;
-					}
-					for (int i = 0; i < (int)review_history->size(); i++) {
-						products_that_have_this_word.insert((*review_history)[i].product_id);
-						users_that_have_used_this_word.insert((*review_history)[i].user_id);
-					}
-					if ((int) products_that_have_this_word.size() < numbers_for_products[j]) {
-						continue;
-					}
-					if ((int) users_that_have_used_this_word.size() < numbers_for_authors[k]) {
-						continue;
-					}
-					innovations[(numbers_for_authors.size()*numbers_for_products.size())*i + numbers_for_authors.size()*j + k]
-					            .push_back(make_pair(word, *review_history));
-				}
-			}
+		set<string> products_that_have_this_word;
+		set<string> users_that_have_used_this_word;
+		if((int) review_history->size() < 10) {
+			return;
 		}
+		for(int i = 0; i < (int)review_history->size(); i++) {
+			products_that_have_this_word.insert((*review_history)[i].product_id);
+			users_that_have_used_this_word.insert((*review_history)[i].user_id);
+		}
+		if((int) products_that_have_this_word.size() < 5) {
+			return;
+		}
+		if((int) users_that_have_used_this_word.size() < 5) {
+			return;
+		}
+		innovations->push_back(make_pair(word, *review_history));
 	}
 
-	static void FindInnovations(int start, vector<Review> *reviews, vector<pair<string, vector<Review> > > *innovations) {
+	static void FindCristianInnovations(int start, vector<Review> *reviews, vector<pair<string, vector<Review> > > *innovations) {
 		map<string, vector<Review> > new_words;
 		string word;
 		vector<Review> temp;
@@ -99,7 +92,7 @@ public:
 				if(dictionary.find(word) != dictionary.end()) {
 					continue;
 				}
-				if (new_words.find(word) == new_words.end()) {
+				if(new_words.find(word) == new_words.end()) {
 					temp.clear();
 					temp.push_back((*reviews)[i]);
 					new_words[word] = temp;
