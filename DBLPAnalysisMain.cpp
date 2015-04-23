@@ -134,7 +134,14 @@ void initialize(char *argv[]) {
 		if(filename[i] == '.' && last_dot == 0) {
 			last_dot = i;
 		}
-
+	}
+	{
+		string temp(argv[4]);
+		if(temp == "final") {
+			Amazon::Global::final = true;
+		} else {
+			Amazon::Global::final = false;
+		}
 	}
 	real_time = "RealTime";
 	Global::NAMEOFDATASET = "DBLP";
@@ -202,7 +209,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 4) {
+	if(argc != 5) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -799,19 +806,23 @@ int main(int argc, char *argv[]) {
 		cerr << "STARTING  [a,b]" << endl;
 		string output_count[30000];
 		string output_bin[30000];
-		double average[210];
-		for (int numerator = 1; numerator <= 4; numerator++) {
+		const int SHIFTER = 100;
+		const int REL_SIZE = SHIFTER * 2 + 10;
+		const bool final = Amazon::Global::final;
+		double average[REL_SIZE];
+		int denominator = 4;
+		for (int numerator = 1; numerator <= denominator; numerator++) {
 			vector<int> num_of_innovative_reviews_relative_to_burst(210);
 			vector<int> sum_of_innovative_reviews_relative_to_burst(210);
 			vector<pair<int, int> > authors_exp_relative_to_burst(210); //(sum, number of authors)
-			for(int i = 0; i < 210; i++) {
+			for(int i = 0; i < REL_SIZE; i++) {
 				authors_exp_relative_to_burst[i] = make_pair(0, 0);
 			}
 			fill(num_of_innovative_reviews_relative_to_burst.begin(), num_of_innovative_reviews_relative_to_burst.end(), 0);
 			fill(sum_of_innovative_reviews_relative_to_burst.begin(), sum_of_innovative_reviews_relative_to_burst.end(), 0);
-			vector<vector<int> > binary(210, vector<int>(210));
-			for(int i = 0; i < 210; i++) {
-				for(int j = 0; j < 210; j++) {
+			vector<vector<int> > binary(REL_SIZE, vector<int>(REL_SIZE));
+			for(int i = 0; i < REL_SIZE; i++) {
+				for(int j = 0; j < REL_SIZE; j++) {
 					binary[i][j] = 0;
 				}
 			}
@@ -819,7 +830,7 @@ int main(int argc, char *argv[]) {
 			int alpha = 0;
 			double fraction = 0;
 			// find K, where K is the least final_exp which half the reviews come from them
-			fraction = numerator / 4.0;
+			fraction = numerator / (double) denominator;
 			fraction = 1 / fraction;
 			cerr << "FINDING K for " << fraction << endl;
 			{
@@ -853,22 +864,26 @@ int main(int argc, char *argv[]) {
 						continue;
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
-					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + 100]++;
+					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + SHIFTER]++;
 					pair<int, int> p;
 					/*	for(string author : reviews[i].authors) {
-						p = authors_exp_relative_to_burst[reviews[i].time.day - start + 100];
+						p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
 						authors_exp_relative_to_burst[reviews[i].time.day - start + 100] = make_pair(p.first + experience_level[author], p.second + 1); // final exp counted
 					}
 					 */
-					p = authors_exp_relative_to_burst[reviews[i].time.day - start + 100];
-					authors_exp_relative_to_burst[reviews[i].time.day - start + 100] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1); //  EXP - final
-					relative_burst_times.push_back(reviews[i].time.day - start + 100);
-					latest = max(latest, reviews[i].time.day - start + 100);
-					earliest = min(earliest, reviews[i].time.day - start + 100);
+					p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
+					if(final == true) {
+						authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+					} else {
+						authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+					}
+					relative_burst_times.push_back(reviews[i].time.day - start + SHIFTER);
+					latest = max(latest, reviews[i].time.day - start + SHIFTER);
+					earliest = min(earliest, reviews[i].time.day - start + SHIFTER);
 				}
 				// at least has one year of intersection
 				for(int s = 0; s < latest; s++) {
-					for(int t = max(s + 1, earliest); t < 200; t++) {
+					for(int t = max(s + 1, earliest); t < 2 * SHIFTER; t++) {
 						for(int l = 0; l < (int)relative_burst_times.size(); l++) {
 							if(s <= relative_burst_times[l] && relative_burst_times[l] <= t) {
 								binary[s][t]++;
@@ -881,15 +896,15 @@ int main(int argc, char *argv[]) {
 			}
 
 			//		cerr << "COMPUTING SUM" << endl;
-			for(int i = 1; i < 200; i++) {
+			for(int i = 1; i < 2 * SHIFTER; i++) {
 				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
 			}
 			// Does the smaller half side of the papers in the final experience create more than half of the innovation?
 			int temp_counter = 0;
-			for(int a = 1 ; a < 200; a++) {
-				for(int b = a + 1; b < 200; b++) {
+			for(int a = 1 ; a < 2 * SHIFTER; a++) {
+				for(int b = a + 1; b < 2 * SHIFTER; b++) {
 					if(numerator == 1 ) {
-						output_count[temp_counter] = SimpleIntToString(a-100) + "\t" + SimpleIntToString(b-100);
+						output_count[temp_counter] = SimpleIntToString(a-100) + "\t" + SimpleIntToString(b - SHIFTER);
 					}
 					int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
 					output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha);
@@ -898,17 +913,89 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			if(numerator == 4) {
-				for(int i = 0; i < 200; i++) {
+				for(int i = 0; i < 2 * SHIFTER; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
 				}
-				string filename = Amazon::Global::output_directory + "present_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+				string filename;
+				if(final == true) {
+					filename = Amazon::Global::output_directory + "final_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+				} else {
+					filename = Amazon::Global::output_directory + "present_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+				}
 				ofstream rel_year_fout(filename.c_str());
 				int temp1 = 0, temp2 = 1;
-				for(int i = 0; i < 200 ; i++) {
+				for(int i = 0; i < 2 * SHIFTER ; i++) {
 					temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
 					temp2 += authors_exp_relative_to_burst[i].second; // number of authors for denominator to divide
-					rel_year_fout << i - 100 << " " << temp1 / (double) temp2	 << " "<< sum_of_innovative_reviews_relative_to_burst[i] << endl;
+					rel_year_fout << i - SHIFTER << " " << temp1 / (double) temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
+			}
+			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
+			vector<int> median_finder[REL_SIZE];
+
+			if(numerator == denominator) {
+				authors_exp_relative_to_burst.clear();
+				for(int i = 0; i < REL_SIZE; i++) {
+					median_finder[i].clear();
+				}
+				int week[100 + 10];
+				int first_non_empty = 1;
+				week[0] = -1100;
+				int each_bucket = 20;
+				long long sum = 0;
+				for(int j = 0; j < REL_SIZE; j++) {
+					sum += num_of_innovative_reviews_relative_to_burst[j];
+					if(sum > each_bucket) {
+						week[first_non_empty++] = j + 1;
+						sum = 0;
+					}
+				}
+				for(int i = 0; i < (int)reviews.size(); i++) {
+					if(final == true) {
+						continue;
+					}
+					if(final == false) {
+						continue;
+					}
+					stringstream ss(reviews[i].text);
+					string s;
+					while(!ss.eof()) {
+						ss >> s;
+						if(innovation_words.find(s) == innovation_words.end()) {
+							continue;
+						}
+						int start = top_innovations[innovation_words[s]].burst_start;
+
+						pair<long long, long long> p;
+						int bucket = upper_bound(week, week + first_non_empty,reviews[i].time.day - start + SHIFTER) - week - 1;
+						p = authors_exp_relative_to_burst[bucket];
+						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
+							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+							median_finder[bucket].push_back(reviews[i].final_experience_level);
+						} else {
+							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+							median_finder[bucket].push_back(reviews[i].current_experience_level);
+						}
+					}
+				}
+				for(int i = 0; i < REL_SIZE; i++) {
+					sort(median_finder[i].begin(), median_finder[i].end());
+				}
+				string filename;
+				if(final == true) {
+					filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+				} else {
+					filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+				}
+				ofstream fout_bucket(filename.c_str());
+				fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
+				for(int i = 0; i < first_non_empty; i++) {
+					if(median_finder[i].size() == 0) {
+						median_finder[i].push_back(0);
+					}
+					fout_bucket << i << "\t" << week[i] << "\t" << authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second << " " << median_finder[i][median_finder[i].size() / 2] << endl;
+				}
+				/**/
 			}
 		}
 
@@ -1089,9 +1176,9 @@ int main(int argc, char *argv[]) {
 				for(string author : reviews[i].authors) {
 					cur_exp[author]++;
 				}
-//				if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) { // Only the max final_exp added
-//					continue;
-//				}
+				//				if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) { // Only the max final_exp added
+				//					continue;
+				//				}
 				while(!ss.eof()) {
 					ss >> s;
 					if(innovation_words.find(s) == innovation_words.end()) {
@@ -1102,7 +1189,7 @@ int main(int argc, char *argv[]) {
 						continue;
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
-//					num[numerator][cur_exp[reviews[i].final_exp_best_author]]++; // Only the max final_exp added
+					//					num[numerator][cur_exp[reviews[i].final_exp_best_author]]++; // Only the max final_exp added
 					for(string author : reviews[i].authors) { // Adding all the authors effect
 						if(experience_level[author] <= K && experience_level[author] > K_bef) {
 							num[numerator][cur_exp[author]]++;
