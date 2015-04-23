@@ -53,3 +53,16 @@ draw_heat_map("Books", "final", "3")
 draw_heat_map("Books", "final", "6")
 draw_heat_map("Books", "final", "12")
 
+draw_heat_map("Beer_Advocate", "final", "3")
+draw_heat_map("Beer_Advocate", "final", "4.5")
+draw_heat_map("Beer_Advocate", "final", "5.3")
+draw_heat_map("Beer_Advocate", "final", "6")
+draw_heat_map("Beer_Advocate", "final", "12")
+
+
+draw_heat_map("Rate_Beer", "final", "3")
+draw_heat_map("Rate_Beer", "final", "4.5")
+draw_heat_map("Rate_Beer", "final", "5.3")
+draw_heat_map("Rate_Beer", "final", "6")
+draw_heat_map("Rate_Beer", "final", "12")
+

@@ -61,9 +61,3 @@ for x in ${InputFiles[*]}; do
     done
 #    Rscript "RScripts/compare_timing.R" "../Output_All/"$x"_bursts/" $x
 done
-~                                                                                                                                                                                                                                                                                   
-~                                                                                                                                                                                                                                                                                   
-~                                                                                                                                                                                                                                                                                   
-~                                                                                                                                                                                                                                                                                   
-~                                                                                                                                                                                                                                                                                   
-~                                               
