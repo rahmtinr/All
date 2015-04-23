@@ -511,6 +511,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 
+//            cerr << " 11111111111 " << endl;
 			//		cerr << "COMPUTING SUM" << endl;
 			for(int i = 1; i < REL_SIZE; i++) {
 				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
@@ -528,6 +529,7 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
+  //          cerr << " 2222222222 " << endl;
 			if(numerator == 4) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
@@ -552,6 +554,7 @@ int main(int argc, char *argv[]) {
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << " " << median_finder[i][median_finder[i].size() / 2]<< endl;
 				}
 			}
+ //           cerr << " 33333333333333" << endl;
 			/**/
 			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 			if(numerator == denominator) {
@@ -559,7 +562,7 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					median_finder[i].clear();
 				}
-				int week[100 + 10];
+				int week[REL_SIZE];
 				int first_non_empty = 1;
 				week[0] = -1100;
 				int each_bucket = 30;
@@ -571,6 +574,8 @@ int main(int argc, char *argv[]) {
 						sum = 0;
 					}
 				}
+   //             cerr << " ---- -first non empty " << first_non_empty << endl;
+    //            cerr << "44444444444444444444444444444$$" << endl;
 				for(int i = 0; i < (int)reviews.size(); i++) {
 					if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
 						continue;
@@ -589,16 +594,24 @@ int main(int argc, char *argv[]) {
 
 						pair<long long, long long> p;
 						int bucket = upper_bound(week, week + first_non_empty,reviews[i].time.day - start + SHIFTER) - week - 1;
+      //                  cerr << reviews[i].time.day-start+SHIFTER << " " << bucket << " " << REL_SIZE << endl;
 						p = authors_exp_relative_to_burst[bucket];
+      //                  cerr << "HAHA " << endl;
 						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+         //                   cerr << "SALAM " << endl;
+         //                   cerr << bucket << " " << reviews[i].final_experience_level << endl;
+         //                   cerr << " HI there " << endl;
 							median_finder[bucket].push_back(reviews[i].final_experience_level);
+         //                   cerr << "OH NO " << endl;
 						} else {
 							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
 							median_finder[bucket].push_back(reviews[i].current_experience_level);
 						}
+        //                cerr << "DONE" << endl;
 					}
 				}
+       //         cerr << " 555555555555555555 " << endl;
 				for(int i = 0; i < REL_SIZE; i++) {
 					sort(median_finder[i].begin(), median_finder[i].end());
 				}
@@ -618,8 +631,7 @@ int main(int argc, char *argv[]) {
 				}
 				/**/
 			}
-
-
+     //       cerr << "666666666666666666666^" << endl;
 
 			string filename;
 			if(final == true) {

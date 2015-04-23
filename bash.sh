@@ -12,7 +12,7 @@ then
     exit 0
 fi
 input_directory=$1
-InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 #InputFiles=("Beer_Advocate" "Rate_Beer")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
@@ -22,27 +22,27 @@ StateMachine=("DocRatio")
 ExperienceState=("final" "current")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
-    if (($x == "Music")) 
+    if [[ $x == "Music" ]]
     then
         StateMachineCoeff=("3.5")
     fi
-    if (($x == "Movies_and_TV")) 
+    if [[ $x == "Movies_and_TV" ]]
     then
         StateMachineCoeff=("3.3" "4.2")
     fi
-    if (($x == "Books")) 
+    if [[ $x == "Books" ]]
     then
         StateMachineCoeff=("3.5" "4.0")
     fi
-    if (($x == "Rate_Beer")) 
+    if [[ $x == "Rate_Beer" ]]
     then
         StateMachineCoeff=("3.4" "3.5")
     fi
-    if (($x == "Beer_Advocate")) 
+    if [[ $x == "Beer_Advocate" ]]
     then
         StateMachineCoeff=("3.7")
     fi
-    if (($x == "Electronics")) 
+    if [[ $x == "Electronics" ]]
     then
         StateMachineCoeff=("4.2" "4.1")
     fi
@@ -53,8 +53,8 @@ for x in ${InputFiles[*]}; do
             burst_mode=$z;
             for t in ${StateMachineCoeff[*]}; do
                 state_machine_coeff=$t;
-#               for q in ${ExperienceState[*]}; do
-#                    experience_state=$q;
+               for q in ${ExperienceState[*]}; do
+                    experience_state=$q;
                     echo $burst_mode
                     echo $time_mode
                     echo $state_machine_coeff
@@ -79,7 +79,7 @@ for x in ${InputFiles[*]}; do
 #                      Rscript "RScripts/baseline_boxplot.R" $output_directory $x
 #                      Rscript "RScripts/xp_showing_up_on_timeline.R" $output_directory $x
                        echo "________________________________"
-#                done
+                done
             done
         done
     done
