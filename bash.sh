@@ -36,11 +36,11 @@ for x in ${InputFiles[*]}; do
     fi
     if (($x == "Rate_Beer")) 
     then
-        StateMachineCoeff=("3.4" "3.0")
+        StateMachineCoeff=("3.4" "3.5")
     fi
     if (($x == "Beer_Advocate")) 
     then
-        StateMachineCoeff=("3.7" "3")
+        StateMachineCoeff=("3.7")
     fi
     if (($x == "Electronics")) 
     then
