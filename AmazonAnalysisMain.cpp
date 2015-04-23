@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
 		vector<int> median_finder[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 4;
+		int denominator = 2;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -554,16 +554,15 @@ int main(int argc, char *argv[]) {
 			}
 			/**/
 			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
-			if(numerator == 4) {
+			if(numerator == denominator) {
 				authors_exp_relative_to_burst.clear();
 				for(int i = 0; i < REL_SIZE; i++) {
 					median_finder[i].clear();
 				}
-				int num_of_all_reviews = sum_of_innovative_reviews_relative_to_burst[REL_SIZE - 1];
 				int week[100 + 10];
 				int first_non_empty = 1;
 				week[0] = -1100;
-				int each_bucket = num_of_all_reviews / 50;
+				int each_bucket = 30;
 				long long sum = 0;
 				for(int j = 0; j < REL_SIZE; j++) {
 					sum += num_of_innovative_reviews_relative_to_burst[j];

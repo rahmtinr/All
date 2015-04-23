@@ -290,9 +290,9 @@ int main(int argc, char *argv[]) {
 				num++;
 				median_finder.push_back(0);
 			}
-			average /= num;
-			median = median_finder[median_finder.size() / 2];
 		}
+		average /= num;
+		median = median_finder[median_finder.size() / 2];
 		for(pair<string, string> p : saved) {
 			fout_append << p.first << " " << p.second << endl;
 		}
