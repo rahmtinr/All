@@ -941,7 +941,7 @@ int main(int argc, char *argv[]) {
 				int week[REL_SIZE];
 				int first_non_empty = 1;
 				week[0] = SHIFTER;
-				int each_bucket = 20;
+				int each_bucket = 30;
 				long long sum = 0;
 				for(int j = 0; j < REL_SIZE; j++) {
 					sum += num_of_innovative_reviews_relative_to_burst[j];
@@ -950,6 +950,7 @@ int main(int argc, char *argv[]) {
 						sum = 0;
 					}
 				}
+				cerr << "---------------->" << first_non_empty << " " << sum_of_innovative_reviews_relative_to_burst[REL_SIZE - 1]<< endl;
 				for(int i = 0; i < (int)reviews.size(); i++) {
 					if(final == true) {
 						continue;

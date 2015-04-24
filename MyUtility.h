@@ -120,6 +120,9 @@ string SimpleDoubleToString(double x) {
 	stringstream ss;
 	ss << x;
 	ss >> ret;
+	if(ret.length() == 1) {
+		ret += ".0";
+	}
 	return ret;
 }
 
