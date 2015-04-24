@@ -938,9 +938,9 @@ int main(int argc, char *argv[]) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					median_finder[i].clear();
 				}
-				int week[100 + 10];
+				int week[REL_SIZE];
 				int first_non_empty = 1;
-				week[0] = -1100;
+				week[0] = SHIFTER;
 				int each_bucket = 20;
 				long long sum = 0;
 				for(int j = 0; j < REL_SIZE; j++) {
