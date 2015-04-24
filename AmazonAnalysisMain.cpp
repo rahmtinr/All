@@ -574,6 +574,12 @@ int main(int argc, char *argv[]) {
 				map<int, int> pdf_exp;
 				int biggest_exp = -1;
 				for(int i = 0; i < (int)reviews.size(); i++) {
+					if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
+						continue;
+					}
+					if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
+						continue;
+					}
 					if(final == true) {
 						pdf_exp[reviews[i].final_experience_level]++;
 						biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
@@ -586,6 +592,7 @@ int main(int argc, char *argv[]) {
 				cdf_exp.push_back(0);
 				cdf_exp[0] += pdf_exp[0];
 				for(int i = 1; i <= biggest_exp; i++) {
+
 					cdf_exp.push_back(cdf_exp[i-1]);
 					cdf_exp[i] += pdf_exp[i];
 				}
@@ -651,7 +658,7 @@ int main(int argc, char *argv[]) {
 							median_finder[i].push_back(0);
 						}
 						int median = median_finder[i][median_finder[i].size() / 2];
-						fout_bucket_median_comparison << i << "\t" << week[i] << "\t" << cdf_exp[median] / (double)reviews.size() << endl;
+						fout_bucket_median_comparison << i << "\t" << week[i] << "\t" << cdf_exp[median] / (double)num_of_reviews_more_than_cut_off << endl;
 					}
 				}
 				/**/
