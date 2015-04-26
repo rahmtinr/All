@@ -634,9 +634,9 @@ int main(int argc, char *argv[]) {
 					{
 						string filename;
 						if(final == true) {
-							filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + each_bucket  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+							filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket)  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 						} else {
-							filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + each_bucket  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+							filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket)  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 						}
 						ofstream fout_bucket(filename.c_str());
 						fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
@@ -650,9 +650,9 @@ int main(int argc, char *argv[]) {
 					{
 						string filename;
 						if(final == true) {
-							filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + each_bucket  +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+							filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) + "_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 						} else {
-							filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + each_bucket  +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+							filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 						}
 						// Where does the median experience of each innovation bucket lie comparing to all the reviews
 						ofstream fout_bucket_median_comparison(filename.c_str());
