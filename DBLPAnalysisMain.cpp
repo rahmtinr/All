@@ -934,9 +934,6 @@ int main(int argc, char *argv[]) {
 			vector<int> median_finder[REL_SIZE];
 
 			if(numerator == denominator) {
-				int bucket_num [5] = {30, 50, 100, 200, 500};
-				for(int bucket_index = 0; bucket_index < 5; bucket_index++) {
-
 					authors_exp_relative_to_burst.clear();
 					for(int i = 0; i < REL_SIZE; i++) {
 						median_finder[i].clear();
@@ -944,7 +941,7 @@ int main(int argc, char *argv[]) {
 					int week[REL_SIZE];
 					int first_non_empty = 1;
 					week[0] = SHIFTER;
-					int each_bucket = bucket_num[bucket_index];
+					int each_bucket = 30;
 					long long sum = 0;
 					for(int j = 0; j < REL_SIZE; j++) {
 						sum += num_of_innovative_reviews_relative_to_burst[j];
@@ -1041,20 +1038,19 @@ int main(int argc, char *argv[]) {
 						}
 					}
 					/**/
-				}
 
 			}
 
-			/*
-			string filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
-			ofstream ab_fout(filename.c_str());
-			int temp_counter = 0;
-			ab_fout << "a\tb\tcq1\tcq2\tcq3\tcq4\tbinq1\tbinq2\tbinq3\binq4" << endl; //cq = count on quartile, binq = binary on quarter
-			while(output_count[temp_counter].size() != 0) {
-				ab_fout << output_count[temp_counter] << output_bin[temp_counter]<< endl;
-				temp_counter++;
-			}
-			 */
+		/*
+		string filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
+		ofstream ab_fout(filename.c_str());
+		int temp_counter = 0;
+		ab_fout << "a\tb\tcq1\tcq2\tcq3\tcq4\tbinq1\tbinq2\tbinq3\binq4" << endl; //cq = count on quartile, binq = binary on quarter
+		while(output_count[temp_counter].size() != 0) {
+			ab_fout << output_count[temp_counter] << output_bin[temp_counter]<< endl;
+			temp_counter++;
+		}
+		 */
 		}
 	}
 #endif
