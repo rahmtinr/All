@@ -571,7 +571,6 @@ int main(int argc, char *argv[]) {
 						sum = 0;
 					}
 				}
-				cerr << "---------------->" << first_non_empty << " " << sum_of_innovative_reviews_relative_to_burst[REL_SIZE - 1]<< endl;
 
 				map<int, int> pdf_exp;
 				int biggest_exp = -1;
