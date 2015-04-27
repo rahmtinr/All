@@ -36,33 +36,35 @@ draw_heat_map <- function(dataset, final, coeff) {
     ggplot(dat, aes(x=a,y=b)) + 
     geom_tile(aes(fill = value),colour='black') +
     scale_fill_gradientn(colours=c("green","yellow","red")) +  
-    ggtitle(paste(dataset, final, "coeff", coeff, sep=" ")) + 
+    ggtitle(paste(dataset, final, "coeff", coeff, "4parts", sep=" ")) + 
     coord_equal() 
 #    dev.off()
 }
 
-draw_heat_map("Music", "final", "3")
-draw_heat_map("Music", "final", "6")
-draw_heat_map("Music", "final", "12")
+draw_heat_map("Music", "final", "3.5")
+draw_heat_map("Music", "current", "3.5")
 
-draw_heat_map("Movies_and_TV", "final", "3")
-draw_heat_map("Movies_and_TV", "final", "6")
-draw_heat_map("Movies_and_TV", "final", "12")
+draw_heat_map("Movies_and_TV", "final", "3.3")
+draw_heat_map("Movies_and_TV", "final", "4.2")
+draw_heat_map("Movies_and_TV", "current", "3.3")
+draw_heat_map("Movies_and_TV", "current", "4.2")
 
-draw_heat_map("Books", "final", "3")
-draw_heat_map("Books", "final", "6")
-draw_heat_map("Books", "final", "12")
+draw_heat_map("Books", "final", "3.5")
+draw_heat_map("Books", "final", "4.0")
+draw_heat_map("Books", "current", "3.5")
+draw_heat_map("Books", "current", "4.0")
 
-draw_heat_map("Beer_Advocate", "final", "3")
-draw_heat_map("Beer_Advocate", "final", "4.5")
-draw_heat_map("Beer_Advocate", "final", "5.3")
-draw_heat_map("Beer_Advocate", "final", "6")
-draw_heat_map("Beer_Advocate", "final", "12")
+draw_heat_map("Beer_Advocate", "final", "3.7")
+draw_heat_map("Beer_Advocate", "current", "3.7")
 
 
-draw_heat_map("Rate_Beer", "final", "3")
-draw_heat_map("Rate_Beer", "final", "4.5")
-draw_heat_map("Rate_Beer", "final", "5.3")
-draw_heat_map("Rate_Beer", "final", "6")
-draw_heat_map("Rate_Beer", "final", "12")
+draw_heat_map("Rate_Beer", "final", "3.4")
+draw_heat_map("Rate_Beer", "final", "3.5")
+draw_heat_map("Rate_Beer", "current", "3.4")
+draw_heat_map("Rate_Beer", "current", "3.5")
+
+draw_heat_map("Electronics", "final", "4.2")
+draw_heat_map("Electronics", "final", "4.1")
+draw_heat_map("Electronics", "current", "4.2")
+draw_heat_map("Electronics", "current", "4.1")
 
