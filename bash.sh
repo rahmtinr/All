@@ -62,9 +62,9 @@ for x in ${InputFiles[*]}; do
 #                      rm $output_directory* -rf
 #                      mkdir $output_directory"BurstPlots"
 #                      mkdir $output_directory"AggregationPlots"
-#                      ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
+                      ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
                        echo "Done With finding the innovations"
-                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
+#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
 #                      time_line_txt=$output_directory$x"_timeline.txt"
 #                      awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
 #                      Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x

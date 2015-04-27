@@ -191,9 +191,9 @@ int main(int argc, char *argv[]) {
 	// sort(reviews.begin(), reviews.end());
 	 */
 	{ // No country for old members paper
-		Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
+//		Innovations::LearnDictionary(0, reviews.size() / 2, &reviews);
 		Innovations::FindCristianInnovations(reviews.size() / 2, &reviews, &innovations); // returns pair of word and review it was started.
-		string filename = Amazon::Global::output_directory + "words_start_burst_cristian.txt";
+		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_no_dict.txt";
 		ofstream fout_cristian_method(filename.c_str());
 		cerr << "# of innovations: " << innovations.size() << endl;
 		for(int i = 0; i < innovations.size(); i++) {
@@ -202,6 +202,7 @@ int main(int argc, char *argv[]) {
 		}
 		// Innovations::AnalyseInnovation(innovations, &reviews);
 	}
+	return 0; //TODO
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
 		for(int i = 0; i < reviews.size(); i++) {
 			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); //setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways

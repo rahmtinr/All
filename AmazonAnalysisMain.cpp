@@ -557,7 +557,6 @@ int main(int argc, char *argv[]) {
 			if(numerator == denominator) {
 				int bucket_num [5] = {30, 50, 100, 200, 500};
 				for(int bucket_index = 0; bucket_index < 5; bucket_index++) {
-
 					authors_exp_relative_to_burst.clear();
 					for(int i = 0; i < REL_SIZE; i++) {
 						median_finder[i].clear();
@@ -640,7 +639,7 @@ int main(int argc, char *argv[]) {
 						}
 						ofstream fout_bucket(filename.c_str());
 						fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
-						for(int i = 0; i < first_non_empty; i++) {
+						for(int i = 1; i < first_non_empty; i++) {
 							if(median_finder[i].size() == 0) {
 								median_finder[i].push_back(0);
 							}
