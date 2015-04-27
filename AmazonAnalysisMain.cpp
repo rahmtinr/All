@@ -685,6 +685,7 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
+			K_bef = K;
 		}
 	}
 #endif

@@ -17,7 +17,7 @@ InputFiles=("DBLP")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-ExperienceState=("final")
+ExperienceState=("final" "current")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
     echo $input
@@ -36,7 +36,7 @@ for x in ${InputFiles[*]}; do
 #               mkdir $output_directory"AggregationPlots"
 #               ./dblpFindInnovation $input $burst_mode $StateMachine #always real time
                 echo "Done with finding innovations, Starting Analysis ..." 
-                ./dblpAnalysis $input $burst_mode $StateMachine $experience_state 2>temp #always real time
+                ./dblpAnalysis $input $burst_mode $StateMachine $experience_state #always real time
 #               time_line_txt=$output_directory$x"_timeline.txt"
 #               awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory"words"
 #               Rscript "RScripts/innovation_correlation_exp.R" $output_directory$x"_innovation_final_exp.txt"
