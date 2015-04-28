@@ -493,9 +493,9 @@ int main(int argc, char *argv[]) {
 						continue;
 					}
 					int start = top_innovations[innovation_words[s]].burst_start;
-					num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + SHIFTER]++;
-					pair<long long, long long> p;
 					int index = reviews[i].time.day - start + SHIFTER;
+					num_of_innovative_reviews_relative_to_burst[index]++;
+					pair<long long, long long> p;
 					p = authors_exp_relative_to_burst[index];
 					if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 						authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
@@ -664,7 +664,6 @@ int main(int argc, char *argv[]) {
 							fout_bucket_median_comparison << i << "\t" << week[i] << "\t" << cdf_exp[median] / (double)num_of_reviews_more_than_cut_off << endl;
 						}
 					}
-					/**/
 				}
 
 				string filename;
