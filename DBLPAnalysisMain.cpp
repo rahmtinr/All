@@ -944,18 +944,17 @@ int main(int argc, char *argv[]) {
 					median_finder[i].clear();
 				}
 				int week[REL_SIZE];
-				int first_non_empty = 1;
+				int first_empty = 1;
 				week[0] = -SHIFTER;
 				int each_bucket = 30;
 				long long sum = 0;
 				for(int j = 0; j < REL_SIZE; j++) {
 					sum += num_of_innovative_reviews_relative_to_burst[j];
 					if(sum > each_bucket) {
-						week[first_non_empty++] = j + 1;
+						week[first_empty++] = j + 1;
 						sum = 0;
 					}
 				}
-
 
 				map<int, int> pdf_exp;
 				int biggest_exp = -1;
@@ -987,7 +986,7 @@ int main(int argc, char *argv[]) {
 						int start = top_innovations[innovation_words[s]].burst_start;
 
 						pair<long long, long long> p;
-						int bucket = upper_bound(week, week + first_non_empty, reviews[i].time.day - start + SHIFTER) - week - 1;
+						int bucket = upper_bound(week, week + first_empty, reviews[i].time.day - start + SHIFTER) - week - 1;
 						p = authors_exp_relative_to_burst[bucket];
 						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
@@ -1012,7 +1011,7 @@ int main(int argc, char *argv[]) {
 					}
 					ofstream fout_bucket(filename.c_str());
 					fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
-					for(int i = 0; i < first_non_empty; i++) {
+					for(int i = 0; i < first_empty; i++) {
 						if(median_finder[i].size() == 0) {
 							median_finder[i].push_back(0);
 						}
@@ -1022,14 +1021,14 @@ int main(int argc, char *argv[]) {
 				{
 					string filename;
 					if(final == true) {
-						filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed" + SimpleIntToString(each_bucket) + "_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+						filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) + "_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 					} else {
-						filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed" + SimpleIntToString(each_bucket) +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+						filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 					}
 					// Where does the median experience of each innovation bucket lie comparing to all the reviews
 					ofstream fout_bucket_median_comparison(filename.c_str());
 					fout_bucket_median_comparison << "Bucket_number\tStart_week\tFraction" << endl;
-					for(int i = 0; i < first_non_empty; i++) {
+					for(int i = 0; i < first_empty; i++) {
 						if(median_finder[i].size() == 0) {
 							median_finder[i].push_back(0);
 						}
