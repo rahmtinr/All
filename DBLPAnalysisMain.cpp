@@ -817,7 +817,7 @@ int main(int argc, char *argv[]) {
 			K_bef = K;
 			vector<int> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<int> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
-			vector<pair<int, int> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
+			vector<pair<long long , long long> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
 			for(int i = 0; i < REL_SIZE; i++) {
 				authors_exp_relative_to_burst[i] = make_pair(0, 0);
 			}
@@ -933,18 +933,19 @@ int main(int argc, char *argv[]) {
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double) temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
-			/*
 			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 			vector<int> median_finder[REL_SIZE];
 
 			if(numerator == denominator) {
-				authors_exp_relative_to_burst.clear();
+				for(int i = 0; i < authors_exp_relative_to_burst.size(); i++) {
+					authors_exp_relative_to_burst[i] = make_pair(0, 0);
+				}
 				for(int i = 0; i < REL_SIZE; i++) {
 					median_finder[i].clear();
 				}
 				int week[REL_SIZE];
 				int first_non_empty = 1;
-				week[0] = SHIFTER;
+				week[0] = -SHIFTER;
 				int each_bucket = 30;
 				long long sum = 0;
 				for(int j = 0; j < REL_SIZE; j++) {
@@ -986,7 +987,7 @@ int main(int argc, char *argv[]) {
 						int start = top_innovations[innovation_words[s]].burst_start;
 
 						pair<long long, long long> p;
-						int bucket = upper_bound(week, week + first_non_empty,reviews[i].time.day - start + SHIFTER) - week - 1;
+						int bucket = upper_bound(week, week + first_non_empty, reviews[i].time.day - start + SHIFTER) - week - 1;
 						p = authors_exp_relative_to_burst[bucket];
 						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
@@ -997,6 +998,7 @@ int main(int argc, char *argv[]) {
 						}
 					}
 				}
+
 
 				for(int i = 0; i < REL_SIZE; i++) {
 					sort(median_finder[i].begin(), median_finder[i].end());
@@ -1036,7 +1038,6 @@ int main(int argc, char *argv[]) {
 					}
 				}
 			}
-*/
 			/*
 		string filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
 		ofstream ab_fout(filename.c_str());

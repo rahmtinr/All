@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
 		vector<int> median_finder[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 2;
+		int denominator = 4;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -557,9 +557,9 @@ int main(int argc, char *argv[]) {
 			if(numerator == denominator) {
 				int bucket_num [5] = {30, 50, 100, 200, 500};
 				for(int bucket_index = 0; bucket_index < 5; bucket_index++) {
-					authors_exp_relative_to_burst.clear();
 					for(int i = 0; i < REL_SIZE; i++) {
 						median_finder[i].clear();
+						authors_exp_relative_to_burst[i] = make_pair(0,0);
 					}
 					int week[REL_SIZE];
 					int first_non_empty = 1;
