@@ -811,7 +811,10 @@ int main(int argc, char *argv[]) {
 		const bool final = Amazon::Global::final;
 		double average[REL_SIZE];
 		int denominator = 2;
+		int K_bef = 0;
+		int K = 0;
 		for (int numerator = 1; numerator <= denominator; numerator++) {
+			K_bef = K;
 			vector<int> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<int> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<pair<int, int> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
@@ -826,7 +829,6 @@ int main(int argc, char *argv[]) {
 					binary[i][j] = 0;
 				}
 			}
-			int K;
 			int alpha = 0;
 			double fraction = 0;
 			// find K, where K is the least final_exp which half the reviews come from them
@@ -853,7 +855,7 @@ int main(int argc, char *argv[]) {
 				vector<int> relative_burst_times;
 				stringstream ss(reviews[i].text);
 				string s;
-				if(reviews[i].final_experience_level > K) { // EXP - final
+				if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) { // EXP - final
 					continue;
 				}
 				int earliest = 300;
@@ -896,7 +898,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			//		cerr << "COMPUTING SUM" << endl;
-			for(int i = 1; i < 2 * SHIFTER; i++) {
+			for(int i = 1; i <= 2 * SHIFTER; i++) {
 				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
 			}
 			// Does the smaller half side of the papers in the final experience create more than half of the innovation?
@@ -912,6 +914,7 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
+
 			if(numerator == 4) {
 				for(int i = 0; i < 2 * SHIFTER; i++) {
 					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
@@ -930,6 +933,7 @@ int main(int argc, char *argv[]) {
 					rel_year_fout << i - SHIFTER << " " << temp1 / (double) temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
 				}
 			}
+			/*
 			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 			vector<int> median_finder[REL_SIZE];
 
@@ -1031,9 +1035,8 @@ int main(int argc, char *argv[]) {
 						fout_bucket_median_comparison << i << "\t" << week[i] << "\t" << cdf_exp[median] / (double)reviews.size() << endl;
 					}
 				}
-				/**/
 			}
-
+*/
 			/*
 		string filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
 		ofstream ab_fout(filename.c_str());

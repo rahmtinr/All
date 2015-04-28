@@ -61,24 +61,25 @@ public:
 		}
 	}
 
-	static void PopWordAddToDictionary(string word, vector<Review> *review_history,
+	static bool PopWordAddToDictionary(string word, vector<Review> *review_history,
 			vector<pair<string, vector<Review> > > *innovations) {
 		set<string> products_that_have_this_word;
 		set<string> users_that_have_used_this_word;
 		if((int) review_history->size() < 10) {
-			return;
+			return false;
 		}
 		for(int i = 0; i < (int)review_history->size(); i++) {
 			products_that_have_this_word.insert((*review_history)[i].product_id);
 			users_that_have_used_this_word.insert((*review_history)[i].user_id);
 		}
 		if((int) products_that_have_this_word.size() < 5) {
-			return;
+			return false;
 		}
 		if((int) users_that_have_used_this_word.size() < 5) {
-			return;
+			return false;
 		}
 		innovations->push_back(make_pair(word, *review_history));
+		return true;
 	}
 
 	static void FindCristianInnovations(int start, vector<Review> *reviews, vector<pair<string, vector<Review> > > *innovations) {
@@ -106,8 +107,13 @@ public:
 						new_words.erase(word);
 						dictionary.insert(word);
 					} else {
-						temp.push_back((*reviews)[i]);
-						new_words[word] = temp;
+						if(PopWordAddToDictionary(word, &temp, innovations) == true) {
+							new_words.erase(word);
+							dictionary.insert(word);
+						} else {
+							temp.push_back((*reviews)[i]);
+							new_words[word] = temp;
+						}
 					}
 				}
 			}
