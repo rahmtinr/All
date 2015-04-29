@@ -33,38 +33,43 @@ draw_heat_map <- function(dataset, final, coeff) {
     dat <- melt(smoothed)
     colnames(dat) = c("a", "b", "value")
     dat[dat$a >= dat$b, "value"] = mini 
-    ggplot(dat, aes(x=a,y=b)) + 
+    myplot <- ggplot(dat, aes(x=a,y=b)) + 
     geom_tile(aes(fill = value),colour='black') +
     scale_fill_gradientn(colours=c("green","yellow","red")) +  
     ggtitle(paste(dataset, final, "coeff", coeff, "4parts", sep=" ")) + 
     coord_equal() 
+    save_address = paste("~/Pictures/today/", dataset,"_", final, "_heat_map_coeff", coeff, "_4parts.jpg", sep="")
+    print(save_address)
+    ggsave(filename=save_address, plot=myplot)
 #    dev.off()
 }
 
-draw_heat_map("Music", "final", "3.5")
-draw_heat_map("Music", "current", "3.5")
+draw_all <- function() {
+    draw_heat_map("Music", "final", "3.5")
+    draw_heat_map("Music", "current", "3.5")
 
-draw_heat_map("Movies_and_TV", "final", "3.3")
-draw_heat_map("Movies_and_TV", "final", "4.2")
-draw_heat_map("Movies_and_TV", "current", "3.3")
-draw_heat_map("Movies_and_TV", "current", "4.2")
+    draw_heat_map("Movies_and_TV", "final", "3.3")
+    draw_heat_map("Movies_and_TV", "final", "4.2")
+    draw_heat_map("Movies_and_TV", "current", "3.3")
+    draw_heat_map("Movies_and_TV", "current", "4.2")
 
-draw_heat_map("Books", "final", "3.5")
-draw_heat_map("Books", "final", "4.0")
-draw_heat_map("Books", "current", "3.5")
-draw_heat_map("Books", "current", "4.0")
+    draw_heat_map("Books", "final", "3.5")
+    draw_heat_map("Books", "final", "4.0")
+    draw_heat_map("Books", "current", "3.5")
+    draw_heat_map("Books", "current", "4.0")
 
-draw_heat_map("Beer_Advocate", "final", "3.7")
-draw_heat_map("Beer_Advocate", "current", "3.7")
+    draw_heat_map("Beer_Advocate", "final", "3.7")
+    draw_heat_map("Beer_Advocate", "current", "3.7")
 
+    draw_heat_map("Rate_Beer", "final", "3.4")
+    draw_heat_map("Rate_Beer", "final", "3.5")
+    draw_heat_map("Rate_Beer", "current", "3.4")
+    draw_heat_map("Rate_Beer", "current", "3.5")
 
-draw_heat_map("Rate_Beer", "final", "3.4")
-draw_heat_map("Rate_Beer", "final", "3.5")
-draw_heat_map("Rate_Beer", "current", "3.4")
-draw_heat_map("Rate_Beer", "current", "3.5")
-
-draw_heat_map("Electronics", "final", "4.2")
-draw_heat_map("Electronics", "final", "4.1")
-draw_heat_map("Electronics", "current", "4.2")
-draw_heat_map("Electronics", "current", "4.1")
+    draw_heat_map("Electronics", "final", "4.2")
+    draw_heat_map("Electronics", "final", "4.1")
+    draw_heat_map("Electronics", "current", "4.2")
+    draw_heat_map("Electronics", "current", "4.1")
+}
+draw_all()
 
