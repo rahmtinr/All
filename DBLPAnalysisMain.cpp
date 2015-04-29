@@ -306,8 +306,8 @@ int main(int argc, char *argv[]) {
 	{
 		string s;
 		int x;
-		ifstream fin_innovation_best_burst("./DBLPparser/words_start_burst.txt");
-
+//		ifstream fin_innovation_best_burst("./DBLPparser/words_start_burst.txt");
+		ifstream fin_innovation_best_burst("./DBLPparser/words_start_burst_selected_manually.txt");
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
 				continue;
@@ -813,11 +813,15 @@ int main(int argc, char *argv[]) {
 		int denominator = 2;
 		int K_bef = 0;
 		int K = 0;
+		int alpha_bef = 0;
+		int alpha = 0;
 		for (int numerator = 1; numerator <= denominator; numerator++) {
+			alpha_bef = alpha;
+			alpha = 0;
 			K_bef = K;
 			vector<int> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<int> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
-			vector<pair<long long , long long> > authors_exp_relative_to_burst(REL_SIZE); //(sum, number of authors)
+			vector<pair<long long , long long> > authors_exp_relative_to_burst(REL_SIZE); // (sum, number of authors)
 			for(int i = 0; i < REL_SIZE; i++) {
 				authors_exp_relative_to_burst[i] = make_pair(0, 0);
 			}
@@ -829,7 +833,6 @@ int main(int argc, char *argv[]) {
 					binary[i][j] = 0;
 				}
 			}
-			int alpha = 0;
 			double fraction = 0;
 			// find K, where K is the least final_exp which half the reviews come from them
 			fraction = numerator / (double) denominator;
@@ -909,8 +912,8 @@ int main(int argc, char *argv[]) {
 						output_count[temp_counter] = SimpleIntToString(a-100) + "\t" + SimpleIntToString(b - SHIFTER);
 					}
 					int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
-					output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha);
-					output_bin[temp_counter] += "\t" + SimpleDoubleToString(binary[a][b]/ (double)alpha);
+					output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha - alpha_bef);
+					output_bin[temp_counter] += "\t" + SimpleDoubleToString(binary[a][b]/ (double)alpha - alpha_bef);
 					temp_counter++;
 				}
 			}

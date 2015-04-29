@@ -141,8 +141,12 @@ int main(int argc, char *argv[]) {
 	ifstream fin(argv[1]);
 	// Read input.
 	while (true) {
-		if (!ReadOneReview(fin, &reviews)) {
-			break;
+		if(argv[1] == "reddit") {
+			if (!ReadOneReview(fin, &reviews)) {
+				break;
+			} else if(!ReadOneRedditReview(fin, &reviews)) {
+				break;
+			}
 		}
 		if(reviews.size() == 0) {
 			continue;
@@ -429,8 +433,6 @@ int main(int argc, char *argv[]) {
 		string output_count[30000];
 		const int SHIFTER = 1100;
 		const int REL_SIZE = SHIFTER * 2 + 10;
-		double average[REL_SIZE];
-		vector<int> median_finder[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
 		int denominator = 2;
@@ -444,7 +446,12 @@ int main(int argc, char *argv[]) {
 		}
 		K_bef = CUT_OFF_EXP - 1;
 		int alpha_bef = 0;
+		int K = CUT_OFF_EXP - 1;
+		int alpha = 0;
 		for (int numerator = 1; numerator <= denominator; numerator++) {
+			K_bef = K;
+			alpha_bef = alpha;
+			alpha = 0;
 			vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<pair<long long, long long> > authors_exp_relative_to_burst(REL_SIZE); // (sum, number of authors)
@@ -453,8 +460,6 @@ int main(int argc, char *argv[]) {
 			}
 			fill(num_of_innovative_reviews_relative_to_burst.begin(), num_of_innovative_reviews_relative_to_burst.end(), 0);
 			fill(sum_of_innovative_reviews_relative_to_burst.begin(), sum_of_innovative_reviews_relative_to_burst.end(), 0);
-			int K;
-			int alpha = 0;
 			double fraction = 0;
 			// find K, where K is the least final_exp which half the reviews come from them
 			fraction = numerator / (double) denominator;
@@ -488,6 +493,7 @@ int main(int argc, char *argv[]) {
 				}
 				stringstream ss(reviews[i].text);
 				string s;
+
 				while(!ss.eof()) {
 					ss >> s;
 					if(innovation_words.find(s) == innovation_words.end()) {
@@ -496,19 +502,6 @@ int main(int argc, char *argv[]) {
 					int start = top_innovations[innovation_words[s]].burst_start;
 					int index = reviews[i].time.day - start + SHIFTER;
 					num_of_innovative_reviews_relative_to_burst[index]++;
-					pair<long long, long long> p;
-					p = authors_exp_relative_to_burst[index];
-					if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
-						authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
-						if(numerator == denominator) {
-							median_finder[index].push_back(reviews[i].final_experience_level);
-						}
-					} else {
-						authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
-						if(numerator == denominator) {
-							median_finder[index].push_back(reviews[i].current_experience_level);
-						}
-					}
 				}
 			}
 
@@ -529,165 +522,184 @@ int main(int argc, char *argv[]) {
 					temp_counter++;
 				}
 			}
-			if(numerator == 4) {
-				for(int i = 0; i < REL_SIZE; i++) {
-					average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
-					sort(median_finder[i].begin(), median_finder[i].end());
-				}
-				string filename;
-				if(final == true) {
-					filename = Amazon::Global::output_directory + "final_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-				} else {
-					filename = Amazon::Global::output_directory + "current_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-				}
-				ofstream rel_year_fout(filename.c_str());
-				double temp1 = 0, temp2 = 1;
-				for(int i = 0; i < REL_SIZE ; i++) {
-					temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
-					temp2 += authors_exp_relative_to_burst[i].second; // divide
-					//   cerr << i << " " << authors_exp_relative_to_burst[i].first << " " << authors_exp_relative_to_burst[i].second << endl;
-					//   cerr << temp1 << " " << temp2 << " " << temp1 / temp2 << endl;
-					if(median_finder[i].size() == 0) {
-						median_finder[i].push_back(0);
-					}
-					rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << " " << median_finder[i][median_finder[i].size() / 2]<< endl;
-				}
-			}
-			/**/
-			// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
-			if(numerator == denominator) {
-				int bucket_num [5] = {30, 50, 100, 200, 500};
-				for(int bucket_index = 0; bucket_index < 5; bucket_index++) {
-					for(int i = 0; i < REL_SIZE; i++) {
-						median_finder[i].clear();
-						authors_exp_relative_to_burst[i] = make_pair(0,0);
-					}
-					int week[REL_SIZE];
-					int first_empty = 1;
-					week[0] = -1100;
-					int each_bucket = bucket_num[bucket_index];
-					long long sum = 0;
-					for(int j = 0; j < REL_SIZE; j++) {
-						sum += num_of_innovative_reviews_relative_to_burst[j];
-						if(sum > each_bucket) {
-							week[first_empty++] = j + 1;
-							sum = 0;
-						}
-					}
-
-					map<int, int> pdf_exp;
-					int biggest_exp = -1;
-					for(int i = 0; i < (int)reviews.size(); i++) {
-						if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
-							continue;
-						}
-						if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
-							continue;
-						}
-						if(final == true) {
-							pdf_exp[reviews[i].final_experience_level]++;
-							biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
-						} else {
-							pdf_exp[reviews[i].current_experience_level]++;
-							biggest_exp = max(biggest_exp, reviews[i].current_experience_level);
-						}
-					}
-					vector<int> cdf_exp;
-					cdf_exp.push_back(0);
-					cdf_exp[0] += pdf_exp[0];
-					for(int i = 1; i <= biggest_exp; i++) {
-						cdf_exp.push_back(cdf_exp[i-1]);
-						cdf_exp[i] += pdf_exp[i];
-					}
-
-					for(int i = 0; i < (int)reviews.size(); i++) {
-						if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
-							continue;
-						}
-						if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
-							continue;
-						}
-						stringstream ss(reviews[i].text);
-						string s;
-						while(!ss.eof()) {
-							ss >> s;
-							if(innovation_words.find(s) == innovation_words.end()) {
-								continue;
-							}
-							int start = top_innovations[innovation_words[s]].burst_start;
-							pair<long long, long long> p;
-							int bucket = upper_bound(week, week + first_empty,reviews[i].time.day - start + SHIFTER) - week - 1;
-							p = authors_exp_relative_to_burst[bucket];
-							if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
-								authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
-								median_finder[bucket].push_back(reviews[i].final_experience_level);
-							} else {
-								authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
-								median_finder[bucket].push_back(reviews[i].current_experience_level);
-							}
-						}
-					}
-					for(int i = 0; i < REL_SIZE; i++) {
-						sort(median_finder[i].begin(), median_finder[i].end());
-					}
-					{
-						string filename;
-						if(final == true) {
-							filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket)  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-						} else {
-							filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket)  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-						}
-						ofstream fout_bucket(filename.c_str());
-						fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
-						for(int i = 1; i < first_empty; i++) {
-							if(median_finder[i].size() == 0) {
-								median_finder[i].push_back(0);
-							}
-							fout_bucket << i << "\t" << week[i] << "\t" << authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second << " " << median_finder[i][median_finder[i].size() / 2] << endl;
-						}
-					}
-					{
-						string filename;
-						if(final == true) {
-							filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) + "_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-						} else {
-							filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-						}
-						// Where does the median experience of each innovation bucket lie comparing to all the reviews
-						ofstream fout_bucket_median_comparison(filename.c_str());
-						fout_bucket_median_comparison << "Bucket_number\tStart_week\tFraction" << endl;
-						for(int i = 0; i < first_empty; i++) {
-							if(median_finder[i].size() == 0) {
-								median_finder[i].push_back(0);
-							}
-							int median = median_finder[i][median_finder[i].size() / 2];
-							fout_bucket_median_comparison << i << "\t" << week[i] << "\t" << cdf_exp[median] / (double)num_of_reviews_more_than_cut_off << endl;
-						}
-					}
-				}
-
-				string filename;
-				if(final == true) {
-					filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator) + "parts.txt";
-				} else {
-					filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator)  + "parts.txt";
-				}
-				ofstream ab_fout(filename.c_str());
-				temp_counter = 0;
-				ab_fout << "a\tb\t";
-				for(int i = 1; i <= denominator; i++) {
-					ab_fout << "cq"<< i << "\t";
-				}
-				ab_fout << endl;
-				while(output_count[temp_counter].size() != 0) {
-					ab_fout << output_count[temp_counter] << endl;
-					temp_counter++;
-				}
-			}
-			K_bef = K;
-			alpha_bef = alpha;
+		}
+		string filename;
+		if(final == true) {
+			filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator) + "parts.txt";
+		} else {
+			filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator)  + "parts.txt";
+		}
+		ofstream ab_fout(filename.c_str());
+		int temp_counter = 0;
+		ab_fout << "a\tb\t";
+		for(int i = 1; i <= denominator; i++) {
+			ab_fout << "cq"<< i << "\t";
+		}
+		ab_fout << endl;
+		while(output_count[temp_counter].size() != 0) {
+			ab_fout << output_count[temp_counter] << endl;
+			temp_counter++;
 		}
 	}
+#endif
+#if 1
+	{
+		// Median comparison
+		bool final = Amazon::Global::final;
+		int K_bef = 0;
+		string output_count[30000];
+		const int SHIFTER = 1100;
+		const int REL_SIZE = SHIFTER * 2 + 10;
+		vector<int> median_finder[REL_SIZE];
+		const int CUT_OFF_EXP = 10;
+		vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
+		vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
+		vector<pair<long long, long long> > authors_exp_relative_to_burst(REL_SIZE);
+		map<int, int> pdf_exp;
+		vector<int> cdf_exp;
+		int num_of_reviews_more_than_cut_off = 0;
+		int biggest_exp = -1;
+		for(int i = 0; i < REL_SIZE; i++) {
+			authors_exp_relative_to_burst[i] = make_pair(0, 0);
+		}
+		fill(num_of_innovative_reviews_relative_to_burst.begin(), num_of_innovative_reviews_relative_to_burst.end(), 0);
+		fill(sum_of_innovative_reviews_relative_to_burst.begin(), sum_of_innovative_reviews_relative_to_burst.end(), 0);
+		for(int i = 0; i < (int)reviews.size(); i++) {
+			if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
+				continue;
+			}
+			if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
+				continue;
+			}
+			num_of_reviews_more_than_cut_off++;
+
+			stringstream ss(reviews[i].text);
+			string s;
+
+			while(!ss.eof()) {
+				ss >> s;
+				if(innovation_words.find(s) == innovation_words.end()) {
+					continue;
+				}
+				int start = top_innovations[innovation_words[s]].burst_start;
+				int index = reviews[i].time.day - start + SHIFTER;
+				num_of_innovative_reviews_relative_to_burst[index]++;
+				pair<long long, long long> p;
+				p = authors_exp_relative_to_burst[index];
+				if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
+					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+					median_finder[index].push_back(reviews[i].final_experience_level);
+				} else {
+					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+					median_finder[index].push_back(reviews[i].current_experience_level);
+				}
+
+				if(final == true) {
+					pdf_exp[reviews[i].final_experience_level]++;
+					biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
+				} else {
+					pdf_exp[reviews[i].current_experience_level]++;
+					biggest_exp = max(biggest_exp, reviews[i].current_experience_level);
+				}
+			}
+		}
+		double average[REL_SIZE];
+		for(int i = 0; i < REL_SIZE; i++) {
+			average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
+			sort(median_finder[i].begin(), median_finder[i].end());
+		}
+		string filename;
+		if(final == true) {
+			filename = Amazon::Global::output_directory + "final_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+		} else {
+			filename = Amazon::Global::output_directory + "current_relative_year_usage_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+		}
+		ofstream rel_year_fout(filename.c_str());
+		double temp1 = 0, temp2 = 1;
+		for(int i = 0; i < REL_SIZE ; i++) {
+			temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
+			temp2 += authors_exp_relative_to_burst[i].second; // divide
+			//   cerr << i << " " << authors_exp_relative_to_burst[i].first << " " << authors_exp_relative_to_burst[i].second << endl;
+			//   cerr << temp1 << " " << temp2 << " " << temp1 / temp2 << endl;
+			if(median_finder[i].size() == 0) {
+				median_finder[i].push_back(0);
+			}
+			rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << " " << median_finder[i][median_finder[i].size() / 2]<< endl;
+		}
+		/**/
+		// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
+		{
+			int bucket_num [5] = {30, 50, 100, 200, 500};
+			for(int bucket_index = 0; bucket_index < 5; bucket_index++) {
+				int week[REL_SIZE];
+				int first_empty = 1;
+				week[0] = -1100;
+				int each_bucket = bucket_num[bucket_index];
+				long long sum = 0;
+				for(int j = 0; j < REL_SIZE; j++) {
+					sum += num_of_innovative_reviews_relative_to_burst[j];
+					if(sum > each_bucket) {
+						week[first_empty++] = j + 1;
+						sum = 0;
+					}
+				}
+				for(int i = 0; i < (int)reviews.size(); i++) {
+					if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
+						continue;
+					}
+					if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
+						continue;
+					}
+
+				}
+				cdf_exp.push_back(0);
+				cdf_exp[0] += pdf_exp[0];
+				for(int i = 1; i <= biggest_exp; i++) {
+					cdf_exp.push_back(cdf_exp[i-1]);
+					cdf_exp[i] += pdf_exp[i];
+				}
+
+				for(int i = 0; i < REL_SIZE; i++) {
+					sort(median_finder[i].begin(), median_finder[i].end());
+				}
+				{
+					string filename;
+					if(final == true) {
+						filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket)  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+					} else {
+						filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket)  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+					}
+					ofstream fout_bucket(filename.c_str());
+					fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
+					for(int i = 1; i < first_empty; i++) {
+						if(median_finder[i].size() == 0) {
+							median_finder[i].push_back(0);
+						}
+						fout_bucket << i << "\t" << week[i] << "\t" << authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second << " " << median_finder[i][median_finder[i].size() / 2] << endl;
+					}
+				}
+				{
+					string filename;
+					if(final == true) {
+						filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) + "_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+					} else {
+						filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+					}
+					// Where does the median experience of each innovation bucket lie comparing to all the reviews
+					ofstream fout_bucket_median_comparison(filename.c_str());
+					fout_bucket_median_comparison << "Bucket_number\tStart_week\tFraction" << endl;
+					for(int i = 0; i < first_empty; i++) {
+						if(median_finder[i].size() == 0) {
+							median_finder[i].push_back(0);
+						}
+						int median = median_finder[i][median_finder[i].size() / 2];
+						fout_bucket_median_comparison << i << "\t" << week[i] << "\t" << cdf_exp[median] / (double)num_of_reviews_more_than_cut_off << endl;
+					}
+				}
+			}
+		}
+	}
+
 #endif
 
 #if 0

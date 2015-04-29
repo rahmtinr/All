@@ -106,5 +106,35 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 	return FAIL;
 }
 
+bool ReadOneRedditReview(std::ifstream& fin, vector<Review> *reviews) {
+	string raw_input;
+	Review review;
+	if (getline(fin, raw_input)) {
+		review.product_id = GetField(raw_input);
 
+		getline(fin, raw_input);
+		review.profile_name = GetField(raw_input);
+		review.user_id = GetField(raw_input);
+
+		getline(fin, raw_input);
+		int time_int = atoi((GetField(raw_input)).c_str());
+		time_t review_time(time_int);
+		if (review_time == -1) {
+			getline(fin, raw_input);
+			getline(fin, raw_input);
+			getline(fin, raw_input);
+			return SUCCESS;
+		}
+		review.time = MyTime(localtime(&review_time));
+		getline(fin, raw_input);
+		review.text = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input)))) + " ";
+		getline(fin, raw_input);
+		if(Amazon::Global::remove_unknown == false ||
+				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
+			reviews->push_back(review);
+		}
+		return SUCCESS;
+	}
+	return FAIL;
+}
 #endif /* REVIEWREADER_H_ */
