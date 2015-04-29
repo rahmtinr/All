@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
 		vector<int> median_finder[REL_SIZE];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 4;
+		int denominator = 2;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -443,6 +443,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		K_bef = CUT_OFF_EXP - 1;
+		int alpha_bef = 0;
 		for (int numerator = 1; numerator <= denominator; numerator++) {
 			vector<long long> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 			vector<long long> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
@@ -473,7 +474,7 @@ int main(int argc, char *argv[]) {
 				}
 				K = index;
 			}
-			cerr << "------>" << K << " " << alpha << " " << num_of_reviews_more_than_cut_off << endl;
+			cerr << "------>" << K << " " << alpha - alpha_bef << " " << num_of_reviews_more_than_cut_off << endl;
 			cerr << "COMPUTING NUM" << endl;
 			for(int i = 0; i < (int)reviews.size(); i++) {
 				if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
@@ -524,7 +525,7 @@ int main(int argc, char *argv[]) {
 						output_count[temp_counter] = SimpleIntToString(a - SHIFTER) + "\t" + SimpleIntToString(b - SHIFTER);
 					}
 					long long sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
-					output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha);
+					output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)(alpha - alpha_bef));
 					temp_counter++;
 				}
 			}
@@ -562,14 +563,14 @@ int main(int argc, char *argv[]) {
 						authors_exp_relative_to_burst[i] = make_pair(0,0);
 					}
 					int week[REL_SIZE];
-					int first_non_empty = 1;
+					int first_empty = 1;
 					week[0] = -1100;
 					int each_bucket = bucket_num[bucket_index];
 					long long sum = 0;
 					for(int j = 0; j < REL_SIZE; j++) {
 						sum += num_of_innovative_reviews_relative_to_burst[j];
 						if(sum > each_bucket) {
-							week[first_non_empty++] = j + 1;
+							week[first_empty++] = j + 1;
 							sum = 0;
 						}
 					}
@@ -595,7 +596,6 @@ int main(int argc, char *argv[]) {
 					cdf_exp.push_back(0);
 					cdf_exp[0] += pdf_exp[0];
 					for(int i = 1; i <= biggest_exp; i++) {
-
 						cdf_exp.push_back(cdf_exp[i-1]);
 						cdf_exp[i] += pdf_exp[i];
 					}
@@ -616,7 +616,7 @@ int main(int argc, char *argv[]) {
 							}
 							int start = top_innovations[innovation_words[s]].burst_start;
 							pair<long long, long long> p;
-							int bucket = upper_bound(week, week + first_non_empty,reviews[i].time.day - start + SHIFTER) - week - 1;
+							int bucket = upper_bound(week, week + first_empty,reviews[i].time.day - start + SHIFTER) - week - 1;
 							p = authors_exp_relative_to_burst[bucket];
 							if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 								authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
@@ -639,7 +639,7 @@ int main(int argc, char *argv[]) {
 						}
 						ofstream fout_bucket(filename.c_str());
 						fout_bucket << "Bucket_number\tStart_week\tAverage_experience\tMedian_experience" << endl;
-						for(int i = 1; i < first_non_empty; i++) {
+						for(int i = 1; i < first_empty; i++) {
 							if(median_finder[i].size() == 0) {
 								median_finder[i].push_back(0);
 							}
@@ -656,7 +656,7 @@ int main(int argc, char *argv[]) {
 						// Where does the median experience of each innovation bucket lie comparing to all the reviews
 						ofstream fout_bucket_median_comparison(filename.c_str());
 						fout_bucket_median_comparison << "Bucket_number\tStart_week\tFraction" << endl;
-						for(int i = 0; i < first_non_empty; i++) {
+						for(int i = 0; i < first_empty; i++) {
 							if(median_finder[i].size() == 0) {
 								median_finder[i].push_back(0);
 							}
@@ -685,6 +685,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			K_bef = K;
+			alpha_bef = alpha;
 		}
 	}
 #endif
