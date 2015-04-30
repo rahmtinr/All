@@ -141,12 +141,8 @@ int main(int argc, char *argv[]) {
 	ifstream fin(argv[1]);
 	// Read input.
 	while (true) {
-		if(argv[1] == "reddit") {
-			if (!ReadOneReview(fin, &reviews)) {
-				break;
-			} else if(!ReadOneRedditReview(fin, &reviews)) {
-				break;
-			}
+		if (!ReadOneReview(fin, &reviews)) {
+			break;
 		}
 		if(reviews.size() == 0) {
 			continue;
@@ -590,7 +586,7 @@ int main(int argc, char *argv[]) {
 					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
 					median_finder[index].push_back(reviews[i].final_experience_level);
 					pdf_exp[reviews[i].final_experience_level]++;
-				    biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
+					biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
 				} else {
 					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
 					median_finder[index].push_back(reviews[i].current_experience_level);
