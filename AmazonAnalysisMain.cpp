@@ -544,10 +544,9 @@ int main(int argc, char *argv[]) {
 #endif
 #if 1
 	{
+		cerr << "Got to median comparison" << endl;
 		// Median comparison
 		bool final = Amazon::Global::final;
-		int K_bef = 0;
-		string output_count[30000];
 		const int SHIFTER = 1100;
 		const int REL_SIZE = SHIFTER * 2 + 10;
 		vector<int> median_finder[REL_SIZE];
@@ -557,6 +556,7 @@ int main(int argc, char *argv[]) {
 		vector<pair<long long, long long> > authors_exp_relative_to_burst(REL_SIZE);
 		map<int, int> pdf_exp;
 		vector<int> cdf_exp;
+		double average[REL_SIZE];
 		int num_of_reviews_more_than_cut_off = 0;
 		int biggest_exp = -1;
 		for(int i = 0; i < REL_SIZE; i++) {
@@ -589,21 +589,16 @@ int main(int argc, char *argv[]) {
 				if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
 					median_finder[index].push_back(reviews[i].final_experience_level);
+					pdf_exp[reviews[i].final_experience_level]++;
+				    biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
 				} else {
 					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
 					median_finder[index].push_back(reviews[i].current_experience_level);
-				}
-
-				if(final == true) {
-					pdf_exp[reviews[i].final_experience_level]++;
-					biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
-				} else {
 					pdf_exp[reviews[i].current_experience_level]++;
 					biggest_exp = max(biggest_exp, reviews[i].current_experience_level);
 				}
 			}
 		}
-		double average[REL_SIZE];
 		for(int i = 0; i < REL_SIZE; i++) {
 			average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
 			sort(median_finder[i].begin(), median_finder[i].end());
@@ -627,6 +622,7 @@ int main(int argc, char *argv[]) {
 			rel_year_fout << i - SHIFTER << " " << temp1 / (double)temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << " " << median_finder[i][median_finder[i].size() / 2]<< endl;
 		}
 		/**/
+		cerr << "I'm gonna start bucketing" << endl;
 		// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 		{
 			int bucket_num [5] = {30, 50, 100, 200, 500};
