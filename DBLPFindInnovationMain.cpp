@@ -97,7 +97,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::real_time = true;
 
 	//State machine parameters.
-	Amazon::Global::state_coeffecient = 3;
+	Amazon::Global::state_coeffecient = SimpleStringToDouble(argv[4]);
 	Amazon::Global::probability_of_state_change = 0.1;
 	Amazon::Global::threshold_for_innovation = 3;
 	string temp(argv[3]);
@@ -137,7 +137,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 4) {
+	if(argc != 5) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-	ofstream innovation_burst_year_out("./DBLPparser/words_start_burst.txt");
+	ofstream innovation_burst_year_out(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 	for(WordTimeLine word_time_line : top_innovations) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
 	}
