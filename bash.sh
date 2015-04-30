@@ -12,13 +12,14 @@ then
     exit 0
 fi
 input_directory=$1
-InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 #InputFiles=("Beer_Advocate" "Rate_Beer")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-#StateMachineCoeff=("3" "4.5" "5.3" "6" "12")
+StateMachineCoeff=("3" "4.5" "5.3" "6" "12")
 #StateMachineCoeff=("3.0" "3.1" "3.2" "3.3" "3.4" "3.5" "3.6" "3.7" "3.8" "3.9" "4.0" "4.1" "4.2" "4.3" "4.4" "4.5")
+
 ExperienceState=("final" "current")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;

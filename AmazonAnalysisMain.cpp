@@ -431,7 +431,7 @@ int main(int argc, char *argv[]) {
 		const int REL_SIZE = SHIFTER * 2 + 10;
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 2;
+		int denominator = 4;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -621,18 +621,30 @@ int main(int argc, char *argv[]) {
 		cerr << "I'm gonna start bucketing" << endl;
 		// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 		{
-			int bucket_num [5] = {30, 50, 100, 200, 500};
-			for(int bucket_index = 0; bucket_index < 5; bucket_index++) {
+			int bucket_num [6] = {30, 50, 100, 200, 500, 1000};
+			for(int bucket_index = 0; bucket_index < 6; bucket_index++) {
 				int week[REL_SIZE];
 				int first_empty = 1;
 				week[0] = -1100;
 				int each_bucket = bucket_num[bucket_index];
 				long long sum = 0;
-				for(int j = 0; j < REL_SIZE; j++) {
-					sum += num_of_innovative_reviews_relative_to_burst[j];
-					if(sum > each_bucket) {
-						week[first_empty++] = j + 1;
+				if(bucket_index == 5) {
+					int iterations = 0;
+					while(true) {
+						iterations++;
+						each_bucket = bucket_num[bucket_index] * iterations;
 						sum = 0;
+						first_empty = 1;
+						for(int j = 0; j < REL_SIZE; j++) {
+							sum += num_of_innovative_reviews_relative_to_burst[j];
+							if(sum > each_bucket) {
+								week[first_empty++] = j + 1;
+								sum = 0;
+							}
+						}
+						if(first_empty < 30) {
+							break;
+						}
 					}
 				}
 				for(int i = 0; i < (int)reviews.size(); i++) {
