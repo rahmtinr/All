@@ -907,41 +907,55 @@ int main(int argc, char *argv[]) {
 				sum_of_innovative_reviews_relative_to_burst[i] = sum_of_innovative_reviews_relative_to_burst[i - 1] + num_of_innovative_reviews_relative_to_burst[i];
 			}
 			// Does the smaller half side of the papers in the final experience create more than half of the innovation?
-			int temp_counter = 0;
-			for(int a = 1 ; a < 2 * SHIFTER; a++) {
-				for(int b = a + 1; b < 2 * SHIFTER; b++) {
-					if(numerator == 1) {
-						output_count[temp_counter] = SimpleIntToString(a-100) + "\t" + SimpleIntToString(b - SHIFTER);
+			{
+				int temp_counter = 0;
+				for(int a = 1 ; a < 2 * SHIFTER; a++) {
+					for(int b = a + 1; b < 2 * SHIFTER; b++) {
+						if(numerator == 1) {
+							output_count[temp_counter] = SimpleIntToString(a-100) + "\t" + SimpleIntToString(b - SHIFTER);
+						}
+						int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
+						output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha - alpha_bef);
+						output_bin[temp_counter] += "\t" + SimpleDoubleToString(binary[a][b]/ (double)alpha - alpha_bef);
+						temp_counter++;
 					}
-					int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
-					output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha - alpha_bef);
-					output_bin[temp_counter] += "\t" + SimpleDoubleToString(binary[a][b]/ (double)alpha - alpha_bef);
+				}
+				string filename;
+				if(final == true) {
+					filename = Amazon::Global::output_directory + "final_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator) + "parts.txt";
+				} else {
+					filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + "_" + SimpleIntToString(denominator)  + "parts.txt";
+				}
+				ofstream ab_fout(filename.c_str());
+				temp_counter = 0;
+				ab_fout << "a\tb\t";
+				for(int i = 1; i <= denominator; i++) {
+					ab_fout << "cq"<< i << "\t";
+				}
+				for(int i = 1; i <= denominator; i++) {
+					ab_fout << "binq"<< i << "\t";
+				}
+				ab_fout << endl;
+				while(output_count[temp_counter].size() != 0) {
+					ab_fout << output_count[temp_counter] << endl;
 					temp_counter++;
 				}
 			}
-			string filename;
-			if(final == true) {
-				filename = Amazon::Global::output_directory + "final_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-			} else {
-				filename = Amazon::Global::output_directory + "present_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" +SimpleDoubleToString(Amazon::Global::state_coeffecient)  +".txt";
+			{
+				string filename;
+				if(final == true) {
+					filename = Amazon::Global::output_directory + "final_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+				} else {
+					filename = Amazon::Global::output_directory + "present_relative_year_usage_all_exp_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" +SimpleDoubleToString(Amazon::Global::state_coeffecient)  +".txt";
+				}
+				ofstream rel_year_fout(filename.c_str());
+				int temp1 = 0, temp2 = 1;
+				for(int i = 0; i < 2 * SHIFTER ; i++) {
+					temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
+					temp2 += authors_exp_relative_to_burst[i].second; // number of authors for denominator to divide
+					rel_year_fout << i - SHIFTER << " " << temp1 / (double) temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
+				}
 			}
-			ofstream rel_year_fout(filename.c_str());
-			int temp1 = 0, temp2 = 1;
-			for(int i = 0; i < 2 * SHIFTER ; i++) {
-				temp1 += authors_exp_relative_to_burst[i].first; // adding up the sum of experiences
-				temp2 += authors_exp_relative_to_burst[i].second; // number of authors for denominator to divide
-				rel_year_fout << i - SHIFTER << " " << temp1 / (double) temp2 << " " << sum_of_innovative_reviews_relative_to_burst[i] << endl;
-			}
-			/*
-		string filename = Amazon::Global::output_directory + "current_[a,b]_top_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations.txt";
-		ofstream ab_fout(filename.c_str());
-		int temp_counter = 0;
-		ab_fout << "a\tb\tcq1\tcq2\tcq3\tcq4\tbinq1\tbinq2\tbinq3\binq4" << endl; //cq = count on quartile, binq = binary on quarter
-		while(output_count[temp_counter].size() != 0) {
-			ab_fout << output_count[temp_counter] << output_bin[temp_counter]<< endl;
-			temp_counter++;
-		}
-			 */
 		}
 	}
 #endif

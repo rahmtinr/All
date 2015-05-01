@@ -12,7 +12,7 @@ then
     exit 0
 fi
 input_directory=$1
-InputFiles=("Software" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 #InputFiles=("Beer_Advocate" "Rate_Beer")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
@@ -47,6 +47,7 @@ for x in ${InputFiles[*]}; do
     then
         StateMachineCoeff=("4.2" "4.1")
     fi
+    StateMachineCoeff=("0.25") #overriding all the coeffs for cristian's innovations
     echo $input_directory
     for y in ${TimeMode[*]}; do
         time_mode=$y;

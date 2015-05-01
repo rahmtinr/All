@@ -187,10 +187,20 @@ int main(int argc, char *argv[]) {
 		reviews[i].time.day /= 7;
 	}
 	map<string, int> innovation_words;
+	bool cristians_innovations = false;
+	if(Amazon::Global::state_coeffecient < 1.01) { // if the coeff passed to the function is less than one it is cristian's innovation and the number is the fraction used for learning the dictionary
+		cristians_innovations = true;
+	}
 	{
 		string s;
 		int x;
-		ifstream fin_innovation_best_burst(Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
+		string filename;
+		if(cristians_innovations == false) {
+			filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+		} else {
+			filename = Amazon::Global::output_directory + "words_start_burst_coeff_cristian_quarter_dict.txt";
+		}
+		ifstream fin_innovation_best_burst(filename.c_str());
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
@@ -219,6 +229,7 @@ int main(int argc, char *argv[]) {
 			fout_dist << x.first << " " << x.second << endl;
 		}
 	}
+	cerr << "top_innovations size: " << top_innovations.size() << endl;
 #if 0
 
 	ofstream fout(Amazon::Global::output_directory + "timeline.txt");
@@ -431,7 +442,7 @@ int main(int argc, char *argv[]) {
 		const int REL_SIZE = SHIFTER * 2 + 10;
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 4;
+		int denominator = 2;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -685,9 +696,11 @@ int main(int argc, char *argv[]) {
 				{
 					string filename;
 					if(final == true) {
-						filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) + "_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+						filename = Amazon::Global::output_directory + "final_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) + "_median_comparison_"
+								+ SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 					} else {
-						filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+						filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(each_bucket) +"_median_comparison_"
+								+ SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 					}
 					// Where does the median experience of each innovation bucket lie comparing to all the reviews
 					ofstream fout_bucket_median_comparison(filename.c_str());
