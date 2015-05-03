@@ -4,7 +4,6 @@ library("ggplot2")
 library("scales")
 
 draw_heat_map <- function(dataset, final, coeff) {
-    dev.new()
     mini = 1000
     a_b = read.table(paste("~/Documents/Amazon/Output_All/",dataset, "_bursts/RealTime/MaxBenefit/",dataset,"_", final, "_[a,b]_top_500_innovations_coeff", coeff, "_4parts.txt", sep=""), header=TRUE)
     mat = matrix(rep(c(0), 200 * 199), nrow=200, ncol=199)
@@ -45,31 +44,43 @@ draw_heat_map <- function(dataset, final, coeff) {
 }
 
 draw_all <- function() {
+    draw_heat_map("Music", "final", "0.25")
     draw_heat_map("Music", "final", "3.5")
+    draw_heat_map("Music", "current", "0.25")
     draw_heat_map("Music", "current", "3.5")
 
+    draw_heat_map("Movies_and_TV", "final", "0.25")
     draw_heat_map("Movies_and_TV", "final", "3.3")
     draw_heat_map("Movies_and_TV", "final", "4.2")
+    draw_heat_map("Movies_and_TV", "current", "0.25")
     draw_heat_map("Movies_and_TV", "current", "3.3")
     draw_heat_map("Movies_and_TV", "current", "4.2")
 
+    draw_heat_map("Books", "final", "0.25")
     draw_heat_map("Books", "final", "3.5")
     draw_heat_map("Books", "final", "4.0")
+    draw_heat_map("Books", "current", "0.25")
     draw_heat_map("Books", "current", "3.5")
     draw_heat_map("Books", "current", "4.0")
 
+    draw_heat_map("Beer_Advocate", "final", "0.25")
     draw_heat_map("Beer_Advocate", "final", "3.7")
+    draw_heat_map("Beer_Advocate", "current", "0.25")
     draw_heat_map("Beer_Advocate", "current", "3.7")
 
+    draw_heat_map("Rate_Beer", "final", "0.25")
     draw_heat_map("Rate_Beer", "final", "3.4")
     draw_heat_map("Rate_Beer", "final", "3.5")
+    draw_heat_map("Rate_Beer", "current", "0.25")
     draw_heat_map("Rate_Beer", "current", "3.4")
     draw_heat_map("Rate_Beer", "current", "3.5")
 
-    draw_heat_map("Electronics", "final", "4.2")
+    draw_heat_map("Electronics", "final", "0.25")
     draw_heat_map("Electronics", "final", "4.1")
-    draw_heat_map("Electronics", "current", "4.2")
+    draw_heat_map("Electronics", "final", "4.2")
+    draw_heat_map("Electronics", "current", "0.25")
     draw_heat_map("Electronics", "current", "4.1")
+    draw_heat_map("Electronics", "current", "4.2")
 }
 draw_all()
 

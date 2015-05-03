@@ -72,7 +72,7 @@ public:
 			products_that_have_this_word.insert((*review_history)[i].product_id);
 			users_that_have_used_this_word.insert((*review_history)[i].user_id);
 		}
-		if((int) products_that_have_this_word.size() < 5) {
+		if(Global::NAMEOFDATASET.substr(0,6) != "reddit" && (int) products_that_have_this_word.size() < 5) {
 			return false;
 		}
 		if((int) users_that_have_used_this_word.size() < 5) {

@@ -205,7 +205,7 @@ int main(int argc, char *argv[]) {
 	if(EqDouble(3.0, Amazon::Global::state_coeffecient))
 	{ // No country for old members paper
 		Innovations::LearnDictionary(0, reviews.size() / 4, &reviews);
-		Innovations::FindCristianInnovations(reviews.size() / 4, &reviews, &innovations); // returns pair of word and review it was started.
+		Innovations::FindCristianInnovations(reviews.size() / 4, &reviews, &innovations); // returns pair of word and the review it was started.
 		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_quarter_dict.txt";
 		ofstream fout_cristian_method(filename.c_str());
 		cerr << "# of innovations: " << innovations.size() << endl;
@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
 	{
 		string filename = Amazon::Global::output_directory + "innovation_words_summary_different_coeff.txt";
 		map<string, string> saved;
-		if(EqDouble(Amazon::Global::state_coeffecient, 3) == false) {
+		if(EqDouble(Amazon::Global::state_coeffecient, 2.6) == false) {
 			ifstream fin_append(filename.c_str());
 			string s1;
 			string s2;
