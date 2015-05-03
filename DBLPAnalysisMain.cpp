@@ -812,7 +812,7 @@ int main(int argc, char *argv[]) {
 		const int REL_SIZE = SHIFTER * 2 + 10;
 		const bool final = Amazon::Global::final;
 		double average[REL_SIZE];
-		int denominator = 4;
+		int denominator = 2;
 		int K_bef = 0;
 		int K = 0;
 		int alpha_bef = 0;
@@ -854,13 +854,13 @@ int main(int argc, char *argv[]) {
 				}
 				K = index;
 			}
-			cerr <<"------>" << K << " " << alpha << " " << reviews.size() << endl;
+			cerr <<"------>" << K << " " << alpha - alpha_bef << " " << reviews.size() << endl;
 			cerr << "COMPUTING NUM" << endl;
 			for(int i = 0; i < (int)reviews.size(); i++) {
 				vector<int> relative_burst_times;
 				stringstream ss(reviews[i].text);
 				string s;
-				if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) { // EXP - final
+				if(reviews[i].final_experience_level > K || reviews[i].final_experience_level <= K_bef) {
 					continue;
 				}
 				int earliest = 300;
@@ -915,8 +915,7 @@ int main(int argc, char *argv[]) {
 							output_count[temp_counter] = SimpleIntToString(a-100) + "\t" + SimpleIntToString(b - SHIFTER);
 						}
 						int sum_a_b = sum_of_innovative_reviews_relative_to_burst[b] - sum_of_innovative_reviews_relative_to_burst[a - 1];
-						output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)alpha - alpha_bef);
-						output_bin[temp_counter] += "\t" + SimpleDoubleToString(binary[a][b]/ (double)alpha - alpha_bef);
+						output_count[temp_counter] += "\t" + SimpleDoubleToString(sum_a_b / (double)(alpha - alpha_bef));
 						temp_counter++;
 					}
 				}
@@ -931,9 +930,6 @@ int main(int argc, char *argv[]) {
 				ab_fout << "a\tb\t";
 				for(int i = 1; i <= denominator; i++) {
 					ab_fout << "cq"<< i << "\t";
-				}
-				for(int i = 1; i <= denominator; i++) {
-					ab_fout << "binq"<< i << "\t";
 				}
 				ab_fout << endl;
 				while(output_count[temp_counter].size() != 0) {
@@ -964,7 +960,6 @@ int main(int argc, char *argv[]) {
 		const int SHIFTER = 100;
 		const int REL_SIZE = SHIFTER * 2 + 10;
 		const bool final = Amazon::Global::final;
-		double average[REL_SIZE];
 		vector<int> num_of_innovative_reviews_relative_to_burst(REL_SIZE);
 		vector<int> sum_of_innovative_reviews_relative_to_burst(REL_SIZE);
 		vector<pair<long long , long long> > authors_exp_relative_to_burst(REL_SIZE); // (sum, number of authors)
@@ -972,29 +967,20 @@ int main(int argc, char *argv[]) {
 		vector<int> cdf_exp;
 		int biggest_exp = -1;
 
-		for(int i = 0; i < REL_SIZE; i++) {
-			authors_exp_relative_to_burst[i] = make_pair(0, 0);
-		}
-		for(int i = 0; i < 2 * SHIFTER; i++) {
-			average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
-		}
-
 		// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 		vector<int> median_finder[REL_SIZE];
 
-		for(int i = 0; i < authors_exp_relative_to_burst.size(); i++) {
-			authors_exp_relative_to_burst[i] = make_pair(0, 0);
-		}
-		for(int i = 0; i < REL_SIZE; i++) {
-			median_finder[i].clear();
-		}
 
 		for(int i = 0; i < (int)reviews.size(); i++) {
-			vector<int> relative_burst_times;
 			stringstream ss(reviews[i].text);
 			string s;
-			int earliest = 300;
-			int latest = -1;
+			if(final == true) {
+				pdf_exp[reviews[i].final_experience_level]++;
+				biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
+			} else {
+				pdf_exp[reviews[i].current_experience_level]++;
+				biggest_exp = max(biggest_exp, reviews[i].current_experience_level);
+			}
 			while(!ss.eof()) {
 				ss >> s;
 				if(innovation_words.find(s) == innovation_words.end()) {
@@ -1002,25 +988,6 @@ int main(int argc, char *argv[]) {
 				}
 				int start = top_innovations[innovation_words[s]].burst_start;
 				num_of_innovative_reviews_relative_to_burst[reviews[i].time.day - start + SHIFTER]++;
-				pair<int, int> p;
-				/*	for(string author : reviews[i].authors) {
-								p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
-								authors_exp_relative_to_burst[reviews[i].time.day - start + 100] = make_pair(p.first + experience_level[author], p.second + 1); // final exp counted
-							}
-				 */
-				p = authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER];
-				if(final == true) {
-					authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
-					pdf_exp[reviews[i].final_experience_level]++;
-					biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
-				} else {
-					authors_exp_relative_to_burst[reviews[i].time.day - start + SHIFTER] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
-					pdf_exp[reviews[i].current_experience_level]++;
-					biggest_exp = max(biggest_exp, reviews[i].current_experience_level);
-				}
-				relative_burst_times.push_back(reviews[i].time.day - start + SHIFTER);
-				latest = max(latest, reviews[i].time.day - start + SHIFTER);
-				earliest = min(earliest, reviews[i].time.day - start + SHIFTER);
 			}
 		}
 
@@ -1032,6 +999,10 @@ int main(int argc, char *argv[]) {
 		}
 		int bucket_size[3] = {30, 60, 100};
 		for(int bucket_index = 0; bucket_index < 3; bucket_index++) {
+			for(int i = 0; i < REL_SIZE; i++) {
+				median_finder[i].clear();
+				authors_exp_relative_to_burst[i] = make_pair(0, 0);
+			}
 			int week[REL_SIZE];
 			int first_empty = 1;
 			week[0] = -SHIFTER;

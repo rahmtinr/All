@@ -134,9 +134,20 @@ int main(int argc, char *argv[]) {
 	initialize(argv);
 	ifstream fin(argv[1]);
 	// Read input.
+	bool reddit = false;
+	if(Global::NAMEOFDATASET.substr(0, 6) == "reddit") {
+		reddit = true;
+	}
 	while (true) {
-		if (!ReadOneReview(fin, &reviews)) {
-			break;
+		string filename(argv[1]);
+		if(reddit == true) {
+			if(!ReadOneRedditReview(fin, &reviews)) {
+				break;
+			}
+		} else {
+			if (!ReadOneReview(fin, &reviews)) {
+				break;
+			}
 		}
 		if(reviews.size() == 0) {
 			continue;
@@ -191,7 +202,7 @@ int main(int argc, char *argv[]) {
 	// sort(reviews.begin(), reviews.end());
 	 */
 
-	/*
+	if(EqDouble(3.0, Amazon::Global::state_coeffecient))
 	{ // No country for old members paper
 		Innovations::LearnDictionary(0, reviews.size() / 4, &reviews);
 		Innovations::FindCristianInnovations(reviews.size() / 4, &reviews, &innovations); // returns pair of word and review it was started.
@@ -204,7 +215,7 @@ int main(int argc, char *argv[]) {
 		}
 		// Innovations::AnalyseInnovation(innovations, &reviews);
 	}
-	*/
+
 
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
 		for(int i = 0; i < reviews.size(); i++) {

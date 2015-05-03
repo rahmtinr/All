@@ -114,6 +114,7 @@ bool ReadOneRedditReview(std::ifstream& fin, vector<Review> *reviews) {
 
 		getline(fin, raw_input);
 		review.profile_name = GetField(raw_input);
+		getline(fin, raw_input);
 		review.user_id = GetField(raw_input);
 
 		getline(fin, raw_input);
@@ -133,6 +134,12 @@ bool ReadOneRedditReview(std::ifstream& fin, vector<Review> *reviews) {
 				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
 			reviews->push_back(review);
 		}
+	/*	cerr << review.product_id << endl;
+		cerr << review.profile_name << endl;
+		cerr << review.user_id << endl;
+		cerr << review.time.ToString() << endl;
+		cerr << review.text << endl;
+		exit(0);*/
 		return SUCCESS;
 	}
 	return FAIL;

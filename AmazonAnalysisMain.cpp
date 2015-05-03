@@ -139,10 +139,20 @@ int main(int argc, char *argv[]) {
 	}
 	initialize(argv);
 	ifstream fin(argv[1]);
+	bool reddit = false;
+	if(Global::NAMEOFDATASET.substr(0, 6)== "reddit") {
+		reddit = true;
+	}
 	// Read input.
 	while (true) {
-		if (!ReadOneReview(fin, &reviews)) {
-			break;
+		if(reddit == false) {
+			if (!ReadOneReview(fin, &reviews)) {
+				break;
+			}
+		} else {
+			if(!ReadOneRedditReview(fin,&reviews)) {
+				break;
+			}
 		}
 		if(reviews.size() == 0) {
 			continue;
@@ -198,7 +208,7 @@ int main(int argc, char *argv[]) {
 		if(cristians_innovations == false) {
 			filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		} else {
-			filename = Amazon::Global::output_directory + "words_start_burst_coeff_cristian_quarter_dict.txt";
+			filename = Amazon::Global::output_directory + "words_start_burst_cristian_quarter_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
@@ -473,20 +483,24 @@ int main(int argc, char *argv[]) {
 			fraction = 1 / fraction;
 			cerr << "FINDING K for " << fraction << endl;
 			{
-				vector<int> counter_exp(10010);
+				vector<int> counter_exp(50010);
 				fill(counter_exp.begin(), counter_exp.end(), 0);
+				int just_checking = 0;
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // We are dividing authors to $denominator buckets by their final xp
+					just_checking = max(just_checking, reviews[i].final_experience_level);
 				}
+				cerr << just_checking << endl;
 				int index = CUT_OFF_EXP - 1;
 				cerr << "GOING INTO THE LOOP" << endl;
-				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
+				while(fraction * alpha + 0.5 < num_of_reviews_more_than_cut_off) {
 					index++;
 					alpha += counter_exp[index];
 				}
 				K = index;
 			}
 			cerr << "------>" << K << " " << alpha - alpha_bef << " " << num_of_reviews_more_than_cut_off << endl;
+			cerr << fraction << " " << K << " " << K_bef << " " << alpha << " " << alpha_bef << " " << num_of_reviews_more_than_cut_off << endl;
 			cerr << "COMPUTING NUM" << endl;
 			for(int i = 0; i < (int)reviews.size(); i++) {
 				if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
@@ -563,7 +577,6 @@ int main(int argc, char *argv[]) {
 		vector<pair<long long, long long> > authors_exp_relative_to_burst(REL_SIZE);
 		map<int, int> pdf_exp;
 		vector<int> cdf_exp;
-		double average[REL_SIZE];
 		int num_of_reviews_more_than_cut_off = 0;
 		int biggest_exp = -1;
 		for(int i = 0; i < REL_SIZE; i++) {
@@ -582,7 +595,13 @@ int main(int argc, char *argv[]) {
 
 			stringstream ss(reviews[i].text);
 			string s;
-
+			if(final == true) {
+				pdf_exp[reviews[i].final_experience_level]++;
+				biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
+			} else {
+				pdf_exp[reviews[i].current_experience_level]++;
+				biggest_exp = max(biggest_exp, reviews[i].current_experience_level);
+			}
 			while(!ss.eof()) {
 				ss >> s;
 				if(innovation_words.find(s) == innovation_words.end()) {
@@ -596,18 +615,24 @@ int main(int argc, char *argv[]) {
 				if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
 					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
 					median_finder[index].push_back(reviews[i].final_experience_level);
-					pdf_exp[reviews[i].final_experience_level]++;
-					biggest_exp = max(biggest_exp, reviews[i].final_experience_level);
 				} else {
 					authors_exp_relative_to_burst[index] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
 					median_finder[index].push_back(reviews[i].current_experience_level);
-					pdf_exp[reviews[i].current_experience_level]++;
-					biggest_exp = max(biggest_exp, reviews[i].current_experience_level);
 				}
 			}
 		}
+		cdf_exp.push_back(0);
+		cdf_exp[0] += pdf_exp[0];
+		for(int i = 1; i <= biggest_exp; i++) {
+			cdf_exp.push_back(cdf_exp[i-1]);
+			cdf_exp[i] += pdf_exp[i];
+		}
 		for(int i = 0; i < REL_SIZE; i++) {
-			average[i] = authors_exp_relative_to_burst[i].first / (double)authors_exp_relative_to_burst[i].second;
+			if(i == 0) {
+				sum_of_innovative_reviews_relative_to_burst[i] = num_of_innovative_reviews_relative_to_burst[i];
+			} else {
+				sum_of_innovative_reviews_relative_to_burst[i] = num_of_innovative_reviews_relative_to_burst[i] + sum_of_innovative_reviews_relative_to_burst[i - 1];
+			}
 			sort(median_finder[i].begin(), median_finder[i].end());
 		}
 		string filename;
@@ -634,6 +659,10 @@ int main(int argc, char *argv[]) {
 		{
 			int bucket_num [6] = {30, 50, 100, 200, 500, 1000};
 			for(int bucket_index = 0; bucket_index < 6; bucket_index++) {
+				for(int i = 0; i < REL_SIZE; i++) {
+					authors_exp_relative_to_burst[i] = make_pair(0, 0);
+					median_finder[i].clear();
+				}
 				int week[REL_SIZE];
 				int first_empty = 1;
 				week[0] = -1100;
@@ -657,6 +686,14 @@ int main(int argc, char *argv[]) {
 							break;
 						}
 					}
+				} else {
+					for(int j = 0; j < REL_SIZE; j++) {
+						sum += num_of_innovative_reviews_relative_to_burst[j];
+						if(sum > each_bucket) {
+							week[first_empty++] = j + 1;
+							sum = 0;
+						}
+					}
 				}
 				for(int i = 0; i < (int)reviews.size(); i++) {
 					if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
@@ -665,13 +702,26 @@ int main(int argc, char *argv[]) {
 					if(final == false && reviews[i].current_experience_level < CUT_OFF_EXP) {
 						continue;
 					}
+					stringstream ss(reviews[i].text);
+					string s;
+					while(!ss.eof()) {
+						ss >> s;
+						if(innovation_words.find(s) == innovation_words.end()) {
+							continue;
+						}
+						int start = top_innovations[innovation_words[s]].burst_start;
 
-				}
-				cdf_exp.push_back(0);
-				cdf_exp[0] += pdf_exp[0];
-				for(int i = 1; i <= biggest_exp; i++) {
-					cdf_exp.push_back(cdf_exp[i-1]);
-					cdf_exp[i] += pdf_exp[i];
+						pair<long long, long long> p;
+						int bucket = upper_bound(week, week + first_empty, reviews[i].time.day - start + SHIFTER) - week - 1;
+						p = authors_exp_relative_to_burst[bucket];
+						if(final == true) { // for averaging out we can either always use the final exp or use their present experience at that time
+							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+							median_finder[bucket].push_back(reviews[i].final_experience_level);
+						} else {
+							authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].current_experience_level, p.second + 1);
+							median_finder[bucket].push_back(reviews[i].current_experience_level);
+						}
+					}
 				}
 
 				for(int i = 0; i < REL_SIZE; i++) {

@@ -12,15 +12,16 @@ then
     exit 0
 fi
 input_directory=$1
-InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+#InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology")
 #InputFiles=("Beer_Advocate" "Rate_Beer")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-StateMachineCoeff=("3" "4.5" "5.3" "6" "12")
+#StateMachineCoeff=("3" "4.5" "5.3" "6" "12")
 #StateMachineCoeff=("3.0" "3.1" "3.2" "3.3" "3.4" "3.5" "3.6" "3.7" "3.8" "3.9" "4.0" "4.1" "4.2" "4.3" "4.4" "4.5")
 
-ExperienceState=("final" "current")
+ExperienceState=("final")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
     if [[ $x == "Music" ]]
@@ -47,7 +48,8 @@ for x in ${InputFiles[*]}; do
     then
         StateMachineCoeff=("4.2" "4.1")
     fi
-    StateMachineCoeff=("0.25") #overriding all the coeffs for cristian's innovations
+    StateMachineCoeff+=("0.25")
+    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5")
     echo $input_directory
     for y in ${TimeMode[*]}; do
         time_mode=$y;
@@ -64,9 +66,9 @@ for x in ${InputFiles[*]}; do
 #                      rm $output_directory* -rf
 #                      mkdir $output_directory"BurstPlots"
 #                      mkdir $output_directory"AggregationPlots"
-#                      ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
+                       ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
                        echo "Done With finding the innovations"
-                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
+#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
 #                      time_line_txt=$output_directory$x"_timeline.txt"
 #                      awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
 #                      Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x
