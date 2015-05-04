@@ -246,16 +246,21 @@ int main(int argc, char *argv[]) {
 			}
 			longest_one = max(longest_one, current);
 		}
-		if(longest_one >= (int)states.size() / Amazon::Global::threshold_for_innovation + 5
-				|| (longest_one > 100 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
+		if(Amazon::Global::state_machine_doc_ratio == false) {
+			if(longest_one >= (int)states.size() / Amazon::Global::threshold_for_innovation + 5
+					|| (longest_one > 100 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
 
-			if(Amazon::Global::burst_mode == LONGBURST) { // Longest burst difference
-				word_states.CalculateCosts(best_start, longest_one, &reviews);
-			}
+				if(Amazon::Global::burst_mode == LONGBURST) { // Longest burst difference
+					word_states.CalculateCosts(best_start, longest_one, &reviews);
+				}
 
-			if(Amazon::Global::burst_mode == ALL) {  // Entire difference
-				word_states.CalculateCosts(0, states.size(), &reviews);
+				if(Amazon::Global::burst_mode == ALL) {  // Entire difference
+					word_states.CalculateCosts(0, states.size(), &reviews);
+				}
+				burst_innovation.insert(word_states);
 			}
+		}
+		if(Amazon::Global::state_machine_doc_ratio == true && longest_one > 8){
 			burst_innovation.insert(word_states);
 		}
 	}
