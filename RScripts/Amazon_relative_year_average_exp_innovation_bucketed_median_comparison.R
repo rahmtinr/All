@@ -22,30 +22,52 @@ draw_all <- function() {
         print(bucket_sizes[i])
         draw_relative_year_comparison("Music", "final", "3.5", bucket_sizes[i])
         draw_relative_year_comparison("Music", "current", "3.5", bucket_sizes[i])
+        draw_relative_year_comparison("Music", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Music", "current", "0.25", bucket_sizes[i])
 
         draw_relative_year_comparison("Movies_and_TV", "final", "3.3", bucket_sizes[i])
         draw_relative_year_comparison("Movies_and_TV", "final", "4.2", bucket_sizes[i])
         draw_relative_year_comparison("Movies_and_TV", "current", "3.3", bucket_sizes[i])
         draw_relative_year_comparison("Movies_and_TV", "current", "4.2", bucket_sizes[i])
-    
+        draw_relative_year_comparison("Movies_and_TV", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Movies_and_TV", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Movies_and_TV", "current", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Movies_and_TV", "current", "0.25", bucket_sizes[i])
+ 
         draw_relative_year_comparison("Books", "final", "3.5", bucket_sizes[i])
         draw_relative_year_comparison("Books", "final", "4.0", bucket_sizes[i])
         draw_relative_year_comparison("Books", "current", "3.5", bucket_sizes[i])
         draw_relative_year_comparison("Books", "current", "4.0", bucket_sizes[i])
+        draw_relative_year_comparison("Books", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Books", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Books", "current", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Books", "current", "0.25", bucket_sizes[i])
     
         draw_relative_year_comparison("Beer_Advocate", "final", "3.7", bucket_sizes[i])
         draw_relative_year_comparison("Beer_Advocate", "current", "3.7", bucket_sizes[i])
+        draw_relative_year_comparison("Beer_Advocate", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Beer_Advocate", "current", "0.25", bucket_sizes[i])
 
 
         draw_relative_year_comparison("Rate_Beer", "final", "3.4", bucket_sizes[i])
         draw_relative_year_comparison("Rate_Beer", "final", "3.5", bucket_sizes[i])
         draw_relative_year_comparison("Rate_Beer", "current", "3.4", bucket_sizes[i])
         draw_relative_year_comparison("Rate_Beer", "current", "3.5", bucket_sizes[i])
+        draw_relative_year_comparison("Rate_Beer", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Rate_Beer", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Rate_Beer", "current", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Rate_Beer", "current", "0.25", bucket_sizes[i])
+
 
         draw_relative_year_comparison("Electronics", "final", "4.2", bucket_sizes[i])
         draw_relative_year_comparison("Electronics", "final", "4.1", bucket_sizes[i])
         draw_relative_year_comparison("Electronics", "current", "4.2", bucket_sizes[i])
         draw_relative_year_comparison("Electronics", "current", "4.1", bucket_sizes[i])
+        draw_relative_year_comparison("Electronics", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Electronics", "final", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Electronics", "current", "0.25", bucket_sizes[i])
+        draw_relative_year_comparison("Electronics", "current", "0.25", bucket_sizes[i])
+ 
     }
     
     draw_relative_year_comparison("Music", "final", "3.5", 187000)
