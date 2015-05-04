@@ -216,7 +216,6 @@ int main(int argc, char *argv[]) {
 		// Innovations::AnalyseInnovation(innovations, &reviews);
 	}
 
-
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
 		for(int i = 0; i < reviews.size(); i++) {
 			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); //setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
@@ -227,7 +226,6 @@ int main(int argc, char *argv[]) {
 	} else {
 		Innovations::FindBurstsTimeDifference(&words_states, &reviews);
 	}
-	cerr << " HI " << endl;
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
 		vector<bool> states = *(word_states.states);
@@ -249,8 +247,7 @@ int main(int argc, char *argv[]) {
 			longest_one = max(longest_one, current);
 		}
 		if(longest_one >= (int)states.size() / Amazon::Global::threshold_for_innovation + 5
-				|| (longest_one > 200 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
-
+				|| (longest_one > 100 && longest_one >= (int)states.size() / (3 * Amazon::Global::threshold_for_innovation))){
 
 			if(Amazon::Global::burst_mode == LONGBURST) { // Longest burst difference
 				word_states.CalculateCosts(best_start, longest_one, &reviews);
@@ -272,11 +269,11 @@ int main(int argc, char *argv[]) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
 		innovation_burst_year_freq_out << word_time_line.word << "   " << word_time_line.burst_start << " " << word_time_line.review_index->size() << endl;
 	}
-
+        cerr << " burst size: " << burst_innovation.size() << endl;
 	{
 		string filename = Amazon::Global::output_directory + "innovation_words_summary_different_coeff.txt";
 		map<string, string> saved;
-		if(EqDouble(Amazon::Global::state_coeffecient, 3) == false) {
+		if(EqDouble(Amazon::Global::state_coeffecient, 2.6) == false) {
 			ifstream fin_append(filename.c_str());
 			string s1;
 			string s2;

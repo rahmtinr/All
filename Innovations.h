@@ -72,7 +72,7 @@ public:
 			products_that_have_this_word.insert((*review_history)[i].product_id);
 			users_that_have_used_this_word.insert((*review_history)[i].user_id);
 		}
-		if((int) products_that_have_this_word.size() < 5) {
+		if(Global::NAMEOFDATASET.substr(0,6) !="reddit" && (int) products_that_have_this_word.size() < 5) {
 			return false;
 		}
 		if((int) users_that_have_used_this_word.size() < 5) {
@@ -90,6 +90,7 @@ public:
 			stringstream ss((*reviews)[i].text);
 			while (ss.good()) {
 				ss >> word;
+
 				if(dictionary.find(word) != dictionary.end()) {
 					continue;
 				}
@@ -99,7 +100,7 @@ public:
 					new_words[word] = temp;
 				} else {
 					temp = new_words.find(word)->second;
-					if (temp[temp.size() - 1] == (*reviews)[i]) {
+					if (temp.back() == (*reviews)[i]) {
 						continue;
 					}
 					if (TimeDifferenceInMonth(temp[0].time, (*reviews)[i].time) > 6) {
