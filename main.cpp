@@ -260,7 +260,7 @@ int main(int argc, char *argv[]) {
 				burst_innovation.insert(word_states);
 			}
 		}
-		if(Amazon::Global::state_machine_doc_ratio == true && longest_one > 8){
+		if(Amazon::Global::state_machine_doc_ratio == true && longest_one > 8 && word_states.review_index->size() > 200){
 			burst_innovation.insert(word_states);
 		}
 	}
