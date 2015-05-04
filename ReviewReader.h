@@ -131,7 +131,7 @@ bool ReadOneRedditReview(std::ifstream& fin, vector<Review> *reviews) {
 		review.text = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input)))) + " ";
 		getline(fin, raw_input);
 		if(Amazon::Global::remove_unknown == false ||
-				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
+				(Amazon::Global::remove_unknown == true && review.user_id != "unknown") || (Amazon::Global::remove_unknown == true && review.user_id != "[deleted]")) {
 			reviews->push_back(review);
 		}
 	/*	cerr << review.product_id << endl;
