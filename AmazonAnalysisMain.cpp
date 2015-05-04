@@ -483,16 +483,14 @@ int main(int argc, char *argv[]) {
 			fraction = 1 / fraction;
 			cerr << "FINDING K for " << fraction << endl;
 			{
-				cerr << " WHAT " << endl
 				vector<int> counter_exp(50010);
 				fill(counter_exp.begin(), counter_exp.end(), 0);
-				cerr <<" HI" << endl;
 				int just_checking = 0;
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // We are dividing authors to $denominator buckets by their final xp
 					just_checking = max(just_checking, reviews[i].final_experience_level);
 				}
-				cerr << just_checking << endl;
+				cerr << "highest experience: " << just_checking << endl;
 				int index = CUT_OFF_EXP - 1;
 				cerr << "GOING INTO THE LOOP" << endl;
 				while(fraction * alpha + 0.5 < num_of_reviews_more_than_cut_off) {
