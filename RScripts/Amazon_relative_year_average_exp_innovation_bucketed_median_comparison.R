@@ -47,6 +47,34 @@ draw_all <- function() {
         draw_relative_year_comparison("Electronics", "current", "4.2", bucket_sizes[i])
         draw_relative_year_comparison("Electronics", "current", "4.1", bucket_sizes[i])
     }
+    
+    draw_relative_year_comparison("Music", "final", "3.5", 187000)
+    draw_relative_year_comparison("Music", "current", "3.5", 140000)
+
+    draw_relative_year_comparison("Movies_and_TV", "final", "3.3", 2201000)
+    draw_relative_year_comparison("Movies_and_TV", "final", "4.2", 246000)
+    draw_relative_year_comparison("Movies_and_TV", "current", "3.3",176000)
+    draw_relative_year_comparison("Movies_and_TV", "current", "4.2", 199000)
+    
+    draw_relative_year_comparison("Books", "final", "3.5", 1492000)
+    draw_relative_year_comparison("Books", "final", "4.0", 127000)
+    draw_relative_year_comparison("Books", "current", "3.5", 1129000)
+    draw_relative_year_comparison("Books", "current", "4.0", 96000)
+    
+    draw_relative_year_comparison("Beer_Advocate", "final", "3.7", 43000)
+    draw_relative_year_comparison("Beer_Advocate", "current", "3.7", 41000)
+
+
+    draw_relative_year_comparison("Rate_Beer", "final", "3.4", 55000)
+    draw_relative_year_comparison("Rate_Beer", "final", "3.5", 46000)
+    draw_relative_year_comparison("Rate_Beer", "current", "3.4", 51000)
+    draw_relative_year_comparison("Rate_Beer", "current", "3.5", 43000)
+
+    draw_relative_year_comparison("Electronics", "final", "4.2", 22000)
+    draw_relative_year_comparison("Electronics", "final", "4.1", 21000)
+    draw_relative_year_comparison("Electronics", "current", "4.2", 9000)
+    draw_relative_year_comparison("Electronics", "current", "4.1", 10000)
+
 }
 
 draw_all()
