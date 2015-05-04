@@ -278,7 +278,7 @@ int main(int argc, char *argv[]) {
 	{
 		string filename = Amazon::Global::output_directory + "innovation_words_summary_different_coeff.txt";
 		map<string, string> saved;
-		if(EqDouble(Amazon::Global::state_coeffecient, 2.6) == false) {
+		if(EqDouble(Amazon::Global::state_coeffecient, 3) == false) {
 			ifstream fin_append(filename.c_str());
 			string s1;
 			string s2;
