@@ -18,44 +18,102 @@ BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
 StateMachineCoeff=("3.0" "3.1" "3.2" "3.3" "3.4" "3.5" "3.6" "3.7" "3.8" "3.9" "4.0" "4.1" "4.2" "4.3" "4.4" "4.5")
 
-ExperienceState=("final")
+ExperienceState=("final", "current")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
-    if [[ $x == "Music" ]]
+    if [[ $x == "reddit_funny" ]]
     then
-        StateMachineCoeff=("3.5")
+        StateMachineCoeff=("3.6" "4.5")
     fi
-    if [[ $x == "Movies_and_TV" ]]
+    if [[ $x == "reddit_AskReddit" ]]
     then
-        StateMachineCoeff=("3.3" "4.2")
+        StateMachineCoeff=("9.0" "12.0")
     fi
-    if [[ $x == "Books" ]]
+    if [[ $x == "reddit_pics" ]]
     then
-        StateMachineCoeff=("3.5" "4.0")
+        StateMachineCoeff=("2.6" "4.5")
     fi
-    if [[ $x == "Rate_Beer" ]]
+    if [[ $x == "reddit_AdviceAnimals" ]]
     then
-        StateMachineCoeff=("3.4" "3.5")
+        StateMachineCoeff=("4.5" "6.0")
     fi
-    if [[ $x == "Beer_Advocate" ]]
+    if [[ $x == "reddit_gaming" ]]
     then
-        StateMachineCoeff=("3.7")
+        StateMachineCoeff=("4.5" "6.0")
     fi
-    if [[ $x == "Electronics" ]]
+    if [[ $x == "reddit_videos" ]]
     then
-        StateMachineCoeff=("4.2" "4.1")
+        StateMachineCoeff=("3.6")
     fi
-    if [[ $x == "reddit_leagueoflegends" ]]
+    if [[ $x == "reddit_politics" ]]
     then
-        StateMachineCoeff=("3.2")
+        StateMachineCoeff=("2.6" "9.0")
+    fi
+    if [[ $x == "reddit_trees" ]]
+    then
+        StateMachineCoeff=("4.5" "6.0")
+    fi
+    if [[ $x == "reddit_WTF" ]]
+    then
+        StateMachineCoeff=("6.0")
+    fi
+    if [[ $x == "reddit_aww" ]]
+    then
+        StateMachineCoeff=("4.0")
+    fi
+    if [[ $x == "reddit_fffffffuuuuuuuuuuuu" ]]
+    then
+        StateMachineCoeff=("3.4")
+    fi
+    if [[ $x == "reddit_Music" ]]
+    then
+        StateMachineCoeff=("3.8")
     fi
     if [[ $x == "reddit_POLITIC" ]]
     then
-        StateMachineCoeff=("4.5")
+        StateMachineCoeff=("4.0")
     fi
-    StateMachineCoeff+=("0.25")
+    if [[ $x == "reddit_worldnews" ]]
+    then
+        StateMachineCoeff=("6.0")
+    fi
+    if [[ $x == "reddit_leagueoflegends" ]]
+
+    then
+        StateMachineCoeff=("4.0" "9.0")
+    fi
+    if [[ $x == "reddit_technology" ]]
+    then
+        StateMachineCoeff=("12.0")
+    fi
+    if [[ $x == "Music" ]]
+    then
+        StateMachineCoeff=("3.8")
+    fi
+    if [[ $x == "Movies_and_TV" ]]
+    then
+        StateMachineCoeff=("9.0" "12.0")
+    fi
+    if [[ $x == "Books" ]]
+    then
+        StateMachineCoeff=("9.0" "12.0")
+    fi
+    if [[ $x == "Electronics" ]]
+    then
+        StateMachineCoeff=("12.0")
+    fi
+    if [[ $x == "Beer_Advocate" ]]
+    then
+        StateMachineCoeff=("4.2" "12.0")
+    fi
+    if [[ $x == "Rate_Beer" ]]
+    then
+        StateMachineCoeff=("6.0" "12.0")
+    fi 
+    
+    StateMachineCoeff+=("0.05")
 #    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5" "6.0")
-    StateMachineCoeff=("9.0" "12.0")
+#    StateMachineCoeff=("9.0" "12.0")
     echo $input_directory
     for y in ${TimeMode[*]}; do
         time_mode=$y;
@@ -72,9 +130,9 @@ for x in ${InputFiles[*]}; do
 #                      rm $output_directory* -rf
 #                      mkdir $output_directory"BurstPlots"
 #                      mkdir $output_directory"AggregationPlots"
-                       ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
+#                       ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
                        echo "Done With finding the innovations"
-#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
+                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state
 #                      time_line_txt=$output_directory$x"_timeline.txt"
 #                      awk '{print $1 }' $time_line_txt | sort | uniq > $output_directory$x"/words"
 #                      Rscript "RScripts/word_timeline_plot.R" $time_line_txt $x

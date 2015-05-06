@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
 		if(cristians_innovations == false) {
 			filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		} else {
-			filename = Amazon::Global::output_directory + "words_start_burst_cristian_quarter_dict.txt";
+			filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.O5_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
