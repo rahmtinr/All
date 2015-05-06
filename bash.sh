@@ -54,7 +54,8 @@ for x in ${InputFiles[*]}; do
         StateMachineCoeff=("4.5")
     fi
     StateMachineCoeff+=("0.25")
-    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5" "6.0")
+#    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5" "6.0")
+    StateMachineCoeff=("9.0" "12.0")
     echo $input_directory
     for y in ${TimeMode[*]}; do
         time_mode=$y;

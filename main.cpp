@@ -202,16 +202,41 @@ int main(int argc, char *argv[]) {
 	// sort(reviews.begin(), reviews.end());
 	 */
 
-	if(EqDouble(3.0, Amazon::Global::state_coeffecient))
+	if(EqDouble(9.0, Amazon::Global::state_coeffecient))
 	{ // No country for old members paper
-		Innovations::LearnDictionary(0, reviews.size() / 4, &reviews);
-		Innovations::FindCristianInnovations(reviews.size() / 4, &reviews, &innovations); // returns pair of word and the review it was started.
-		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_quarter_dict.txt";
+		map<string, long long> word_freq;
+		map<string, int> word_burst_start_date;
+		int common_divider = 20;
+		Innovations::LearnDictionary(0, reviews.size() / common_divider, &reviews);
+		Innovations::FindCristianInnovations(reviews.size() / common_divider, &reviews, &innovations); // returns pair of word and the review it was started.
+		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.O5_dict.txt";
 		ofstream fout_cristian_method(filename.c_str());
 		cerr << "# of innovations: " << innovations.size() << endl;
 		for(int i = 0; i < innovations.size(); i++) {
 			int week_that_burst_started = (((innovations[i].second)[0]).time.epoch_time / (24 * 60 * 60) - (25 * 365)) / 7;
-			fout_cristian_method << innovations[i].first << " " << week_that_burst_started << endl;
+			word_burst_start_date[innovations[i].first] = week_that_burst_started;
+			word_freq[innovations[i].first] = 0;
+		}
+		for(int i = 0; i <reviews.size(); i++) {
+			stringstream ss(reviews[i].text);
+			string s;
+			while(!ss.eof()) {
+				ss >> s;
+				if(word_freq.find(s) == word_freq.end()) {
+					continue;
+				}
+				word_freq[s]++;
+			}
+		}
+		vector<pair<long long, string> > freq_word;
+		for(pair<string, long long> p : word_freq) {
+			freq_word.push_back(make_pair(p.second, p.first));
+		}
+		sort(freq_word.begin(), freq_word.end());
+		int starting_point = max(0, (int)freq_word.size() - 500);
+		for(int i = starting_point; i < freq_word.size(); i++) {
+			string word = freq_word[i].second;
+			fout_cristian_method << word << " " << word_burst_start_date[word] << endl;
 		}
 		// Innovations::AnalyseInnovation(innovations, &reviews);
 	}
@@ -274,7 +299,7 @@ int main(int argc, char *argv[]) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
 		innovation_burst_year_freq_out << word_time_line.word << "   " << word_time_line.burst_start << " " << word_time_line.review_index->size() << endl;
 	}
-        cerr << " burst size: " << burst_innovation.size() << endl;
+	cerr << " burst size: " << burst_innovation.size() << endl;
 	{
 		string filename = Amazon::Global::output_directory + "innovation_words_summary_different_coeff.txt";
 		map<string, string> saved;
@@ -303,10 +328,10 @@ int main(int argc, char *argv[]) {
 			if(num == 500) {
 				break;
 			}
-			if(num == 0) {
-				num++;
-				median_finder.push_back(0);
-			}
+		}
+		if(num == 0) {
+			num++;
+			median_finder.push_back(0);
 		}
 		average /= num;
 		median = median_finder[median_finder.size() / 2];
