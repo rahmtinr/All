@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 	}
 	{ // distribution of reviews over time - weekly bucketed! Now that day is based on week
 		map<int, int> dist;
-		for(int i = 0; i < reviews.size(); i++) {
+		for(int i = 0; i < (int)reviews.size(); i++) {
 			dist[reviews[i].time.day]++;
 		}
 		ofstream fout_dist(("../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + Global::NAMEOFDATASET + "_distribution.txt").c_str());
@@ -781,9 +781,8 @@ int main(int argc, char *argv[]) {
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
 		int denominator = 4;
-		const bool binary = false;
 		memset(num, 0, sizeof num);
-		for(int i = 0; i < reviews.size(); i++) {
+		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
 			}
@@ -837,11 +836,7 @@ int main(int argc, char *argv[]) {
 					if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 5 <= reviews[i].time.day) { // the range where we count the word as an innovation
 						continue;
 					}
-					int start = top_innovations[innovation_words[s]].burst_start;
 					num[numerator][reviews[i].current_experience_level]++; // Only the max final_exp added
-					if(binary == true) {
-						break;
-					}
 				}
 			}
 			for(pair<string, int> p : experience_level) {
@@ -855,11 +850,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		string filename;
-		if(binary == true) {
-			filename = Amazon::Global::output_directory + "cristian_probability_binary_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-		} else {
-			filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-		}
+		filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		ofstream cristian_fout(filename.c_str());
 		for(int i = 1; i <= 4; i++) {
 			for(int j = 0; j < 1000; j++) {
@@ -1052,7 +1043,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-
+#endif
 #if 1
 	{
 		cerr << "Starting the distribution comparison (review on exp vs innovation on exp) and (innovation on exp vs random pick on exp)" << endl;
@@ -1066,7 +1057,7 @@ int main(int argc, char *argv[]) {
 		vector<int> experience_array;
 		int max_exp_innovated = 0;
 		map<int, int> random_exp_to_count;
-		for(int i = 0; i < reviews.size(); i++) {
+		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(reviews[i].final_experience_level < CUT_OFF_EXP) {
 				continue;
 			}
@@ -1124,7 +1115,6 @@ int main(int argc, char *argv[]) {
 			for(pair<int, int> p : exp_review_num) {
 				int exp_level = p.first;
 				int numerator = p.second;
-				double out;
 				if(innovation_denom == 0) {
 					innovation_denom = 1;
 				}
