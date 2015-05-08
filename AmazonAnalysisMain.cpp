@@ -926,13 +926,14 @@ int main(int argc, char *argv[]) {
 		cerr << "I'm gonna start bucketing" << endl;
 		// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 		{
-			const int bucket_num_size = 6;
-			int bucket_num[bucket_num_size] = {30, 50, 100, 200, 500, 1000};
+			const int bucket_num_size = 8;
+			int bucket_num[bucket_num_size] = {100, 500, 1000, 2000, 5000, 10000, 20000, 30000};
 			for(int bucket_index = 0; bucket_index < bucket_num_size; bucket_index++) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					authors_exp_relative_to_burst[i] = make_pair(0, 0);
 					median_finder[i].clear();
 				}
+				user_word_to_relative_week.clear();
 				int week[REL_SIZE];
 				int first_empty = 1;
 				week[0] = -1100;

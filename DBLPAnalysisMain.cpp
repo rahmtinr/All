@@ -615,145 +615,147 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 
-	/*
-	cerr << "STARTING FEYNMAN" << endl;
-	// Richard Feynman trace back
-	ofstream feynman_fout(Amazon::Global::output_directory + "Feynman.txt");
-	for(int k = 0; k < (int)top_innovations.size(); k++) {
-		WordTimeLine word_time_line = top_innovations[k];
-		string word = word_time_line.word;
-		cerr << "starting " << k << " " << word << endl;
-		vector<int> indecies_contain_word;
-		map<string, int> local_author_id;
-		const int H = 1000 * 1000;
-		vector<string> rev_local_author_id(H);
-		int local_counter = 0;
-		vector<vector<int> > graph(H);
-		vector<int> local_earliest(H);
-		vector<int> fin_time;
-		vector<int> local_mark(H);
-		vector<vector<int> > comp(H);
-		cerr << "BUILDING GRAPH " << endl;
-		for(int i = 0; i < (int)reviews.size(); i++) {
-			if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
-				continue;
-			}
-			stringstream ss(reviews[i].text);
-			bool check = false;
-			while(!ss.eof()) {
-				string s;
-				ss >> s;
-				if(s == word) {
-					check = true;
-					break;
+#if 1
+	{
+		cerr << "STARTING FEYNMAN" << endl;
+		// Richard Feynman trace back
+		ofstream feynman_fout(Amazon::Global::output_directory + "Feynman.txt");
+		for(int k = 0; k < (int)top_innovations.size(); k++) {
+			WordTimeLine word_time_line = top_innovations[k];
+			string word = word_time_line.word;
+			cerr << "starting " << k << " " << word << endl;
+			vector<int> indecies_contain_word;
+			map<string, int> local_author_id;
+			const int H = 1000 * 1000;
+			vector<string> rev_local_author_id(H);
+			int local_counter = 0;
+			vector<vector<int> > graph(H);
+			vector<int> local_earliest(H);
+			vector<int> fin_time;
+			vector<int> local_mark(H);
+			vector<vector<int> > comp(H);
+			cerr << "BUILDING GRAPH " << endl;
+			for(int i = 0; i < (int)reviews.size(); i++) {
+				if(reviews[i].authors[0].substr(0, 5) == "Dummy") {
+					continue;
 				}
-			}
-			if(check == false) {
-				continue;
-			}
-			indecies_contain_word.push_back(i);
-			for(string author : reviews[i].authors) {
-				if(local_author_id.find(author) == local_author_id.end()){
-					rev_local_author_id[local_counter] = author;
-					local_author_id[author] = local_counter++;
-					local_earliest[local_counter - 1] = reviews[i].time.day;
-				}
-			}
-			for(string author1 : reviews[i].authors) {
-				for(string author2 : reviews[i].authors) {
-					if(author1 == author2) {
-						continue;
-					}
-					int x = local_author_id[author1];
-					int y = local_author_id[author2];
-					if(local_earliest[x] <= local_earliest[y] && local_earliest[y] == reviews[i].time.day) {
-						graph[x].push_back(y);
+				stringstream ss(reviews[i].text);
+				bool check = false;
+				while(!ss.eof()) {
+					string s;
+					ss >> s;
+					if(s == word) {
+						check = true;
+						break;
 					}
 				}
+				if(check == false) {
+					continue;
+				}
+				indecies_contain_word.push_back(i);
+				for(string author : reviews[i].authors) {
+					if(local_author_id.find(author) == local_author_id.end()){
+						rev_local_author_id[local_counter] = author;
+						local_author_id[author] = local_counter++;
+						local_earliest[local_counter - 1] = reviews[i].time.day;
+					}
+				}
+				for(string author1 : reviews[i].authors) {
+					for(string author2 : reviews[i].authors) {
+						if(author1 == author2) {
+							continue;
+						}
+						int x = local_author_id[author1];
+						int y = local_author_id[author2];
+						if(local_earliest[x] <= local_earliest[y] && local_earliest[y] == reviews[i].time.day) {
+							graph[x].push_back(y);
+						}
+					}
+				}
 			}
-		}
-		cerr << "STARTED SCC" << endl;
-		// strongly connected component
-		for(int i = 0 ; i < local_counter; i++) {
-			if(local_mark[i] == 0) {
-				StrongDfs(i, &graph, &local_mark, &fin_time);
+			cerr << "STARTED SCC" << endl;
+			// strongly connected component
+			for(int i = 0 ; i < local_counter; i++) {
+				if(local_mark[i] == 0) {
+					StrongDfs(i, &graph, &local_mark, &fin_time);
+				}
 			}
-		}
-		cerr << "FINISHING TIME IS DONE" << endl;
-		fill(local_mark.begin(), local_mark.end(), 0);
-		int comp_num = 1;
-		set<int> comps_to_check;
-		for(int i = 0; i < local_counter; i++) {
-			if(local_mark[fin_time[i]] == 0) {
-				comps_to_check.insert(comp_num);
-				StrongDfsRev(fin_time[i], &graph, &local_mark, &comp[comp_num], comp_num);
-				comp_num++;
-			}
-		}
-		cerr <<"GOT THE COMPONENTS" << endl;
-		for(int i = 0; i < local_counter; i++) {
-			for(int x : graph[i]) {
-				if(local_mark[x] != local_mark[i])
-					comps_to_check.erase(local_mark[x]);
-			}
-		}
-		cerr << "Num of candidate components to check: " << comps_to_check.size() << endl;
-		cerr << "FIND THE BEST COMPONENT" << endl;
-		int max_people = 0;
-		int best_comp = 0;
-		int second_max_people = 0;
-		int second_best_comp = 0;
-		for(int x : comps_to_check) {
+			cerr << "FINISHING TIME IS DONE" << endl;
 			fill(local_mark.begin(), local_mark.end(), 0);
-			int temp = comp[x][0];
-			int num = CountDfs(temp, &graph, &local_mark);
-			if(max_people < num) {
-				max_people = num;
-				best_comp = x;
-			} else if (second_best_comp < num) {
-				second_max_people = num;
-				second_best_comp = x;
-			}
-		}
-		// Find the intersection of two biggest sets.
-		cerr << " Finding the intersection of two biggest sets" << endl;
-		fill(local_mark.begin(), local_mark.end(), 0);
-		int temp = comp[best_comp][0];
-		CountDfs(temp, &graph, &local_mark);
-		int intersection = second_max_people;
-		if(local_mark[comp[second_best_comp][0]] == 0 ) {
-			intersection -= CountDfs(comp[second_best_comp][0], &graph, &local_mark);
-		}
-		cerr << " LOOK INTO THE BEST COMPONENT" << endl;
-		set<string> seed_authors;
-		set<string> seed_authors_copy;
-		set<int> seed_paper_indecies;
-		for(int i = 0; i < (int)comp[best_comp].size() ; i++) {
-			seed_authors.insert(rev_local_author_id[comp[best_comp][i]]);
-			seed_authors_copy.insert(rev_local_author_id[comp[best_comp][i]]);
-		}
-		set<string> all_people;
-		for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
-			int index = indecies_contain_word[i];
-			for(string author : reviews[index].authors) {
-				all_people.insert(author);
-				if(seed_authors.find(author) != seed_authors.end()) {
-					seed_paper_indecies.insert(index);
-					seed_authors.erase(author);
+			int comp_num = 1;
+			set<int> comps_to_check;
+			for(int i = 0; i < local_counter; i++) {
+				if(local_mark[fin_time[i]] == 0) {
+					comps_to_check.insert(comp_num);
+					StrongDfsRev(fin_time[i], &graph, &local_mark, &comp[comp_num], comp_num);
+					comp_num++;
 				}
 			}
+			cerr <<"GOT THE COMPONENTS" << endl;
+			for(int i = 0; i < local_counter; i++) {
+				for(int x : graph[i]) {
+					if(local_mark[x] != local_mark[i])
+						comps_to_check.erase(local_mark[x]);
+				}
+			}
+			cerr << "Num of candidate components to check: " << comps_to_check.size() << endl;
+			cerr << "FIND THE BEST COMPONENT" << endl;
+			int max_people = 0;
+			int best_comp = 0;
+			int second_max_people = 0;
+			int second_best_comp = 0;
+			for(int x : comps_to_check) {
+				fill(local_mark.begin(), local_mark.end(), 0);
+				int temp = comp[x][0];
+				int num = CountDfs(temp, &graph, &local_mark);
+				if(max_people < num) {
+					max_people = num;
+					best_comp = x;
+				} else if (second_best_comp < num) {
+					second_max_people = num;
+					second_best_comp = x;
+				}
+			}
+			// Find the intersection of two biggest sets.
+			cerr << " Finding the intersection of two biggest sets" << endl;
+			fill(local_mark.begin(), local_mark.end(), 0);
+			int temp = comp[best_comp][0];
+			CountDfs(temp, &graph, &local_mark);
+			int intersection = second_max_people;
+			if(local_mark[comp[second_best_comp][0]] == 0 ) {
+				intersection -= CountDfs(comp[second_best_comp][0], &graph, &local_mark);
+			}
+			cerr << " LOOK INTO THE BEST COMPONENT" << endl;
+			set<string> seed_authors;
+			set<string> seed_authors_copy;
+			set<int> seed_paper_indecies;
+			for(int i = 0; i < (int)comp[best_comp].size() ; i++) {
+				seed_authors.insert(rev_local_author_id[comp[best_comp][i]]);
+				seed_authors_copy.insert(rev_local_author_id[comp[best_comp][i]]);
+			}
+			set<string> all_people;
+			for(int i = 0; i < (int)indecies_contain_word.size(); i++) {
+				int index = indecies_contain_word[i];
+				for(string author : reviews[index].authors) {
+					all_people.insert(author);
+					if(seed_authors.find(author) != seed_authors.end()) {
+						seed_paper_indecies.insert(index);
+						seed_authors.erase(author);
+					}
+				}
+			}
+			int best_index = *seed_paper_indecies.begin();
+			// word, number of people on biggest impact, number of people on second biggest impact, intersecion of the two biggest sets,  all the people used that word, a sample text in the biggest component
+			feynman_fout << word << " :: " << max_people  << " " << second_max_people << " " << intersection << " " << all_people.size() << " " << reviews[best_index].text << endl;
+			// When the best paper was published, when the best burst started
+			feynman_fout << reviews[best_index].time.day + 1935 << " " << word_time_line.burst_start + 1935 << endl;
+			for(string author : seed_authors_copy) {
+				feynman_fout << author << ", ";
+			}
+			feynman_fout << endl << "________________________________________" << endl;
 		}
-		int best_index = *seed_paper_indecies.begin();
-		// word, number of people on biggest impact, number of people on second biggest impact, intersecion of the two biggest sets,  all the people used that word, a sample text in the biggest component
-		feynman_fout << word << " :: " << max_people  << " " << second_max_people << " " << intersection << " " << all_people.size() << " " << reviews[best_index].text << endl;
-		// When the best paper was published, when the best burst started
-		feynman_fout << reviews[best_index].time.day + 1935 << " " << word_time_line.burst_start + 1935 << endl;
-		for(string author : seed_authors_copy) {
-			feynman_fout << author << ", ";
-		}
-		feynman_fout << endl << "________________________________________" << endl;
 	}
-	 */
+#endif
 	/*
 	//Pairwise prediction, equal current exp, different #innovative reviews ->
 	{
