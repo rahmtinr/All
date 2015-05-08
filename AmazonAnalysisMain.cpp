@@ -61,6 +61,15 @@ void initialize(char *argv[]) {
 			Amazon::Global::final = false;
 		}
 	}
+	{
+			string temp(argv[7]);
+			if(temp == "4") {
+				Amazon::Global::denominator = 4;
+			} else {
+				Amazon::Global::denominator = 2;
+			}
+			cerr << "denominator: " << " " << temp << " " << Amazon::Global::denominator << endl;
+		}
 	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
 		if(filename[i] == '/' && last_slash == -1) {
@@ -133,7 +142,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 7) {
+	if(argc != 8) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -441,7 +450,7 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 #endif
-#if 1
+#if 0
 	{
 		bool final = Amazon::Global::final;
 		// [a,b] and blue and black plot
@@ -452,7 +461,7 @@ int main(int argc, char *argv[]) {
 		const int REL_SIZE = SHIFTER * 2 + 10;
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
-		int denominator = 2;
+		int denominator = Amazon::Global::denominator;
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(final == true && reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -563,7 +572,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0
 	{
 		cerr << "Got to median comparison" << endl;
 		// Median comparison
@@ -770,7 +779,7 @@ int main(int argc, char *argv[]) {
 
 #endif
 
-#if 1
+#if 0
 	{
 		// Comparison with "No country for old men"
 		cerr << "Comparison to no country for old men" << endl;
@@ -954,6 +963,8 @@ int main(int argc, char *argv[]) {
 							}
 						}
 						if(first_empty < 30) {
+							ofstream largest_bucket_fout("largest_bucket.txt", ios::out | ios::app)
+							largest_bucket_fout << "Name: " << Global::NAMEOFDATASET << " Final:" << Amazon::Global::final << " coeff:" << Amazon::Global::state_coeffecient << " each bucket:" << each_bucket << endl;
 							break;
 						}
 					}
@@ -1045,7 +1056,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0
 	{
 		cerr << "Starting the distribution comparison (review on exp vs innovation on exp) and (innovation on exp vs random pick on exp)" << endl;
 		// innovations vs num of reviews for authors with more than 20 reviews
