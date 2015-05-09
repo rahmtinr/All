@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 		int common_divider = 20;
 		Innovations::LearnDictionary(0, reviews.size() / common_divider, &reviews);
 		Innovations::FindCristianInnovations(reviews.size() / common_divider, &reviews, &innovations); // returns pair of word and the review it was started.
-		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.O5_dict.txt";
+		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.05_dict.txt";
 		ofstream fout_cristian_method(filename.c_str());
 		cerr << "# of innovations: " << innovations.size() << endl;
 		for(int i = 0; i < innovations.size(); i++) {

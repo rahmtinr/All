@@ -11,8 +11,8 @@ then
     echo "Compilation error!"
     exit 0
 fi
-rm largest_bucket.txt
-touch largest_bucket.txt
+#rm largest_bucket.txt
+#touch largest_bucket.txt
 input_directory=$1
 InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 TimeMode=("RealTime")
@@ -113,7 +113,7 @@ for x in ${InputFiles[*]}; do
         StateMachineCoeff=("6.0" "12.0")
     fi 
     
-    StateMachineCoeff+=("0.05")
+    StateMachineCoeff=("0.05")
 #    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5" "6.0")
 #    StateMachineCoeff=("9.0" "12.0")
     echo $input_directory

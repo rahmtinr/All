@@ -450,7 +450,7 @@ int main(int argc, char *argv[]) {
 	// StarAveragePerMonth(&reviews);
 	//	StarAveragePerMonthAccumulatedOverYears(&reviews);
 #endif
-#if 0
+#if 1
 	{
 		bool final = Amazon::Global::final;
 		// [a,b] and blue and black plot
@@ -572,7 +572,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 0
+#if 1
 	{
 		cerr << "Got to median comparison" << endl;
 		// Median comparison
@@ -779,7 +779,7 @@ int main(int argc, char *argv[]) {
 
 #endif
 
-#if 0
+#if 1
 	{
 		// Comparison with "No country for old men"
 		cerr << "Comparison to no country for old men" << endl;
@@ -963,8 +963,8 @@ int main(int argc, char *argv[]) {
 							}
 						}
 						if(first_empty < 30) {
-							ofstream largest_bucket_fout("largest_bucket.txt", ios::out | ios::app)
-							largest_bucket_fout << "Name: " << Global::NAMEOFDATASET << " Final:" << Amazon::Global::final << " coeff:" << Amazon::Global::state_coeffecient << " each bucket:" << each_bucket << endl;
+				//			ofstream largest_bucket_fout("largest_bucket.txt", ios::out | ios::app);
+				//			largest_bucket_fout << "Name: " << Global::NAMEOFDATASET << " Final:" << Amazon::Global::final << " coeff:" << Amazon::Global::state_coeffecient << " each bucket:" << each_bucket << endl;
 							break;
 						}
 					}
@@ -1056,7 +1056,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 0
+#if 1
 	{
 		cerr << "Starting the distribution comparison (review on exp vs innovation on exp) and (innovation on exp vs random pick on exp)" << endl;
 		// innovations vs num of reviews for authors with more than 20 reviews
