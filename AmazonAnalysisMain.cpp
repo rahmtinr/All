@@ -876,7 +876,7 @@ int main(int argc, char *argv[]) {
 				if(sum < each_bucket) {
 					continue;
 				}
-				cristian_fout << i << " " << j << " " << num[i][j] / ((double)denom[i][j] + 1) << endl;
+				cristian_fout << i << " " << j << " " << sum / ((double)denom[i][j] + 1) << endl;
 				sum = 0;
 			}
 		}
@@ -1070,7 +1070,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0
 	{
 		cerr << "Starting the distribution comparison (review on exp vs innovation on exp) and (innovation on exp vs random pick on exp)" << endl;
 		// innovations vs num of reviews for authors with more than 20 reviews

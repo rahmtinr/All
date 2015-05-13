@@ -19,7 +19,7 @@ TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
 StateMachineCoeff=("3.0" "3.1" "3.2" "3.3" "3.4" "3.5" "3.6" "3.7" "3.8" "3.9" "4.0" "4.1" "4.2" "4.3" "4.4" "4.5")
-Denominators=("2" "4")
+Denominators=("2")
 ExperienceState=("current" "final")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
@@ -113,7 +113,7 @@ for x in ${InputFiles[*]}; do
         StateMachineCoeff=("6.0" "12.0")
     fi 
     
-    StateMachineCoeff=("0.05")
+    StateMachineCoeff+=("0.05")
 #    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5" "6.0")
 #    StateMachineCoeff=("9.0" "12.0")
     echo $input_directory
