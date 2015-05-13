@@ -871,13 +871,16 @@ int main(int argc, char *argv[]) {
 			}
 			int each_bucket = sum / num_of_buckets;
 			sum = 0;
+
+			int bucket_num = 1;
 			for(int j = 0; j < 1000; j++) {
 				sum += num[i][j];
 				if(sum < each_bucket) {
 					continue;
 				}
-				cristian_fout << i << " " << j << " " << sum / ((double)denom[i][j] + 1) << endl;
+				cristian_fout << i << " " << bucket_num	 << " " << sum / ((double)denom[i][j] + 1) << endl;
 				sum = 0;
+				bucket_num++;
 			}
 		}
 	}
