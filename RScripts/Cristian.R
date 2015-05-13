@@ -1,5 +1,5 @@
 draw_cristian_plot <- function(dataset, coeff, binary) {
-    t = read.table(paste("~/Documents/Amazon/Output_All/",dataset,"_bursts/RealTime/MaxBenefit/", dataset, "_cristian_probability_", binary, "_comparison_top500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)    
+    t = read.table(paste("~/Documents/Amazon/Output_All/",dataset,"_bursts/RealTime/MaxBenefit/", dataset, "_cristian_probability_", binary, "_comparison_top500_innovations_20_buckets_coeff", coeff, ".txt", sep=""), header=TRUE)    
     colnames(t) = c("V1", "V2", "V3")
 #    t1 = t[(t$V1 == 1) & (t$V3 > 0),]
 #    t2 = t[(t$V1 == 2) & (t$V3 > 0),]
@@ -16,7 +16,7 @@ draw_cristian_plot <- function(dataset, coeff, binary) {
     maxi = max(t2$V3, maxi)
     maxi = max(t3$V3, maxi)
     maxi = max(t4$V3, maxi)
-    name = paste("~/Pictures/today/", dataset, "_cristian_probability_", binary, "_comparison_top500_innovations_coeff", coeff, ".png"  ,sep="")
+    name = paste("~/Pictures/today/", dataset, "_cristian_probability_", binary, "_comparison_top500_innovations_20_buckets_coeff", coeff, ".png"  ,sep="")
     png(file = name)
     plot(t1$V2, t1$V3, type ="l", col = "blue", xlab="current xp", ylab="# innovations used", xlim =c(0,200), ylim = c(0, maxi))
     lines(t2$V2, t2$V3, type ="l", col = "green", xlab="current xp", ylab="# innovations used")
