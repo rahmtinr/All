@@ -263,7 +263,8 @@ int main(int argc, char *argv[]) {
 
 	ofstream filtered_words_fout(filename.c_str());
 	for(int i = 0; i < (int)top_innovations.size(); i++) {
-		if(latest[top_innovations[i].word] - earliest[top_innovations[i].word] > 52 * 4) { // a life cycle of at least 4 year
+		cerr << latest[top_innovations[i].word] << " " << earliest[top_innovations[i].word] << endl;
+		if(latest[top_innovations[i].word] - earliest[top_innovations[i].word] > 52 * 8) { // a life cycle of at least 4 year
 			filtered_words_fout << top_innovations[i].word << " " << top_innovations[i].burst_start << endl;
 			counter++;
 		}

@@ -15,6 +15,9 @@ DBLPAnalysis: DBLPAnalysis.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.
 AmazonAnalysis: AmazonAnalysis.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
 	${CC} -o amazonAnalysis AmazonAnalysisMain.o ${CFLAGS}
 
+minLife : minLife.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
+	${CC} -o minLife AmazonLifeSpanWords.o ${CFLAGS}
+
 main.o : main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c main.cpp ${CFLAGS}
 
@@ -27,6 +30,9 @@ DBLPFindInnovation.o : DBLPFindInnovationMain.cpp MyUtility.o Reviews.o AmazonUt
 DBLPAnalysis.o : DBLPAnalysisMain.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c DBLPAnalysisMain.cpp ${CFLAGS}
 
+
+minLife.o : AmazonLifeSpanWords.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
+	${CC} -c AmazonLifeSpanWords.cpp ${CFLAGS}
 
 ReviewReader.o : ReviewReader.h AmazonUtility.h
 	${CC} -c ReviewReader.h ${CFLAGS}
