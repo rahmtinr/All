@@ -48,6 +48,7 @@ string filename;
 string burst_mode;
 string real_time;
 map<string, int> earliest, latest;
+int check[6][30000];
 void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
@@ -240,6 +241,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	const int CUT_OFF_EXP = 10;
+	int buckets[6] = {-200, -100, 0, 100, 200, 10000};
+	memset(check, 0, sizeof check);
 	for(Review review : reviews) {
 		if(review.final_experience_level < CUT_OFF_EXP) {
 			continue;
@@ -251,11 +254,25 @@ int main(int argc, char *argv[]) {
 			if(innovation_words.find(s) == innovation_words.end()) {
 				continue;
 			}
-			if(earliest.find(s) == earliest.end()){
-				earliest[s] = review.time.day;
+			int index = innovation_words[s];
+			int relative_year = review.time.day - top_innovations[index].burst_start;
+			for(int i = 0; i <6; i++) {
+				if(relative_year < buckets[i]) {
+					check[i][index] = 1;
+					break;
+				}
 			}
-			latest[s] = review.time.day;
 		}
+	}
+	for(int i = 0; i < 30000; i++) {
+		int sum = 0;
+		for(int j = 0; j < 6; j++) {
+			sum += check[j][i];
+		}
+		if(sum < 6) { // not all of the buckets contain that word
+			check[0][i] = 0;
+		}
+		//check is one otherwise
 	}
 	int counter = 0;
 	string filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_coeff_" +
@@ -263,8 +280,7 @@ int main(int argc, char *argv[]) {
 
 	ofstream filtered_words_fout(filename.c_str());
 	for(int i = 0; i < (int)top_innovations.size(); i++) {
-		cerr << latest[top_innovations[i].word] << " " << earliest[top_innovations[i].word] << endl;
-		if(latest[top_innovations[i].word] - earliest[top_innovations[i].word] > 52 * 8) { // a life cycle of at least 4 year
+		if(check[0][i] == 1) { // it appeaered in all buckets
 			filtered_words_fout << top_innovations[i].word << " " << top_innovations[i].burst_start << endl;
 			counter++;
 		}
