@@ -785,8 +785,8 @@ int main(int argc, char *argv[]) {
 		cerr << "Comparison to no country for old men" << endl;
 		int K;
 		int K_bef = 0;
-		int num[5][50000];
-		int denom[5][50000];
+		int num[5][70000];
+		int denom[5][70000];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
 		int denominator = 4;
@@ -809,7 +809,7 @@ int main(int argc, char *argv[]) {
 			fraction = 1 / fraction;
 			cerr << "FINDING K for " << fraction << endl;
 			{
-				vector<int> counter_exp(50010);
+				vector<int> counter_exp(70010);
 				fill(counter_exp.begin(), counter_exp.end(), 0);
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // EXP - final
@@ -819,6 +819,7 @@ int main(int argc, char *argv[]) {
 				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
 					index++;
 					alpha += counter_exp[index];
+					cerr << alpha * fraction << " " << num_of_reviews_more_than_cut_off << endl;
 				}
 				K = index;
 			}
