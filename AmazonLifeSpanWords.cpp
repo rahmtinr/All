@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
 	}
 	const int CUT_OFF_EXP = 10;
 	int buckets[6] = {-100, -50, 0, 50, 100, 10000};
-	if(Global::NAMEOFDATASET.substr(0,6) != "reddit") {
+	if(reddit == false) {
 		buckets[0] = -200;
 		buckets[1] = -100;
 		buckets[2] = 0;

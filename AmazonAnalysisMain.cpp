@@ -128,7 +128,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::remove_unknown = true;
 
 	//Output Directory
-	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_";
+	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_min_life_span_";
 	//Read StopWords
 	ifstream fin_stop_words("stopwords.txt");
 	string s;
@@ -572,7 +572,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 0
+#if 1
 	{
 		cerr << "Got to median comparison" << endl;
 		// Median comparison
@@ -885,7 +885,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 0
+#if 1
 	{
 		cerr << "Got to median comparison for only the first occurrence for each user" << endl;
 		// Median comparison
@@ -1073,7 +1073,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 0
+#if 1
 	{
 		cerr << "Starting the distribution comparison (review on exp vs innovation on exp) and (innovation on exp vs random pick on exp)" << endl;
 		// innovations vs num of reviews for authors with more than 20 reviews
