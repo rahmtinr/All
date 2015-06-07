@@ -11,6 +11,14 @@ then
     echo "Compilation error!"
     exit 0
 fi
+
+make minLife
+if [ $? -ne 0 ]
+then
+    echo "Compilation error!"
+    exit 0
+fi
+
 #rm largest_bucket.txt
 #touch largest_bucket.txt
 input_directory=$1
@@ -136,6 +144,7 @@ for x in ${InputFiles[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
+                       ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator
                        ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator
                     done
                 done

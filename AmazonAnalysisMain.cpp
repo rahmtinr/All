@@ -215,9 +215,9 @@ int main(int argc, char *argv[]) {
 		int x;
 		string filename;
 		if(cristians_innovations == false) {
-			filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+			filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		} else {
-			filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.05_dict.txt";
+			filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_cristian_0.05_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
