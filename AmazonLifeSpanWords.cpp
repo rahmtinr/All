@@ -243,7 +243,12 @@ int main(int argc, char *argv[]) {
 	const int CUT_OFF_EXP = 10;
 	int buckets[6] = {-100, -50, 0, 50, 100, 10000};
 	if(Global::NAMEOFDATASET.substr(0,6) != "reddit") {
-		buckets = {-200, -100, 0, 100, 200, 10000};
+		buckets[0] = -200;
+		buckets[1] = -100;
+		buckets[2] = 0;
+		buckets[3] = 100;
+		buckets[4] = 200;
+		buckets[5] = 10000;
 	}
 	memset(check, 0, sizeof check);
 	for(Review review : reviews) {
