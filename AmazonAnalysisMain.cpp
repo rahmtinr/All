@@ -128,7 +128,7 @@ void initialize(char *argv[]) {
 	Amazon::Global::remove_unknown = true;
 
 	//Output Directory
-	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_min_life_span_";
+	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_";
 	//Read StopWords
 	ifstream fin_stop_words("stopwords.txt");
 	string s;
@@ -216,10 +216,12 @@ int main(int argc, char *argv[]) {
 		string filename;
 		if(cristians_innovations == false) {
 			filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+            cerr << filename << endl;
 		} else {
 			filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_cristian_0.05_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
+        Amazon::Global::output_directory += "mlf_";
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 
 		while(fin_innovation_best_burst >> s >> x) {
@@ -785,8 +787,8 @@ int main(int argc, char *argv[]) {
 		cerr << "Comparison to no country for old men" << endl;
 		int K;
 		int K_bef = 0;
-		int num[5][70000];
-		int denom[5][70000];
+		int num[5][200000];
+		int denom[5][200000];
 		const int CUT_OFF_EXP = 10;
 		int num_of_reviews_more_than_cut_off = 0;
 		int denominator = 4;
@@ -809,7 +811,7 @@ int main(int argc, char *argv[]) {
 			fraction = 1 / fraction;
 			cerr << "FINDING K for " << fraction << endl;
 			{
-				vector<int> counter_exp(70010);
+				vector<int> counter_exp(200010);
 				fill(counter_exp.begin(), counter_exp.end(), 0);
 				for(int i = 0; i <(int) reviews.size(); i++) {
 					counter_exp[reviews[i].final_experience_level]++; // EXP - final
@@ -819,7 +821,7 @@ int main(int argc, char *argv[]) {
 				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
 					index++;
 					alpha += counter_exp[index];
-					cerr << alpha * fraction << " " << num_of_reviews_more_than_cut_off << endl;
+		//			cerr << alpha * fraction << " " << num_of_reviews_more_than_cut_off << endl;
 				}
 				K = index;
 			}

@@ -22,7 +22,10 @@ fi
 #rm largest_bucket.txt
 #touch largest_bucket.txt
 input_directory=$1
+
 InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+
+#InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -121,7 +124,7 @@ for x in ${InputFiles[*]}; do
         StateMachineCoeff=("6.0" "12.0")
     fi 
     
-    StateMachineCoeff+=("0.05")
+#    StateMachineCoeff+=("0.05")
 #    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5" "6.0")
 #    StateMachineCoeff=("9.0" "12.0")
     echo $input_directory
@@ -140,11 +143,11 @@ for x in ${InputFiles[*]}; do
 #               mkdir $output_directory"AggregationPlots"
 #               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
                 echo "Done With finding the innovations"
+#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4
                 for q in ${ExperienceState[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-                       ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator
                        ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator
                     done
                 done

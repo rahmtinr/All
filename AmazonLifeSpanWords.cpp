@@ -48,7 +48,7 @@ string filename;
 string burst_mode;
 string real_time;
 map<string, int> earliest, latest;
-int check[6][30000];
+int check[6][100000];
 void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
@@ -242,7 +242,8 @@ int main(int argc, char *argv[]) {
 	}
 	const int CUT_OFF_EXP = 10;
 	int buckets[6] = {-100, -50, 0, 50, 100, 10000};
-	if(reddit == false) {
+/*
+    if(reddit == false) {
 		buckets[0] = -200;
 		buckets[1] = -100;
 		buckets[2] = 0;
@@ -250,6 +251,7 @@ int main(int argc, char *argv[]) {
 		buckets[4] = 200;
 		buckets[5] = 10000;
 	}
+    */
 	memset(check, 0, sizeof check);
 	for(Review review : reviews) {
 		if(review.final_experience_level < CUT_OFF_EXP) {
