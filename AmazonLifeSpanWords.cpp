@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 			}
 			int index = innovation_words[s];
 			int relative_year = review.time.day - top_innovations[index].burst_start;
-			for(int i = 0; i <6; i++) {
+			for(int i = 0; i < 6; i++) {
 				if(relative_year < buckets[i]) {
 					check[i][index] = 1;
 					break;

@@ -668,8 +668,8 @@ int main(int argc, char *argv[]) {
 		cerr << "I'm gonna start bucketing" << endl;
 		// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 		{
-			const int bucket_num_size = 8;
-			int bucket_num[bucket_num_size] = {100, 500, 1000, 2000, 5000, 10000, 20000, 30000};
+			const int bucket_num_size = 1;
+			int bucket_num[bucket_num_size] = {100/*, 500, 1000, 2000, 5000, 10000, 20000, 30000*/};
 			for(int bucket_index = 0; bucket_index < bucket_num_size; bucket_index++) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					authors_exp_relative_to_burst[i] = make_pair(0, 0);
@@ -680,6 +680,7 @@ int main(int argc, char *argv[]) {
 				week[0] = -1100;
 				int each_bucket = bucket_num[bucket_index];
 				long long sum = 0;
+			/*
 				if(bucket_index == bucket_num_size - 1) {
 					int iterations = 0;
 					while(true) {
@@ -698,7 +699,7 @@ int main(int argc, char *argv[]) {
 							break;
 						}
 					}
-				} else {
+				} else {*/
 					for(int j = 0; j < REL_SIZE; j++) {
 						sum += num_of_innovative_reviews_relative_to_burst[j];
 						if(sum > each_bucket) {
@@ -706,7 +707,7 @@ int main(int argc, char *argv[]) {
 							sum = 0;
 						}
 					}
-				}
+	//			}
 				for(int i = 0; i < (int)reviews.size(); i++) {
 					if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
 						continue;
@@ -888,7 +889,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0
 	{
 		cerr << "Got to median comparison for only the first occurrence for each user" << endl;
 		// Median comparison
@@ -1076,7 +1077,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0
 	{
 		cerr << "Starting the distribution comparison (review on exp vs innovation on exp) and (innovation on exp vs random pick on exp)" << endl;
 		// innovations vs num of reviews for authors with more than 20 reviews
