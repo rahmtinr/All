@@ -149,9 +149,10 @@ int main(int argc, char *argv[]) {
 	initialize(argv);
 	ifstream fin(argv[1]);
 	bool reddit = false;
-	if(Global::NAMEOFDATASET.substr(0, 6)== "reddit") {
+	if(Global::NAMEOFDATASET.substr(0, 6)== "reddit" || Global::NAMEOFDATASET.substr(6, 12)== "reddit") {
 		reddit = true;
 	}
+	cerr << reddit << endl;
 	// Read input.
 	while (true) {
 		if(reddit == false) {
