@@ -124,10 +124,18 @@ void initialize(char *argv[]) {
 		}
 		stop_words.insert(s);
 	}
+	{
+		string temp(argv[6]);
+		if(temp == "Bigram") {
+			Amazon::Global::bigram = true;
+		} else {
+			Amazon::Global::bigram = false;
+		}
+	}
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 6) {
+	if(argc != 7) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -289,16 +297,21 @@ int main(int argc, char *argv[]) {
 			burst_innovation.insert(word_states);
 		}
 	}
-	string filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+	string bigram_string = "words_";
+	if(Amazon::Global::bigram == true) {
+		bigram_string = "bigrams_";
+	}
+	string filename = Amazon::Global::output_directory +  bigram_string + "start_burst_coeff_" + bigram_string + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 	ofstream innovation_burst_year_out(filename.c_str());
 
-	string filename2 = Amazon::Global::output_directory + "words_start_burst_freq_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+	string filename2 = Amazon::Global::output_directory + bigram_string + "start_burst_freq_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 	ofstream innovation_burst_year_freq_out(filename2.c_str());
 
 	for(WordTimeLine word_time_line : burst_innovation) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
 		innovation_burst_year_freq_out << word_time_line.word << "   " << word_time_line.burst_start << " " << word_time_line.review_index->size() << endl;
 	}
+#if 0
 	cerr << " burst size: " << burst_innovation.size() << endl;
 	{
 		string filename = Amazon::Global::output_directory + "innovation_words_summary_different_coeff.txt";
@@ -340,6 +353,8 @@ int main(int argc, char *argv[]) {
 		}
 		fout_append << Amazon::Global::state_coeffecient << " " << average << " " << median << endl;
 	}
+#endif
+
 #if 0
 
 	ofstream fout(Amazon::Global::output_directory + "timeline.txt");

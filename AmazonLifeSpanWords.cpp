@@ -78,6 +78,14 @@ void initialize(char *argv[]) {
 		}
 		cerr << "denominator: " << " " << temp << " " << Amazon::Global::denominator << endl;
 	}
+	{
+		string temp(argv[8]);
+		if(temp == "Bigram") {
+			Amazon::Global::bigram = true;
+		} else {
+			Amazon::Global::bigram = false;
+		}
+	}
 	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
 		if(filename[i] == '/' && last_slash == -1) {
@@ -150,7 +158,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 8) {
+	if(argc != 9) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -222,10 +230,14 @@ int main(int argc, char *argv[]) {
 		string s;
 		int x;
 		string filename;
+		string bigram_string = "words_";
+		if(Amazon::Global::bigram == true) {
+			bigram_string = "bigrams_";
+		}
 		if(cristians_innovations == false) {
-			filename = Amazon::Global::output_directory + "words_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+			filename = Amazon::Global::output_directory + bigram_string + "start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		} else {
-			filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.05_dict.txt";
+			filename = Amazon::Global::output_directory + bigram_string + "start_burst_cristian_0.05_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
 
@@ -285,7 +297,11 @@ int main(int argc, char *argv[]) {
 		//check is one otherwise
 	}
 	int counter = 0;
-	string filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_coeff_" +
+	string bigram_string = "words_";
+	if(Amazon::Global::bigram == true) {
+		bigram_string == "bigrams_";
+	}
+	string filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" +
 			SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 
 	ofstream filtered_words_fout(filename.c_str());

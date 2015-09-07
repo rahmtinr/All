@@ -78,6 +78,7 @@ public:
 	static vector<double> sum_ln;
 	static bool final;
 	static int denominator;
+	static bool bigram;
 };
 }
 
@@ -157,5 +158,6 @@ bool Amazon::Global::state_machine_doc_ratio;
 bool Amazon::Global::final;
 vector<double> Amazon::Global::sum_ln;
 int Amazon::Global::denominator;
+bool Amazon::Global::bigram;
 
 #endif /* AMAZONUTILITY_H_ */

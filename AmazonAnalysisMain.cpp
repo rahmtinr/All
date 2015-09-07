@@ -102,7 +102,14 @@ void initialize(char *argv[]) {
 		cerr << "Third argument did not match! Force quitting." <<endl;
 		exit(0);
 	}
-
+	{
+		string temp(argv[8]);
+		if(temp == "Bigram") {
+			Amazon::Global::bigram = true;
+		} else {
+			Amazon::Global::bigram = false;
+		}
+	}
 	cerr << Global::NAMEOFDATASET <<endl;
 	cerr << "Final = " << argv[6] << " " << Amazon::Global::final << endl;
 	// Preprocess
@@ -142,7 +149,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 8) {
+	if(argc != 9) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}
@@ -152,7 +159,6 @@ int main(int argc, char *argv[]) {
 	if(Global::NAMEOFDATASET.find("reddit") != string::npos) {
 		reddit = true;
 	}
-	cerr << reddit << endl;
 	// Read input.
 	while (true) {
 		if(reddit == false) {
@@ -215,16 +221,22 @@ int main(int argc, char *argv[]) {
 		string s;
 		int x;
 		string filename;
+		string bigram_string = "words_";
+		if(Amazon::Global::bigram == true) {
+			bigram_string = "bigrams_";
+		}
 		if(cristians_innovations == false) {
-			filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
             cerr << filename << endl;
 		} else {
-			filename = Amazon::Global::output_directory + "words_min_life_span_start_burst_cristian_0.05_dict.txt";
+			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_cristian_0.05_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
         Amazon::Global::output_directory += "mlf_";
-		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 
+        Amazon::Global::output_directory += bigram_string;
+		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
+		cerr << "-----> " << Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt" << endl;
 		while(fin_innovation_best_burst >> s >> x) {
 			if(s == "") {
 				continue;
