@@ -299,6 +299,7 @@ int main(int argc, char *argv[]) {
 	}
 	string bigram_string = "words_";
 	if(Amazon::Global::bigram == true) {
+		cerr << "KIRE KHAR MADAR JENDE" << endl;
 		bigram_string = "bigrams_";
 	}
 	string filename = Amazon::Global::output_directory +  bigram_string + "start_burst_coeff_" + bigram_string + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
