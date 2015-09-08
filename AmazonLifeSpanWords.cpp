@@ -86,6 +86,7 @@ void initialize(char *argv[]) {
 			Amazon::Global::bigram = false;
 		}
 	}
+
 	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
 		if(filename[i] == '/' && last_slash == -1) {
@@ -303,7 +304,7 @@ int main(int argc, char *argv[]) {
 	}
 	string filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" +
 			SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-
+	cerr << "-------> " << filename << endl;
 	ofstream filtered_words_fout(filename.c_str());
 	for(int i = 0; i < (int)top_innovations.size(); i++) {
 		if(check[0][i] == 1) { // it appeaered in all buckets
