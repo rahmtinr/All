@@ -144,12 +144,12 @@ for x in ${InputFiles[*]}; do
 #               mkdir $output_directory"AggregationPlots"
 #               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
                 echo "Done With finding the innovations"
-                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
+#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
                 for q in ${ExperienceState[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Bigram
+                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Bigram
                     done
                 done
 #               time_line_txt=$output_directory$x"_timeline.txt"
