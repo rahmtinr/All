@@ -176,7 +176,7 @@ void initialize(char *argv[]) {
 
 	//Output Directory
 
-	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/" + real_time + "/" + burst_mode + "/" + Global::NAMEOFDATASET + "_";
+	Amazon::Global::output_directory = "../Output_All/"  + Global::NAMEOFDATASET + "_bursts/RealTime/MaxBenefit/" + Global::NAMEOFDATASET + "_";
 
 	//Read StopWords
 	ifstream fin_stop_words("stopwords.txt");
@@ -213,12 +213,14 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+	string filename = Amazon::Global::output_directory + "capital_bigrams.txt";
+	ofstream fout(filename.c_str());
 	for (pair<string, int> my_pair : capital_bigrams) {
 		string temp = SimpleToLower(my_pair.first);
 		int total_usage = all_bigrams_lowered[temp];
 		double ratio = (double)my_pair.second / total_usage;
 		if(ratio > 0.3 && total_usage > 30) {
-			cerr << my_pair.first << " " << ratio << endl;
+			fout << my_pair.first << endl;
 		}
 	}
 	cerr << "trying to finish it!" << endl;
