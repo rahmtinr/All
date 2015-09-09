@@ -216,8 +216,9 @@ int main(int argc, char *argv[]) {
 	for (pair<string, int> my_pair : capital_bigrams) {
 		string temp = SimpleToLower(my_pair.first);
 		cerr << my_pair.first << " " << my_pair.second << " "  << all_bigrams_lowered[temp] << endl;
-		double ratio = (double)my_pair.second / all_bigrams_lowered[temp];
-		if(ratio > 0.3) {
+		int total_usage = all_bigrams_lowered[temp];
+		double ratio = (double)my_pair.second / total_usage;
+		if(ratio > 0.3 && total_usage > 30) {
 			cerr << my_pair.first << " " << ratio << endl;
 		}
 	}
