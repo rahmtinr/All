@@ -200,7 +200,6 @@ int main(int argc, char *argv[]) {
 	}
 	initialize(argv);
 	ifstream fin(argv[1]);
-	ifstream fin2(argv[2]);
 	// Read input.
 	bool reddit = false;
 	if(Global::NAMEOFDATASET.substr(0, 6) == "reddit") {
@@ -220,6 +219,7 @@ int main(int argc, char *argv[]) {
 	}
 	for (pair<string, int> my_pair : capital_bigrams) {
 		string temp = SimpleToLower(my_pair.first);
+		cerr << my_pair.first << " " << my_pair.second << " "  << all_bigrams_lowered[temp] << endl;
 		double ratio = (double)my_pair.second / all_bigrams_lowered[temp];
 		if(ratio > 0.3) {
 			cerr << my_pair.first << " " << ratio << endl;
