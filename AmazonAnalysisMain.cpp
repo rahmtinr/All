@@ -62,14 +62,14 @@ void initialize(char *argv[]) {
 		}
 	}
 	{
-			string temp(argv[7]);
-			if(temp == "4") {
-				Amazon::Global::denominator = 4;
-			} else {
-				Amazon::Global::denominator = 2;
-			}
-			cerr << "denominator: " << " " << temp << " " << Amazon::Global::denominator << endl;
+		string temp(argv[7]);
+		if(temp == "4") {
+			Amazon::Global::denominator = 4;
+		} else {
+			Amazon::Global::denominator = 2;
 		}
+		cerr << "denominator: " << " " << temp << " " << Amazon::Global::denominator << endl;
+	}
 	int last_slash = -1, last_dot = 0;
 	for(int i = filename.length() - 1; i >=0; i--) {
 		if(filename[i] == '/' && last_slash == -1) {
@@ -227,14 +227,13 @@ int main(int argc, char *argv[]) {
 		}
 		if(cristians_innovations == false) {
 			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-            cerr << filename << endl;
+			cerr << filename << endl;
 		} else {
 			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_cristian_0.05_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
-        Amazon::Global::output_directory += "mlf_";
-
-        Amazon::Global::output_directory += bigram_string;
+		Amazon::Global::output_directory += "mlf_";
+		Amazon::Global::output_directory += bigram_string;
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 		cerr << "-----> " << Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt" << endl;
 		while(fin_innovation_best_burst >> s >> x) {
@@ -693,7 +692,7 @@ int main(int argc, char *argv[]) {
 				week[0] = -1100;
 				int each_bucket = bucket_num[bucket_index];
 				long long sum = 0;
-			/*
+				/*
 				if(bucket_index == bucket_num_size - 1) {
 					int iterations = 0;
 					while(true) {
@@ -713,14 +712,14 @@ int main(int argc, char *argv[]) {
 						}
 					}
 				} else {*/
-					for(int j = 0; j < REL_SIZE; j++) {
-						sum += num_of_innovative_reviews_relative_to_burst[j];
-						if(sum > each_bucket) {
-							week[first_empty++] = j + 1;
-							sum = 0;
-						}
+				for(int j = 0; j < REL_SIZE; j++) {
+					sum += num_of_innovative_reviews_relative_to_burst[j];
+					if(sum > each_bucket) {
+						week[first_empty++] = j + 1;
+						sum = 0;
 					}
-	//			}
+				}
+				//			}
 				for(int i = 0; i < (int)reviews.size(); i++) {
 					if(final == true && reviews[i].final_experience_level < CUT_OFF_EXP) {
 						continue;
@@ -835,7 +834,7 @@ int main(int argc, char *argv[]) {
 				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
 					index++;
 					alpha += counter_exp[index];
-		//			cerr << alpha * fraction << " " << num_of_reviews_more_than_cut_off << endl;
+					//			cerr << alpha * fraction << " " << num_of_reviews_more_than_cut_off << endl;
 				}
 				K = index;
 			}
@@ -859,11 +858,11 @@ int main(int argc, char *argv[]) {
 						continue;
 					}
 					int innovation_index = innovation_words[s];
-/*
+					/*
 					if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 5 <= reviews[i].time.day) { // the range where we count the word as an innovation
 						continue;
 					}
-*/
+					 */
 					num[numerator][reviews[i].current_experience_level]++; // Only the max final_exp added
 				}
 			}
@@ -997,8 +996,8 @@ int main(int argc, char *argv[]) {
 							}
 						}
 						if(first_empty < 30) {
-				//			ofstream largest_bucket_fout("largest_bucket.txt", ios::out | ios::app);
-				//			largest_bucket_fout << "Name: " << Global::NAMEOFDATASET << " Final:" << Amazon::Global::final << " coeff:" << Amazon::Global::state_coeffecient << " each bucket:" << each_bucket << endl;
+							//			ofstream largest_bucket_fout("largest_bucket.txt", ios::out | ios::app);
+							//			largest_bucket_fout << "Name: " << Global::NAMEOFDATASET << " Final:" << Amazon::Global::final << " coeff:" << Amazon::Global::state_coeffecient << " each bucket:" << each_bucket << endl;
 							break;
 						}
 					}
@@ -1123,10 +1122,10 @@ int main(int argc, char *argv[]) {
 					continue;
 				}
 				int innovation_index = innovation_words[s];
-	/*			if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 1 <= reviews[i].time.day) { // the range where we count the word as an innovation
+				/*			if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 1 <= reviews[i].time.day) { // the range where we count the word as an innovation
 					continue;
 				}
-	*/
+				 */
 				innovation_denom++;
 				if(final == true) {
 					exp_innovoation_num[reviews[i].final_experience_level]++;
