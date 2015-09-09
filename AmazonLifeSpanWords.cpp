@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
 	int counter = 0;
 	string bigram_string = "words_";
 	if(Amazon::Global::bigram == true) {
-		bigram_string == "bigrams_";
+		bigram_string =	 "bigrams_";
 	}
 	string filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" +
 			SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
