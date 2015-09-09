@@ -101,9 +101,7 @@ bool ReadOneReview2(std::ifstream& fin, vector<Review> *reviews) {
 		review.summary = RemoveStopWords2(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
 		getline(fin, raw_input);
 		review.text = review.product_title + " " + RemoveStopWords2(RemoveAllSymbols(GetField(raw_input))) + " ";
-		if(Amazon::Global::bigram == true) {
-			review.text = MakeBigram2(review.text);
-		}
+		review.text = MakeBigram2(review.text);
 		getline(fin, raw_input);
 		if(Amazon::Global::remove_unknown == false ||
 				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
@@ -137,9 +135,7 @@ bool ReadOneRedditReview2(std::ifstream& fin, vector<Review> *reviews) {
 		review.time = MyTime(localtime(&review_time));
 		getline(fin, raw_input);
 		review.text = RemoveStopWords2(RemoveAllSymbols(GetField(raw_input))) + " ";
-		if(Amazon::Global::bigram == true) {
-			review.text = MakeBigram2(review.text);
-		}
+		review.text = MakeBigram2(review.text);
 		getline(fin, raw_input);
 		if(Amazon::Global::remove_unknown == false ||
 				(Amazon::Global::remove_unknown == true && review.user_id != "[deleted]")) {
