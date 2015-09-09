@@ -26,12 +26,13 @@ input_directory=$1
 #InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 
 #InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+#InputFiles=("reddit_Music" "reddit_movies" "Movies_and_TV")
 InputFiles=("Music")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-Denominators=("2")
-ExperienceState=("current" "final")
+Denominators=(4)
+ExperienceState=("final")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
     if [[ $x == "reddit_funny" ]]
@@ -143,12 +144,12 @@ for x in ${InputFiles[*]}; do
 #               mkdir $output_directory"AggregationPlots"
 #               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
                 echo "Done With finding the innovations"
-#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
+                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
                 for q in ${ExperienceState[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Bigram
+#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Bigram
                     done
                 done
 #               time_line_txt=$output_directory$x"_timeline.txt"
