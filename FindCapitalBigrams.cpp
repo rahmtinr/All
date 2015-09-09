@@ -101,9 +101,7 @@ bool ReadOneReview2(std::ifstream& fin, vector<Review> *reviews) {
 		review.summary = RemoveStopWords2(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
 		getline(fin, raw_input);
 		review.text = review.product_title + " " + RemoveStopWords2(RemoveAllSymbols(GetField(raw_input))) + " ";
-		if(Amazon::Global::bigram == true) {
-			review.text = MakeBigram2(review.text);
-		}
+		review.text = MakeBigram2(review.text);
 		getline(fin, raw_input);
 		if(Amazon::Global::remove_unknown == false ||
 				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
@@ -137,9 +135,7 @@ bool ReadOneRedditReview2(std::ifstream& fin, vector<Review> *reviews) {
 		review.time = MyTime(localtime(&review_time));
 		getline(fin, raw_input);
 		review.text = RemoveStopWords2(RemoveAllSymbols(GetField(raw_input))) + " ";
-		if(Amazon::Global::bigram == true) {
-			review.text = MakeBigram2(review.text);
-		}
+		review.text = MakeBigram2(review.text);
 		getline(fin, raw_input);
 		if(Amazon::Global::remove_unknown == false ||
 				(Amazon::Global::remove_unknown == true && review.user_id != "[deleted]")) {
@@ -200,7 +196,6 @@ int main(int argc, char *argv[]) {
 	}
 	initialize(argv);
 	ifstream fin(argv[1]);
-	ifstream fin2(argv[2]);
 	// Read input.
 	bool reddit = false;
 	if(Global::NAMEOFDATASET.substr(0, 6) == "reddit") {
@@ -220,6 +215,7 @@ int main(int argc, char *argv[]) {
 	}
 	for (pair<string, int> my_pair : capital_bigrams) {
 		string temp = SimpleToLower(my_pair.first);
+		cerr << my_pair.first << " " << my_pair.second << " "  << all_bigrams_lowered[temp] << endl;
 		double ratio = (double)my_pair.second / all_bigrams_lowered[temp];
 		if(ratio > 0.3) {
 			cerr << my_pair.first << " " << ratio << endl;
