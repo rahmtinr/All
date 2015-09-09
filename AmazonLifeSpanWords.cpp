@@ -48,7 +48,7 @@ string filename;
 string burst_mode;
 string real_time;
 map<string, int> earliest, latest;
-int check[6][100000];
+int check[6][1000000];
 void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];
@@ -82,6 +82,7 @@ void initialize(char *argv[]) {
 		string temp(argv[8]);
 		if(temp == "Bigram") {
 			Amazon::Global::bigram = true;
+            cerr << " AAAAH " << endl;
 		} else {
 			Amazon::Global::bigram = false;
 		}
@@ -300,7 +301,7 @@ int main(int argc, char *argv[]) {
 	int counter = 0;
 	string bigram_string = "words_";
 	if(Amazon::Global::bigram == true) {
-		bigram_string == "bigrams_";
+		bigram_string =	 "bigrams_";
 	}
 	string filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" +
 			SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";

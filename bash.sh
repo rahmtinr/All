@@ -6,7 +6,7 @@ then
 fi
 
 make AmazonAnalysis
-if [ $? -ne 0 ]
+if [ $? -ne 0 ] 
 then
     echo "Compilation error!"
     exit 0
@@ -23,13 +23,13 @@ fi
 #touch largest_bucket.txt
 input_directory=$1
 
-InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+#InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 
 #InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+InputFiles=("Music")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-StateMachineCoeff=("3.0" "3.1" "3.2" "3.3" "3.4" "3.5" "3.6" "3.7" "3.8" "3.9" "4.0" "4.1" "4.2" "4.3" "4.4" "4.5")
 Denominators=("2")
 ExperienceState=("current" "final")
 for x in ${InputFiles[*]}; do
@@ -125,8 +125,8 @@ for x in ${InputFiles[*]}; do
     fi 
     
 #    StateMachineCoeff+=("0.05")
-#    StateMachineCoeff=("2.6" "2.8" "3.0" "3.2" "3.4" "3.6" "3.8" "4.0" "4.2" "4.5" "6.0")
-#    StateMachineCoeff=("9.0" "12.0")
+    StateMachineCoeff=("4.2" "4.5" "6.0")
+    StateMachineCoeff+=("9.0" "12.0")
     echo $input_directory
     for y in ${TimeMode[*]}; do
         time_mode=$y;
@@ -141,14 +141,14 @@ for x in ${InputFiles[*]}; do
 #               rm $output_directory* -rf
 #               mkdir $output_directory"BurstPlots"
 #               mkdir $output_directory"AggregationPlots"
-#               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff
+#               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
                 echo "Done With finding the innovations"
-#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4
+#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
                 for q in ${ExperienceState[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator
+                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Bigram
                     done
                 done
 #               time_line_txt=$output_directory$x"_timeline.txt"
