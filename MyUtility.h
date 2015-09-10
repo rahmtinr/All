@@ -120,7 +120,13 @@ string SimpleDoubleToString(double x) {
 	stringstream ss;
 	ss << x;
 	ss >> ret;
-	if(ret.length() == 1) {
+	bool check = false;
+	for(int i = 0; (int) i < ret.length(); i++) {
+		if(ret[i] == '.') {
+			check = true;
+		}
+	}
+	if(check == false) {
 		ret += ".0";
 	}
 	return ret;

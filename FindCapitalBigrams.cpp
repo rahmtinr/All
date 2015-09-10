@@ -25,7 +25,6 @@
 #include "Videos.h"
 using namespace std;
 
-
 vector<Review> reviews;
 // Langauge innovations
 string MODE;
