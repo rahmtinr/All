@@ -213,13 +213,13 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
-	string filename = Amazon::Global::output_directory + "capital_bigrams.txt";
+	string filename = Amazon::Global::output_directory + "capital_bigrams2.txt";
 	ofstream fout(filename.c_str());
 	for (pair<string, int> my_pair : capital_bigrams) {
 		string temp = SimpleToLower(my_pair.first);
 		int total_usage = all_bigrams_lowered[temp];
 		double ratio = (double)my_pair.second / total_usage;
-		if(ratio > 0.3 && total_usage > 30) {
+		if(ratio > 0.6 && total_usage > 30) {
 			fout << my_pair.first << endl;
 		}
 	}

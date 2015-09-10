@@ -27,7 +27,7 @@ input_directory=$1
 
 #InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 #InputFiles=("reddit_Music" "reddit_movies" "Movies_and_TV")
-InputFiles=("Music")
+InputFiles=("Music" "Movies_and_TV")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -126,8 +126,8 @@ for x in ${InputFiles[*]}; do
     fi 
     
 #    StateMachineCoeff+=("0.05")
-    StateMachineCoeff=("4.2" "4.5" "6.0")
-    StateMachineCoeff+=("9.0" "12.0")
+#    StateMachineCoeff=("4.2" "4.5" "6.0" "9.0" "12.0")
+    StateMachineCoeff=("30.0")
     echo $input_directory
     for y in ${TimeMode[*]}; do
         time_mode=$y;
