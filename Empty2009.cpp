@@ -330,7 +330,7 @@ int main(int argc, char *argv[]) {
 				if(reviews[index].time.day < 52 * 15) {
 					temp++;
 				} else {
-					if(100 * temp > word_time_line.review_index->size()) { // less than 1 percent should be in 2010
+					if(100 * temp > (int)word_time_line.review_index->size()) { // less than 1 percent should be in 2010
 						break;
 					} else {
 						check = true;

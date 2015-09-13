@@ -121,7 +121,7 @@ string SimpleDoubleToString(double x) {
 	ss << x;
 	ss >> ret;
 	bool check = false;
-	for(int i = 0; (int) i < ret.length(); i++) {
+	for(int i = 0; i < (int)ret.length(); i++) {
 		if(ret[i] == '.') {
 			check = true;
 		}
