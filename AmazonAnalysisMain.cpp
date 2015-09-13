@@ -857,8 +857,8 @@ int main(int argc, char *argv[]) {
 					if(innovation_words.find(s) == innovation_words.end()) {
 						continue;
 					}
-					int innovation_index = innovation_words[s];
 					/*
+					int innovation_index = innovation_words[s];
 					if(top_innovations[innovation_index].burst_start - 1 > reviews[i].time.day || top_innovations[innovation_index].burst_start + 5 <= reviews[i].time.day) { // the range where we count the word as an innovation
 						continue;
 					}

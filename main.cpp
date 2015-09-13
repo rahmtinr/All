@@ -220,12 +220,12 @@ int main(int argc, char *argv[]) {
 		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.05_dict.txt";
 		ofstream fout_cristian_method(filename.c_str());
 		cerr << "# of innovations: " << innovations.size() << endl;
-		for(int i = 0; i < innovations.size(); i++) {
+		for(int i = 0; i < (int)innovations.size(); i++) {
 			int week_that_burst_started = (((innovations[i].second)[0]).time.epoch_time / (24 * 60 * 60) - (25 * 365)) / 7;
 			word_burst_start_date[innovations[i].first] = week_that_burst_started;
 			word_freq[innovations[i].first] = 0;
 		}
-		for(int i = 0; i <reviews.size(); i++) {
+		for(int i = 0; i < (int)reviews.size(); i++) {
 			stringstream ss(reviews[i].text);
 			string s;
 			while(!ss.eof()) {
@@ -242,7 +242,7 @@ int main(int argc, char *argv[]) {
 		}
 		sort(freq_word.begin(), freq_word.end());
 		int starting_point = max(0, (int)freq_word.size() - 500);
-		for(int i = starting_point; i < freq_word.size(); i++) {
+		for(int i = starting_point; i < (int)freq_word.size(); i++) {
 			string word = freq_word[i].second;
 			fout_cristian_method << word << " " << word_burst_start_date[word] << endl;
 		}
@@ -250,7 +250,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
-		for(int i = 0; i < reviews.size(); i++) {
+		for(int i = 0; i < (int)reviews.size(); i++) {
 			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); //setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
 			// Bucket a week
 			reviews[i].time.day /= 7;

@@ -27,7 +27,7 @@ input_directory=$1
 
 #InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 #InputFiles=("reddit_Music" "reddit_movies" "Movies_and_TV")
-InputFiles=("Music" "Movies_and_TV")
+InputFiles=("Movies_and_TV")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
