@@ -69,7 +69,7 @@ string MakeBigram(string raw_input) {
 	string prev, current;
 	ss >> prev;
 	while(ss >> current) {
-		ret += prev + current + " ";
+		ret += prev + "-" + current + " ";
 		prev = current;
 	}
 	return ret;
