@@ -322,7 +322,7 @@ int main(int argc, char *argv[]) {
     cerr << "YAAAAAAAAAH     " << burst_innovation.size() << endl;
 
 	for(WordTimeLine word_time_line : burst_innovation) {
-		if(word_time_line.burst_start < 52 * 16) { // burst should be after start of 2011
+		if(word_time_line.burst_start >	 52 * 16) { // burst should be after start of 2011
 			bool check = false;
 			for(int i = 0; i < (int)word_time_line.review_index->size(); i++) {
 				int index = (*word_time_line.review_index)[i];
@@ -330,11 +330,10 @@ int main(int argc, char *argv[]) {
 				if(reviews[index].time.day < 52 * 15) {
 					temp++;
 				} else {
-					if(100 * temp > (int)word_time_line.review_index->size()) { // less than 1 percent should be in 2010
-						break;
-					} else {
+					if(200 * temp < (int)word_time_line.review_index->size()) { // less than 1 percent should be in 2010
 						check = true;
 					}
+					break;
 				}
 			}
 			if(check == true) {
