@@ -6,6 +6,10 @@ LDFLAGS = -lm
 all : main.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
 	${CC} -o main main.o ${CFLAGS}
 
+
+empty2009 : empty2009.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
+	${CC} -o empty2009 Empty2009.o ${CFLAGS}
+
 DBLPFindInnovation : DBLPFindInnovation.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o ProductRelated.o UserRelated.o Aggregation.o Seasonal.o
 	${CC} -o dblpFindInnovation DBLPFindInnovationMain.o ${CFLAGS}
 
@@ -21,6 +25,9 @@ minLife : minLife.o MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovat
 main.o : main.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c main.cpp ${CFLAGS}
 
+empty2009.o : Empty2009.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
+	${CC} -c Empty2009.cpp ${CFLAGS}
+ 
 AmazonAnalysis.o : AmazonAnalysisMain.cpp MyUtility.o Reviews.o AmazonUtility.o ReviewReader.o Innovations.o Videos.o
 	${CC} -c AmazonAnalysisMain.cpp ${CFLAGS}
 

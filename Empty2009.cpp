@@ -33,7 +33,7 @@
 using namespace std;
 
 
-vector<Review> reviews, after_2009_reviews, in_2009_reviews;
+vector<Review> reviews, after_2009_reviews;
 set<WordTimeLine> words_states;
 vector<WordTimeLine> top_innovations;
 // Langauge innovations
@@ -262,17 +262,15 @@ int main(int argc, char *argv[]) {
 			reviews[i].time.day /= 7;
 			// Bucket a week
 			if(reviews[i].time.day > 52 * 14)  {
-				if(reviews[i].time.day < 52 * 15) {
-					in_2009_reviews.push_back(reviews[i]);
-				}
 				after_2009_reviews.push_back(reviews[i]);
 			}
-			reviews = after_2009_reviews;
 		}
+		reviews = after_2009_reviews;
 		Innovations::FindBurstsDocumentRatio(&words_states, &reviews);
 	} else {
 		Innovations::FindBurstsTimeDifference(&words_states, &reviews);
 	}
+    cerr << "size after filtering " << reviews.size() << endl;
 	for(WordTimeLine word_states : words_states) {
 		string word = word_states.word;
 		vector<bool> states = *(word_states.states);
@@ -321,10 +319,11 @@ int main(int argc, char *argv[]) {
 	string filename2 = Amazon::Global::output_directory + bigram_string + "start_burst_freq_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 	ofstream innovation_burst_year_freq_out(filename2.c_str());
 
+    cerr << "YAAAAAAAAAH     " << burst_innovation.size() << endl;
+
 	for(WordTimeLine word_time_line : burst_innovation) {
 		if(word_time_line.burst_start < 52 * 16) { // burst should be after start of 2011
 			bool check = false;
-			cerr << "I'm in " << endl;
 			for(int i = 0; i < (int)word_time_line.review_index->size(); i++) {
 				int index = (*word_time_line.review_index)[i];
 				long long temp = 0;
@@ -332,7 +331,6 @@ int main(int argc, char *argv[]) {
 					temp++;
 				} else {
 					if(100 * temp > (int)word_time_line.review_index->size()) { // less than 1 percent should be in 2010
-						cerr << temp << " " << (int)word_time_line.review_index->size() << endl;
 						break;
 					} else {
 						check = true;
