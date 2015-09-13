@@ -311,9 +311,9 @@ int main(int argc, char *argv[]) {
 			burst_innovation.insert(word_states);
 		}
 	}
-	string bigram_string = "words_";
+	string bigram_string = "words_empty2009_";
 	if(Amazon::Global::bigram == true) {
-		bigram_string = "bigrams_";
+		bigram_string = "bigrams_empty2009_";
 	}
 	string filename = Amazon::Global::output_directory +  bigram_string + "start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 	ofstream innovation_burst_year_out(filename.c_str());
@@ -346,6 +346,3 @@ int main(int argc, char *argv[]) {
 	cerr << "trying to finish it!" << endl;
 	return 0;
 }
-
-
-
