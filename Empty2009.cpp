@@ -324,6 +324,7 @@ int main(int argc, char *argv[]) {
 	for(WordTimeLine word_time_line : burst_innovation) {
 		if(word_time_line.burst_start < 52 * 16) { // burst should be after start of 2011
 			bool check = false;
+			cerr << "I'm in " << endl;
 			for(int i = 0; i < (int)word_time_line.review_index->size(); i++) {
 				int index = (*word_time_line.review_index)[i];
 				long long temp = 0;
@@ -331,6 +332,7 @@ int main(int argc, char *argv[]) {
 					temp++;
 				} else {
 					if(100 * temp > (int)word_time_line.review_index->size()) { // less than 1 percent should be in 2010
+						cerr << temp << " " << (int)word_time_line.review_index->size() << endl;
 						break;
 					} else {
 						check = true;
