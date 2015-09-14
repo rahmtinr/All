@@ -266,6 +266,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		reviews = after_2009_reviews;
+        after_2009_reviews.clear();
 		Innovations::FindBurstsDocumentRatio(&words_states, &reviews);
 	} else {
 		Innovations::FindBurstsTimeDifference(&words_states, &reviews);
@@ -324,13 +325,14 @@ int main(int argc, char *argv[]) {
 	for(WordTimeLine word_time_line : burst_innovation) {
 		if(word_time_line.burst_start >	 52 * 16) { // burst should be after start of 2011
 			bool check = false;
+			long long temp = 0;
 			for(int i = 0; i < (int)word_time_line.review_index->size(); i++) {
 				int index = (*word_time_line.review_index)[i];
-				long long temp = 0;
 				if(reviews[index].time.day < 52 * 15) {
 					temp++;
 				} else {
 					if(200 * temp < (int)word_time_line.review_index->size()) { // less than 1 percent should be in 2010
+                        cerr << word_time_line.word << " " << temp <<  " " <<  word_time_line.review_index->size() << endl;
 						check = true;
 					}
 					break;
