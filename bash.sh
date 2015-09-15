@@ -33,8 +33,8 @@ input_directory=$1
 #InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 
 #InputFiles=("Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
-InputFiles=("reddit_Music" "reddit_movies" "Movies_and_TV" "Music")
-InputFiles=("reddit_Music" "reddit_movies")
+InputFiles=("Movies_and_TV")
+#InputFiles=("reddit_Music" "reddit_movies")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -135,7 +135,7 @@ for x in ${InputFiles[*]}; do
 #    StateMachineCoeff+=("0.05")
 #    StateMachineCoeff=("4.2" "4.5" "6.0" "9.0" "12.0")
 #    StateMachineCoeff=("2.5" "3" "4")
-    StateMachineCoeff=("3.5")
+    StateMachineCoeff=("4.0")
     echo $input_directory
     for y in ${TimeMode[*]}; do
         time_mode=$y;
@@ -151,7 +151,7 @@ for x in ${InputFiles[*]}; do
 #               mkdir $output_directory"BurstPlots"
 #               mkdir $output_directory"AggregationPlots"
 #               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
-               ./empty2009 $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
+               ./empty2009 $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram 2> temp
                 echo "Done With finding the innovations"
 #                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
                 for q in ${ExperienceState[*]}; do
