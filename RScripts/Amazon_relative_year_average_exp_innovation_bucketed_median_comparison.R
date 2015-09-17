@@ -4,8 +4,11 @@ draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size) {
         return(NULL)
     }
     print(paste(dataset, coeff,  final, bucket_size, sep=" "))
+#    t = read.table(paste("~/Documents/Amazon/Output_All/", dataset, "_bursts/RealTime/MaxBenefit/", 
+#                dataset, "_mlf_bigrams_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
+
     t = read.table(paste("~/Documents/Amazon/Output_All/", dataset, "_bursts/RealTime/MaxBenefit/", 
-                dataset, "_mlf_bigrams_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
+                dataset, "_bigrams_empty2009_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
     t = t[-1, ]
     print("Hello")
     if(nrow(t) == 0) {
@@ -14,7 +17,8 @@ draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size) {
     }
     print("HOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOORAY")
     t$Start_week = t$Start_week - 1100
-    name = paste("~/Pictures/today/", dataset, "_min_life_span_bigrams_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
+#   name = paste("~/Pictures/today/", dataset, "_min_life_span_bigrams_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
+    name = paste("~/Pictures/today/", dataset, "_bigrams_empty2009_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
     png(name)
     plot(t$Start_week, t$Fraction, type ="o", col = "black", ylim=c(0,1), xlab = "relative week to burst", ylab="Fraction of all reviews below median of the bucket")
     abline(h = 0.5, untf = FALSE, col="red")

@@ -226,14 +226,15 @@ int main(int argc, char *argv[]) {
 			bigram_string = "bigrams_";
 		}
 		if(cristians_innovations == false) {
-			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+//			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+			filename = Amazon::Global::output_directory + bigram_string + "empty2009_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt"; //TODO
 			cerr << filename << endl;
 		} else {
 			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_cristian_0.05_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
-		Amazon::Global::output_directory += "mlf_";
-		Amazon::Global::output_directory += bigram_string;
+// TODO		Amazon::Global::output_directory += "mlf_";
+		Amazon::Global::output_directory += bigram_string + "empty2009_";
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 		cerr << "-----> " << Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt" << endl;
 		while(fin_innovation_best_burst >> s >> x) {
