@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	const int CUT_OFF_EXP = 10;
-	int buckets[6] = {-100, -50, 0, 50, 100, 10000};
+	int buckets[6] = {-50, -25, 0, 25, 50, 10000};
 /*
     if(reddit == false) {
 		buckets[0] = -200;
