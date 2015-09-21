@@ -261,7 +261,7 @@ int main(int argc, char *argv[]) {
 			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); //setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
 			reviews[i].time.day /= 7;
 			// Bucket a week
-			if(reviews[i].time.day > 52 * 13)  {
+			if(reviews[i].time.day > 52 * 14)  {
 				after_2009_reviews.push_back(reviews[i]);
 			}
 		}
@@ -324,18 +324,18 @@ int main(int argc, char *argv[]) {
 
     int killed1 = 0, killed2 = 0;
 	for(WordTimeLine word_time_line : burst_innovation) {
-		if(word_time_line.burst_start >	 52 * 15) { // burst should be after start of 2010
+		if(word_time_line.burst_start >	 52 * 16) { // burst should be after start of 2010
 			bool check = false;
 			long long temp = 0;
 			for(int i = 0; i < (int)word_time_line.review_index->size(); i++) {
 				int index = (*word_time_line.review_index)[i];
-				if(reviews[index].time.day < 52 * 14) {
+				if(reviews[index].time.day < 52 * 15) {
 					temp++;
 				} else {
-					if(10 * temp < (int)word_time_line.review_index->size()) { // less than 10 percent should be in 2010
+					if(50 * temp < (int)word_time_line.review_index->size()) { // less than 2 percent should be in 2010
 						check = true;
 					} else {
-                        cerr << word_time_line.word << " " << temp << "  " << word_time_line.review_index->size() << endl;
+//                        cerr << word_time_line.word << " " << temp << "  " << word_time_line.review_index->size() << endl;
                     }
 					break;
 				}

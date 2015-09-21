@@ -17,6 +17,7 @@ draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size) {
     }
     print("HOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOORAY")
     t$Start_week = t$Start_week - 1100
+    t = t[t$Start_week > -50 & t$Start_week < 50, ]
 #   name = paste("~/Pictures/today/", dataset, "_min_life_span_bigrams_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
     name = paste("~/Pictures/today/", dataset, "_bigrams_empty2009_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
     png(name)
