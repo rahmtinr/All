@@ -210,14 +210,14 @@ int main(int argc, char *argv[]) {
 	// sort(reviews.begin(), reviews.end());
 	 */
 
-	if(EqDouble(0.05, Amazon::Global::state_coeffecient))
+//	if(EqDouble(0.05, Amazon::Global::state_coeffecient))
 	{ // No country for old members paper
 		map<string, long long> word_freq;
 		map<string, int> word_burst_start_date;
 		int common_divider = 20;
 		Innovations::LearnDictionary(0, reviews.size() / common_divider, &reviews);
 		Innovations::FindCristianInnovations(reviews.size() / common_divider, &reviews, &innovations); // returns pair of word and the review it was started.
-		string filename = Amazon::Global::output_directory + "words_start_burst_cristian_0.05_dict.txt";
+		string filename = Amazon::Global::output_directory + "words_start_burst_coeff_0.05.txt";
 		ofstream fout_cristian_method(filename.c_str());
 		cerr << "# of innovations: " << innovations.size() << endl;
 		for(int i = 0; i < (int)innovations.size(); i++) {
@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
 			fout_cristian_method << word << " " << word_burst_start_date[word] << endl;
 		}
 		// Innovations::AnalyseInnovation(innovations, &reviews);
-		return 0;
+//		return 0;
 	}
 
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
