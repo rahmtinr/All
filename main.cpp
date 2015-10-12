@@ -210,7 +210,7 @@ int main(int argc, char *argv[]) {
 	// sort(reviews.begin(), reviews.end());
 	 */
 
-	if(EqDouble(9.0, Amazon::Global::state_coeffecient))
+	if(EqDouble(0.05, Amazon::Global::state_coeffecient))
 	{ // No country for old members paper
 		map<string, long long> word_freq;
 		map<string, int> word_burst_start_date;
@@ -247,11 +247,12 @@ int main(int argc, char *argv[]) {
 			fout_cristian_method << word << " " << word_burst_start_date[word] << endl;
 		}
 		// Innovations::AnalyseInnovation(innovations, &reviews);
+		return 0;
 	}
 
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
 		for(int i = 0; i < (int)reviews.size(); i++) {
-			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); //setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
+			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); // setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
 			// Bucket a week
 			reviews[i].time.day /= 7;
 		}
@@ -311,10 +312,10 @@ int main(int argc, char *argv[]) {
 		innovation_burst_year_out << word_time_line.word << "   " << word_time_line.burst_start << endl;
 		innovation_burst_year_freq_out << word_time_line.word << "   " << word_time_line.burst_start << " " << word_time_line.review_index->size() << endl;
 	}
-#if 0
+#if 1
 	cerr << " burst size: " << burst_innovation.size() << endl;
 	{
-		string filename = Amazon::Global::output_directory + "innovation_words_summary_different_coeff.txt";
+		string filename = Amazon::Global::output_directory + "innovation_" + bigram_string + "_summary_different_coeff.txt";
 		map<string, string> saved;
 		if(EqDouble(Amazon::Global::state_coeffecient, 2.6) == false) {
 			ifstream fin_append(filename.c_str());
