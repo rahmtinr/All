@@ -255,7 +255,8 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	const int CUT_OFF_EXP = 10;
-	int buckets[6] = {-50, -25, 0, 25, 50, 10000};
+	int buckets[8] = {-39, -26, -13, 0, 13, 26, 39, 52};
+	int buckets_size = 8;
 /*
     if(reddit == false) {
 		buckets[0] = -200;
@@ -279,9 +280,9 @@ int main(int argc, char *argv[]) {
 				continue;
 			}
 			int index = innovation_words[s];
-			int relative_year = review.time.day - top_innovations[index].burst_start;
-			for(int i = 0; i < 6; i++) {
-				if(relative_year < buckets[i]) {
+			int relative_week = review.time.day - top_innovations[index].burst_start;
+			for(int i = 0; i < buckets_size; i++) {
+				if(relative_week < buckets[i]) {
 					check[i][index] = 1;
 					break;
 				}
@@ -290,10 +291,10 @@ int main(int argc, char *argv[]) {
 	}
 	for(int i = 0; i < 30000; i++) {
 		int sum = 0;
-		for(int j = 0; j < 6; j++) {
+		for(int j = 0; j < buckets_size; j++) {
 			sum += check[j][i];
 		}
-		if(sum < 6) { // not all of the buckets contain that word
+		if(sum < buckets_size) { // not all of the buckets contain that word
 			check[0][i] = 0;
 		}
 		//check is one otherwise

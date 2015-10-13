@@ -226,15 +226,16 @@ int main(int argc, char *argv[]) {
 			bigram_string = "bigrams_";
 		}
 		if(cristians_innovations == false) {
-//			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
-			filename = Amazon::Global::output_directory + bigram_string + "empty2009_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt"; //TODO
+			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+//			filename = Amazon::Global::output_directory + bigram_string + "empty2009_start_burst_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt"; //TODO
 			cerr << filename << endl;
 		} else {
 			filename = Amazon::Global::output_directory + bigram_string + "min_life_span_start_burst_cristian_0.05_dict.txt";
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
-// TODO		Amazon::Global::output_directory += "mlf_";
-		Amazon::Global::output_directory += bigram_string + "empty2009_";
+// TODO
+		Amazon::Global::output_directory += "mlf_";
+//		Amazon::Global::output_directory += bigram_string + "empty2009_";
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 		cerr << "-----> " << Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt" << endl;
 		while(fin_innovation_best_burst >> s >> x) {
@@ -878,25 +879,21 @@ int main(int argc, char *argv[]) {
 		}
 
 		string filename;
-		filename = Amazon::Global::output_directory + "cristian_probability_count_comparison_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_20_buckets_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+		filename = Amazon::Global::output_directory + "cristian_comparison_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 		ofstream cristian_fout(filename.c_str());
-		int num_of_buckets = 20;
 		for(int i = 1; i <= 4; i++) {
-			long long sum = 0;
-			for(int j = 0; j < 1000; j++) {
-				sum += num[i][j];
-			}
-			int each_bucket = sum / num_of_buckets;
-			sum = 0;
-
+			int each_bucket = 5;
+			long long sum_numerator = 0;
+			long long sum_denominator = 0;
 			int bucket_num = 1;
-			for(int j = 0; j < 1000; j++) {
-				sum += num[i][j];
-				if(sum < each_bucket) {
-					continue;
+			for(int j = 0; j < 1000; j+=each_bucket) {
+				sum_numerator = 0;
+				sum_denominator = 0;
+				for(int k = j; k < j + each_bucket; k++) {
+					sum_numerator += num[i][k];
+					sum_denominator += denom[i][k];
 				}
-				cristian_fout << i << " " << bucket_num	 << " " << sum / ((double)denom[i][j] + 1) << endl;
-				sum = 0;
+				cristian_fout << i << " " << bucket_num	 << " " << sum_numerator / ((double)sum_denominator + 1) << endl;
 				bucket_num++;
 			}
 		}
