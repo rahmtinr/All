@@ -914,6 +914,7 @@ int main(int argc, char *argv[]) {
 			}
 			sort(values_in_this_bucket.begin(), values_in_this_bucket.end());
 			if(num >= bucket_size || i == 2 * shifter - 1) {
+				starting_week = i;
 				median = values_in_this_bucket[values_in_this_bucket.size() / 2];
 				average /= num;
 				current_exp_out << starting_week - shifter << " " << average << " " << median << endl;
@@ -921,7 +922,6 @@ int main(int argc, char *argv[]) {
 				average = 0;
 				median = 0;
 				values_in_this_bucket.clear();
-				starting_week = i + 1;
 				num = 0;
 			}
 		}
