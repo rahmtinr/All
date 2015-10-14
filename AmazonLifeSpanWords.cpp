@@ -48,7 +48,7 @@ string filename;
 string burst_mode;
 string real_time;
 map<string, int> earliest, latest;
-int check[6][1000000];
+int check[10][1000000];
 void initialize(char *argv[]) {
 	filename = argv[1];
 	burst_mode = argv[2];

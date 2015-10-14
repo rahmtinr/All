@@ -1,3 +1,4 @@
+library(ggplot2)
 draw_cristian_plot <- function(dataset, coeff, binary) {
     t = read.table(paste("~/Documents/Amazon/Output_All/",dataset,"_bursts/RealTime/MaxBenefit/",dataset, "_mlf_cristian_comparison_coeff_", coeff, ".txt", sep=""), header=TRUE)    
     colnames(t) = c("V1", "V2", "V3")
