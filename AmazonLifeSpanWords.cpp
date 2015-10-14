@@ -252,6 +252,9 @@ int main(int argc, char *argv[]) {
 			innovation_words[s] = top_innovations.size();
 			word_time_line.burst_start = x;
 			top_innovations.push_back(word_time_line);
+			if(top_innovations.size() > 10 * 1000) {
+				break;
+			}
 		}
 	}
 	const int CUT_OFF_EXP = 10;
