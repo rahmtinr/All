@@ -859,8 +859,11 @@ int main(int argc, char *argv[]) {
 					sum_numerator += num[i][k];
 					sum_denominator += denom[i][k];
 				}
-				cristian_fout << i << " " << bucket_num	 << " " << sum_numerator / ((double)sum_denominator + 1) << endl;
 				bucket_num++;
+				if(sum_numerator == 0) {
+					continue;
+				}
+				cristian_fout << i << " " << bucket_num	 << " " << sum_numerator / ((double)sum_denominator + 1) << endl;
 			}
 		}
 	}
