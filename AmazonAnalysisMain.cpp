@@ -234,7 +234,7 @@ int main(int argc, char *argv[]) {
 		}
 		ifstream fin_innovation_best_burst(filename.c_str());
 		// TODO
-		Amazon::Global::output_directory += "mlf_";
+		Amazon::Global::output_directory += "mlf_" + bigram_string;
 		//		Amazon::Global::output_directory += bigram_string + "empty2009_";
 		ofstream fout_innovation_best_burst(Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt");
 		cerr << "-----> " << Amazon::Global::output_directory + "innovation_time_histogram" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt" << endl;
@@ -801,7 +801,7 @@ int main(int argc, char *argv[]) {
 				}
 				int index = CUT_OFF_EXP;
 				cerr << "GOING INTO THE LOOP" << endl;
-				while(fraction * alpha < num_of_reviews_more_than_cut_off) {
+				while(fraction * alpha < num_of_reviews_more_than_cut_off && index < 200000) {
 					index++;
 					alpha += counter_exp[index];
 					//			cerr << alpha * fraction << " " << num_of_reviews_more_than_cut_off << endl;
@@ -871,7 +871,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 0  // current experience median comparison
+#if 1  // current experience median comparison
 	if(Amazon::Global::final == false) {
 		const int shifter = 1100;
 		int bucket_size = 200;
@@ -899,7 +899,7 @@ int main(int argc, char *argv[]) {
 				relative_alphas[relative_week].push_back(index / (double)week_dist[absolute_week].size());
 			}
 		}
-		string filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(bucket_size)  +"_top" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+		string filename = Amazon::Global::output_directory + "current_relative_year_usage_bucketed_" + SimpleIntToString(bucket_size)  +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 
 		ofstream current_exp_out(filename.c_str());
 		current_exp_out << "Week   Average     Median" << endl;
