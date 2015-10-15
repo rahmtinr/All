@@ -588,7 +588,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0
 	{
 		cerr << "Got to median comparison" << endl;
 		// Median comparison
@@ -774,6 +774,8 @@ int main(int argc, char *argv[]) {
 		int num_of_reviews_more_than_cut_off = 0;
 		int denominator = 4;
 		memset(num, 0, sizeof num);
+		memset(denom, 0, sizeof denom);
+
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			if(reviews[i].final_experience_level >= CUT_OFF_EXP) {
 				num_of_reviews_more_than_cut_off++;
@@ -869,7 +871,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 1  // current experience median comparison
+#if 0  // current experience median comparison
 	if(Amazon::Global::final == false) {
 		const int shifter = 1100;
 		int bucket_size = 200;
