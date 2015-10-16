@@ -867,6 +867,7 @@ int main(int argc, char *argv[]) {
 					}
 					bound -= 5;
 				}
+				cerr << "BOUND :::: --------->" << bound << endl;
 				for(int j = 0; j < bound; j+=each_bucket) {
 					sum_numerator = 0;
 					sum_denominator = 0;
