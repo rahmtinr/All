@@ -17,8 +17,8 @@ InputFiles=("DBLP")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
-ExperienceState=("final" "current")
-StateMachineCoeff=("2.0" "2.2" "2.4" "2.6" "2.8" "3.0" "3.5" "4.0" "5.0" "6.0" )
+ExperienceState=("current")
+StateMachineCoeff=("6.0" )
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
     echo $input
