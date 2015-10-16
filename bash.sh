@@ -30,17 +30,16 @@ fi
 #touch largest_bucket.txt
 input_directory=$1
 
-#InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
+#######InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 
-#InputFiles=("Books" " Movies_and_TV" "Music" "reddit_books" "reddit_movies" "reddit_Music" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends" "reddit_books" "Rate_Beer" "Beer_Advocate" )
-#InputFiles=("Books" " Movies_and_TV" "Music" "reddit_movies" "reddit_Music" )
-#InputFiles=("reddit_books" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends")
-InputFiles=("Books")
+#InputFiles=("Books" "Movies_and_TV" "Music" "reddit_books" "reddit_movies" "reddit_Music" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends" "Rate_Beer" "Beer_Advocate")
+#InputFiles=("reddit_posts_books" "reddit_posts_movies" "reddit_posts_Music" "reddit_posts_funny" "reddit_posts_gaming" "reddit_posts_politics" "reddit_posts_leagueoflegends")
+InputFiles=("Rate_Beer")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
 Denominators=(4)
-ExperienceState=("final")
+ExperienceState=("current")
 for x in ${InputFiles[*]}; do
     input=$input_directory$x.txt;
     if [[ $x == "reddit_funny" ]]
@@ -110,18 +109,18 @@ for x in ${InputFiles[*]}; do
                 echo $time_mode
                 echo $state_machine_coeff
                 output_directory="../Output_All/"$x"_bursts/"$time_mode"/"$burst_mode"/"
-#               rm $output_directory* -rf
+#   ####            rm $output_directory* -rf
 #               mkdir $output_directory"BurstPlots"
 #               mkdir $output_directory"AggregationPlots"
 #               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
 #               ./empty2009 $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
                 echo "Done With finding the innovations"
-                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
+#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
                 for q in ${ExperienceState[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram
+                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram
                     done
                 done
 #               time_line_txt=$output_directory$x"_timeline.txt"

@@ -10,3 +10,7 @@ grep "review/userId" ~/CurrentData/$dataset.txt | grep -v "unknown" | awk '{prin
 
 
  for i in ${InputFiles[*]}; do echo "_______________________"; echo "------------->"  $i; temp=`ls "../Output_All/"$i"_bursts/RealTime/MaxBenefit/"*_min_life_span*`; cat $temp | grep -v -e www -e http -e tube | grep  -x '[a-z][a-z][a-z][a-z ]\+[0-9]\+' > temp; cp $temp $temp"_unfiltered"; mv temp $temp; done
+ 
+
+for i in ${InputFiles[*]}; do echo "_______________________"; echo "------------->"  $i; temp=`ls "../Output_All/"$i"_bursts/RealTime/MaxBenefit/"*bigrams_min_life_span*.txt`; cat $temp | grep -v -e www -e http -e tube | grep  -x '[-a-z ]\+[0-9]\+' > temp; cp $temp $temp"_unfiltered"; mv temp $temp; done
+

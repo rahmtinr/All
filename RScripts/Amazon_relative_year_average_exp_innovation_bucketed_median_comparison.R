@@ -1,14 +1,15 @@
-
-draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size) {
+library(ggplot2)
+library(grid)
+library(gridExtra)
+draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size, bigram, myrange) {
     if(coeff == "0.05"){
         return(NULL)
     }
-    print(paste(dataset, coeff,  final, bucket_size, sep=" "))
-#    t = read.table(paste("~/Documents/Amazon/Output_All/", dataset, "_bursts/RealTime/MaxBenefit/", 
-#                dataset, "_mlf_bigrams_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
-
+    print(paste(dataset, coeff,  final, bucket_size, bigram, myrange,  sep=" "))
     t = read.table(paste("~/Documents/Amazon/Output_All/", dataset, "_bursts/RealTime/MaxBenefit/", 
-                dataset, "_bigrams_empty2009_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
+                dataset, "_mlf_",bigram, "_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
+#    t = read.table(paste("~/Documents/Amazon/Output_All/", dataset, "_bursts/RealTime/MaxBenefit/", 
+#                dataset, "_bigrams_empty2009_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
     t = t[-1, ]
     print("Hello")
     if(nrow(t) == 0) {
@@ -16,266 +17,107 @@ draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size) {
         return(NULL)
     }
     print("HOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOORAY")
-    t$Start_week = t$Start_week - 1100
-    t = t[t$Start_week > -50 & t$Start_week < 50, ]
-#   name = paste("~/Pictures/today/", dataset, "_min_life_span_bigrams_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
-    name = paste("~/Pictures/today/", dataset, "_bigrams_empty2009_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
+    linesize=1
+    if(final=="final") {
+        t$Start_week = t$Start_week - 1100
+    } else {
+        colnames(t)=c("Start_week", "Average", "Fraction")
+    }
+    t = t[t$Start_week > -myrange & t$Start_week < myrange, ]
+   name = paste("~/Pictures/today/", final, "/", bigram, "/", myrange, "/", dataset, "_min_life_span_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
+#    name = paste("~/Pictures/today/", dataset, "_bigrams_empty2009_", final, "_relative_year_usage_bucketed_", bucket_size,"_median_comparison_innovation_coeff", coeff, ".png"  ,sep="")
+    print(name)
     png(name)
-    plot(t$Start_week, t$Fraction, type ="o", col = "black", ylim=c(0,1), xlab = "relative week to burst", ylab="Fraction of all reviews below median of the bucket")
-    abline(h = 0.5, untf = FALSE, col="red")
-    abline(v = 0, untf = FALSE, col="red")
-    title(main=paste(dataset , " ", final, " rel year, bucketed(", bucket_size, ") median comparison, coeff ", coeff , sep=""))
-    legend("topleft", col = c("black"),
-        legend = c("fraction of all data below the median experience of each bucket"),  
-            lty = c(1,1,1), cex = 0.75)
+    p <- ggplot() + 
+         theme(  legend.title=element_blank(), legend.position = "none",
+                 axis.text.x=element_text(color="black", size=12),  axis.text.y=element_text(color="black", size=12)) +
+         geom_line(data=t, aes(x=Start_week, y = Fraction, colour = "Innovation Median"), size=linesize) +
+         xlab("Relative Week") +
+         ylab("Median Fraction Score") + ggtitle(dataset) +
+         ylim(0.20,0.80) +
+         scale_color_manual(values=c("Innovation Median"="black")) +
+         geom_hline(aes(yintercept=0.5), color="red") + geom_vline(aes(xintercept=0), color="red")
+    print(p)
     dev.off()
+    return(p)
 }
 
 draw_all <- function() {
-       bucket_sizes = c("100", "500", "1000", "2000", "5000", "10000", "20000")
-    for(i in 1:7) {
-        print(bucket_sizes[i])
-        draw_relative_year_comparison("Music", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Music", "final", "3.8", bucket_sizes[i])
-        draw_relative_year_comparison("Music", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Music", "current", "3.8", bucket_sizes[i])
-        print("1")
+    ExpOption = c("final", "current")
+    bigramOption= c("words", "bigrams")
 
-        draw_relative_year_comparison("Movies_and_TV", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Movies_and_TV", "final", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("Movies_and_TV", "final", "12", bucket_sizes[i])
-        draw_relative_year_comparison("Movies_and_TV", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Movies_and_TV", "current", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("Movies_and_TV", "current", "12", bucket_sizes[i])
-        print("2")
+    for(i in 1:2) {
+        for(j in 1:1) { 
+            for(k in seq(10,50,by=10)) {
+                p1=draw_relative_year_comparison("Music", ExpOption[i], "5.0","200", bigramOption[j], k)
 
-        draw_relative_year_comparison("Books", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Books", "final", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("Books", "final", "12", bucket_sizes[i])
-        draw_relative_year_comparison("Books", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Books", "current", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("Books", "current", "12", bucket_sizes[i])
-        print("3")
+                p2=draw_relative_year_comparison("Movies_and_TV", ExpOption[i], "12.0", "200", bigramOption[j], k)
 
-        draw_relative_year_comparison("Electronics", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Electronics", "final", "12", bucket_sizes[i])
-        draw_relative_year_comparison("Electronics", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Electronics", "current", "12", bucket_sizes[i])
-        print("4")
+                p3=draw_relative_year_comparison("Books", ExpOption[i], "9.0", "200", bigramOption[j], k)
 
-        draw_relative_year_comparison("Beer_Advocate", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Beer_Advocate", "final", "4.2", bucket_sizes[i])
-        draw_relative_year_comparison("Beer_Advocate", "final", "12", bucket_sizes[i])
-        draw_relative_year_comparison("Beer_Advocate", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Beer_Advocate", "current", "4.2", bucket_sizes[i])
-        draw_relative_year_comparison("Beer_Advocate", "current", "12", bucket_sizes[i])
-        print("5")
+                p4=draw_relative_year_comparison("Beer_Advocate", ExpOption[i], "4.2", "200", bigramOption[j], k)
 
-        draw_relative_year_comparison("Rate_Beer", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Rate_Beer", "final", "6.0", bucket_sizes[i])
-        draw_relative_year_comparison("Rate_Beer", "final", "12", bucket_sizes[i])
-        draw_relative_year_comparison("Rate_Beer", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("Rate_Beer", "current", "6.0", bucket_sizes[i])
-        draw_relative_year_comparison("Rate_Beer", "current", "12", bucket_sizes[i])
-        print("6")
+                p5=draw_relative_year_comparison("Rate_Beer", ExpOption[i], "6.0", "200", bigramOption[j], k)
 
-        draw_relative_year_comparison("reddit_funny", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_funny", "final", "3.6", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_funny", "final", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_funny", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_funny", "current", "3.6", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_funny", "current", "4.5", bucket_sizes[i])
-        print("7")
+                p6=draw_relative_year_comparison("reddit_funny", ExpOption[i], "6.0", "200", bigramOption[j], k)
+                
+                p7=draw_relative_year_comparison("reddit_politics", ExpOption[i], "9.0", "200", bigramOption[j], k)
+                
+                p8=draw_relative_year_comparison("reddit_Music", ExpOption[i], "4.5", "200", bigramOption[j], k)
 
-        draw_relative_year_comparison("reddit_AskReddit", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AskReddit", "final", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AskReddit", "final", "12", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AskReddit", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AskReddit", "current", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AskReddit", "current", "12", bucket_sizes[i])
-        print("8")
-        
-        draw_relative_year_comparison("reddit_pics", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_pics", "final", "2.6", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_pics", "final", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_pics", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_pics", "current", "2.6", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_pics", "current", "4.5", bucket_sizes[i])
-        print("9")
-
-        draw_relative_year_comparison("reddit_AdviceAnimals", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AdviceAnimals", "final", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AdviceAnimals", "final", "6.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AdviceAnimals", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AdviceAnimals", "current", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_AdviceAnimals", "current", "6.0", bucket_sizes[i])
-        print("10")
-        
-        draw_relative_year_comparison("reddit_gaming", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_gaming", "final", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_gaming", "final", "6.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_gaming", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_gaming", "current", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_gaming", "current", "6.0", bucket_sizes[i])
-        print("11")
-
-        draw_relative_year_comparison("reddit_videos", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_videos", "final", "3.6", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_videos", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_videos", "current", "3.6", bucket_sizes[i])
-        print("12")
-
-        draw_relative_year_comparison("reddit_politics", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_politics", "final", "2.6", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_politics", "final", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_politics", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_politics", "current", "2.6", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_politics", "current", "9.0", bucket_sizes[i])
-        print("13")
-        
-        draw_relative_year_comparison("reddit_trees", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_trees", "final", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_trees", "final", "6.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_trees", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_trees", "current", "4.5", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_trees", "current", "6.0", bucket_sizes[i])
-        print("14")
-
-        draw_relative_year_comparison("reddit_WTF", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_WTF", "final", "6.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_WTF", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_WTF", "current", "6.0", bucket_sizes[i])
-        print("15")
-        
-        draw_relative_year_comparison("reddit_aww", "final", "0.05", bucket_sizes[i])
-        print("---1")
-        draw_relative_year_comparison("reddit_aww", "final", "4.0", bucket_sizes[i])
-        print("---2")
-        draw_relative_year_comparison("reddit_aww", "current", "0.05", bucket_sizes[i])
-        print("---3")
-        draw_relative_year_comparison("reddit_aww", "current", "4.0", bucket_sizes[i])
-        print("16")
-
-        draw_relative_year_comparison("reddit_fffffffuuuuuuuuuuuu", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_fffffffuuuuuuuuuuuu", "final", "3.4", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_fffffffuuuuuuuuuuuu", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_fffffffuuuuuuuuuuuu", "current", "3.4", bucket_sizes[i])
-        print("17")
-
-        draw_relative_year_comparison("reddit_Music", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_Music", "final", "3.8", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_Music", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_Music", "current", "3.8", bucket_sizes[i])
-        print("18")
-        
-        draw_relative_year_comparison("reddit_worldnews", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_worldnews", "final", "6.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_worldnews", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_worldnews", "current", "6.0", bucket_sizes[i])
-        print("19")
-        
-        draw_relative_year_comparison("reddit_leagueoflegends", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_leagueoflegends", "final", "4.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_leagueoflegends", "final", "9.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_leagueoflegends", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_leagueoflegends", "current", "4.0", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_leagueoflegends", "current", "9.0", bucket_sizes[i])
-        print("20")
-
-        draw_relative_year_comparison("reddit_technology", "final", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_technology", "final", "12", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_technology", "current", "0.05", bucket_sizes[i])
-        draw_relative_year_comparison("reddit_technology", "current", "12", bucket_sizes[i])
+                p9=draw_relative_year_comparison("reddit_leagueoflegends", ExpOption[i], "9.0", "200", bigramOption[j], k)
+                p10=draw_relative_year_comparison("reddit_gaming", ExpOption[i], "7.0", "200", bigramOption[j], k)
+                p11=draw_relative_year_comparison("reddit_movies", ExpOption[i], "6.3", "200", bigramOption[j], k)
+                p12=draw_relative_year_comparison("reddit_books", ExpOption[i], "6.5", "200", bigramOption[j], k)
+                if(k == 30) {
+                    png(paste("~/Pictures/today/Finalized/", ExpOption[i], "_",bigramOption[j], "_", k,".png", sep=""), width= 1100, height = 1200, res = 60)
+                    p=grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, left = "", nrow=4)
+                    dev.off()
+                }
+            }
+        }
     }
-print("done")
-    draw_relative_year_comparison("Music", "final", "3.8", "1710000" )
-    draw_relative_year_comparison("Music", "current", "3.8","1290000" )
-
-    draw_relative_year_comparison("Movies_and_TV", "final", "9.0", "270000")
-    draw_relative_year_comparison("Movies_and_TV", "final", "12", "210000")
-    draw_relative_year_comparison("Movies_and_TV", "current", "9.0", "240000")
-    draw_relative_year_comparison("Movies_and_TV", "current", "12", "150000")
-
-    draw_relative_year_comparison("Books", "final", "9.0", "150000")
-    draw_relative_year_comparison("Books", "final", "12", "90000")
-    draw_relative_year_comparison("Books", "current", "9.0", "120000")
-    draw_relative_year_comparison("Books", "current", "12", "90000")
-
-    draw_relative_year_comparison("Electronics", "final", "12", "30000" )
-    draw_relative_year_comparison("Electronics", "current", "12", "30000")
-
-    draw_relative_year_comparison("Beer_Advocate", "final", "4.2", "810000")
-    draw_relative_year_comparison("Beer_Advocate", "final", "12", "60000")
-    draw_relative_year_comparison("Beer_Advocate", "current", "4.2", "750000" )
-    draw_relative_year_comparison("Beer_Advocate", "current", "12", "60000")
-
-    draw_relative_year_comparison("Rate_Beer", "final", "6.0", "180000")
-    draw_relative_year_comparison("Rate_Beer", "final", "12", "60000")
-    draw_relative_year_comparison("Rate_Beer", "current", "6.0", "180000")
-    draw_relative_year_comparison("Rate_Beer", "current", "12", "60000")
-
-    draw_relative_year_comparison("reddit_funny", "final", "3.6", "90000")
-    draw_relative_year_comparison("reddit_funny", "final", "4.5", "60000")
-    draw_relative_year_comparison("reddit_funny", "current", "3.6", "60000" )
-    draw_relative_year_comparison("reddit_funny", "current", "4.5", "30000")
-
-    draw_relative_year_comparison("reddit_AskReddit", "final", "9.0", "60000")
-    draw_relative_year_comparison("reddit_AskReddit", "final", "12", "30000")
-    draw_relative_year_comparison("reddit_AskReddit", "current", "9.0", "30000")
-    draw_relative_year_comparison("reddit_AskReddit", "current", "12", "30000")
-    
-    draw_relative_year_comparison("reddit_pics", "final", "2.6", "90000")
-    draw_relative_year_comparison("reddit_pics", "final", "4.5", "60000")
-    draw_relative_year_comparison("reddit_pics", "current", "2.6", "60000")
-    draw_relative_year_comparison("reddit_pics", "current", "4.5", "30000")
-
-    draw_relative_year_comparison("reddit_AdviceAnimals", "final", "4.5",  "60000")
-    draw_relative_year_comparison("reddit_AdviceAnimals", "final", "6.0", "30000")
-    draw_relative_year_comparison("reddit_AdviceAnimals", "current", "4.5", "30000")
-    draw_relative_year_comparison("reddit_AdviceAnimals", "current", "6.0", "30000" )
-    
-    draw_relative_year_comparison("reddit_gaming", "final", "4.5", "90000")
-    draw_relative_year_comparison("reddit_gaming", "final", "6.0", "60000")
-    draw_relative_year_comparison("reddit_gaming", "current", "4.5", "60000")
-    draw_relative_year_comparison("reddit_gaming", "current", "6.0", "30000")
-
-    draw_relative_year_comparison("reddit_videos", "final", "3.6", "30000")
-    draw_relative_year_comparison("reddit_videos", "current", "3.6", "30000")
-
-    draw_relative_year_comparison("reddit_politics", "final", "2.6", "120000")
-    draw_relative_year_comparison("reddit_politics", "final", "9.0", "60000")
-    draw_relative_year_comparison("reddit_politics", "current", "2.6", "120000")
-    draw_relative_year_comparison("reddit_politics", "current", "9.0", "60000")
-    
-    draw_relative_year_comparison("reddit_trees", "final", "4.5", "150000")
-    draw_relative_year_comparison("reddit_trees", "final", "6.0", "90000")
-    draw_relative_year_comparison("reddit_trees", "current", "4.5", "90000")
-    draw_relative_year_comparison("reddit_trees", "current", "6.0", "60000")
-
-    draw_relative_year_comparison("reddit_WTF", "final", "6.0", "30000")
-    draw_relative_year_comparison("reddit_WTF", "current", "6.0", "30000")
-    
-    draw_relative_year_comparison("reddit_aww", "final", "4.0", "30000")
-    draw_relative_year_comparison("reddit_aww", "current", "4.0", "30000")
-
-    draw_relative_year_comparison("reddit_fffffffuuuuuuuuuuuu", "final", "3.4", "30000")
-    draw_relative_year_comparison("reddit_fffffffuuuuuuuuuuuu", "current", "3.4", "30000")
-
-    draw_relative_year_comparison("reddit_Music", "final", "3.8", "30000")
-    draw_relative_year_comparison("reddit_Music", "current", "3.8", "30000")
-    
-    draw_relative_year_comparison("reddit_worldnews", "final", "6.0", "30000")
-    draw_relative_year_comparison("reddit_worldnews", "current", "6.0", "30000")
-    
-    draw_relative_year_comparison("reddit_leagueoflegends", "final", "4.0", "120000")
-    draw_relative_year_comparison("reddit_leagueoflegends", "final", "9.0", "30000")
-    draw_relative_year_comparison("reddit_leagueoflegends", "current", "4.0", "60000")
-    draw_relative_year_comparison("reddit_leagueoflegends", "current", "9.0", "30000")
-
-    draw_relative_year_comparison("reddit_technology", "final", "12", "30000")
-    draw_relative_year_comparison("reddit_technology", "current", "12", "30000")
+}
+draw_all()
+########################################################################################## DBLP VERSION
+library(ggplot2)
+library(grid)
+library(gridExtra)
+draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size) {
+    if(coeff == "0.05"){
+        return(NULL)
+    }
+    print(paste(dataset, coeff,  final, bucket_size, sep=" "))
+    t = read.table(paste("~/Documents/Amazon/Output_All/", dataset, "_bursts/RealTime/MaxBenefit/", 
+                dataset, "_mlf_words_", final, "_relative_year_usage_bucketed_", bucket_size ,"_median_comparison_500_innovations_coeff", coeff, ".txt", sep=""), header=TRUE)
+    t = t[-1, ]
+    print("Hello")
+    if(nrow(t) == 0) {
+        print("WTF")
+        return(NULL)
+    }
+    print("HOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOORAY")
+    linesize=1
+    if(final=="final") {
+        t$Start_week = t$Start_week - 100
+    } else {
+        colnames(t)=c("Start_week", "Average", "Fraction")
+    }
+    t = t[t$Start_week > -15 & t$Start_week < 20, ]
+    p <- ggplot() + 
+         theme(  legend.title=element_blank(), legend.position = "none",
+                 axis.text.x=element_text(color="black", size=12),  axis.text.y=element_text(color="black", size=12)) +
+         geom_line(data=t, aes(x=Start_week, y = Fraction, colour = "Innovation Median"), size=linesize) +
+         xlab("Relative Year") +
+         ylab("Median Fraction Score") + ggtitle(paste(dataset, final)) +
+         ylim(0.20,0.80) +
+         scale_color_manual(values=c("Innovation Median"="black")) +
+         geom_hline(aes(yintercept=0.5), color="red") + geom_vline(aes(xintercept=0), color="red")
+    return(p)
 }
 
-draw_all()
-
-
+p1=draw_relative_year_comparison("DBLP", "current", "6.0", "100")
+p2=draw_relative_year_comparison("DBLP", "final", "6.0", "100")
+png(paste("~/Pictures/today/Finalized/DBLP.png", sep=""), width= 650, height = 300, res = 60)
+p=grid.arrange(p1, p2, left = "", nrow=1)
+dev.off()
