@@ -588,7 +588,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1
+#if 0 //TODO
 	{
 		cerr << "Got to median comparison" << endl;
 		// Median comparison
@@ -762,7 +762,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 0
+#if 1
 	{
 		if(Amazon::Global::bigram == false) {
 			// Comparison with "No country for old men"
@@ -855,7 +855,19 @@ int main(int argc, char *argv[]) {
 				long long sum_numerator = 0;
 				long long sum_denominator = 0;
 				int bucket_num = 1;
-				for(int j = 0; j < 1000; j+=each_bucket) {
+				int bound = 20000;
+				while(true) {
+					int bef = bound;
+					int blah = 0;
+					for(int bef=bound; bef > bound - 5; bef--) {
+						blah += num[i][bef];
+					}
+					if(blah > 10) {
+						break;
+					}
+					bound -= 5;
+				}
+				for(int j = 0; j < bound; j+=each_bucket) {
 					sum_numerator = 0;
 					sum_denominator = 0;
 					for(int k = j; k < j + each_bucket; k++) {
@@ -863,9 +875,6 @@ int main(int argc, char *argv[]) {
 						sum_denominator += denom[i][k];
 					}
 					bucket_num++;
-					if(sum_numerator == 0) {
-						continue;
-					}
 					cristian_fout << i << " " << bucket_num	 << " " << sum_numerator / ((double)sum_denominator + 1) << endl;
 				}
 			}
@@ -873,7 +882,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 1  // current experience median comparison
+#if 0  // current experience median comparison
 	//	if(Amazon::Global::final == false) {
 	const int shifter = 1100;
 	int bucket_size = 200;
