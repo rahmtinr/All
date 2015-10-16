@@ -588,7 +588,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 0 //TODO
+#if 1 //TODO
 	{
 		cerr << "Got to median comparison" << endl;
 		// Median comparison
@@ -762,7 +762,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 1
+#if 0
 	{
 		if(Amazon::Global::bigram == false) {
 			// Comparison with "No country for old men"
@@ -885,7 +885,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 0  // current experience median comparison
+#if 1  // current experience median comparison
 	//	if(Amazon::Global::final == false) {
 	const int shifter = 1100;
 	int bucket_size = 200;
