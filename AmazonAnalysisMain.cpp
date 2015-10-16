@@ -851,7 +851,7 @@ int main(int argc, char *argv[]) {
 			filename = Amazon::Global::output_directory + "cristian_comparison_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 			ofstream cristian_fout(filename.c_str());
 			for(int i = 1; i <= 4; i++) {
-				int each_bucket = 5;
+				int each_bucket = 30;
 				long long sum_numerator = 0;
 				long long sum_denominator = 0;
 				int bucket_num = 1;
@@ -859,15 +859,14 @@ int main(int argc, char *argv[]) {
 				while(true) {
 					int bef = bound;
 					int blah = 0;
-					for(int bef=bound; bef > bound - 5; bef--) {
+					for(int bef=bound; bef > bound - each_bucket; bef--) {
 						blah += num[i][bef];
 					}
 					if(blah > 10) {
 						break;
 					}
-					bound -= 5;
+					bound -= each_bucket;
 				}
-				cerr << "BOUND :::: --------->" << bound << endl;
 				for(int j = 0; j < bound; j+=each_bucket) {
 					sum_numerator = 0;
 					sum_denominator = 0;
@@ -879,7 +878,6 @@ int main(int argc, char *argv[]) {
 					if(sum_numerator == 0) {
 						continue;
 					}
-					cerr << i << " " << j << endl;
 					cristian_fout << i << " " << bucket_num	 << " " << sum_numerator / ((double)sum_denominator + 1) << endl;
 				}
 			}
