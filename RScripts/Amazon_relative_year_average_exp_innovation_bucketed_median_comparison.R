@@ -47,8 +47,8 @@ draw_all <- function() {
     bigramOption= c("words", "bigrams")
 
     for(i in 1:2) {
-        for(j in 1:1) { 
-            for(k in seq(10,50,by=10)) {
+       for(j in 1:2) { 
+            for(k in seq(30,30,by=10)) {
                 p1=draw_relative_year_comparison("Music", ExpOption[i], "5.0","200", bigramOption[j], k)
 
                 p2=draw_relative_year_comparison("Movies_and_TV", ExpOption[i], "12.0", "200", bigramOption[j], k)
@@ -74,11 +74,22 @@ draw_all <- function() {
                     p=grid.arrange(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, left = "", nrow=4)
                     dev.off()
                 }
+                if(j==1) {
+                    draw_relative_year_comparison("reddit_posts_funny", ExpOption[i], "6.0", "200", bigramOption[j], k)
+                    draw_relative_year_comparison("reddit_posts_politics", ExpOption[i], "9.0", "200", bigramOption[j], k)
+                    draw_relative_year_comparison("reddit_posts_Music", ExpOption[i], "4.5", "200", bigramOption[j], k)
+                    draw_relative_year_comparison("reddit_posts_leagueoflegends", ExpOption[i], "9.0", "200", bigramOption[j], k)
+                    draw_relative_year_comparison("reddit_posts_gaming", ExpOption[i], "7.0", "200", bigramOption[j], k)
+                    draw_relative_year_comparison("reddit_posts_movies", ExpOption[i], "6.3", "200", bigramOption[j], k)
+                    draw_relative_year_comparison("reddit_posts_books", ExpOption[i], "6.5", "200", bigramOption[j], k)
+                }
             }
+
         }
     }
 }
 draw_all()
+
 ########################################################################################## DBLP VERSION
 library(ggplot2)
 library(grid)

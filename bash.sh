@@ -33,8 +33,7 @@ input_directory=$1
 #######InputFiles=("reddit_funny" "reddit_AskReddit" "reddit_pics" "reddit_AdviceAnimals" "reddit_gaming" "reddit_videos" "reddit_politics" "reddit_trees" "reddit_WTF" "reddit_aww" "reddit_fffffffuuuuuuuuuuuu" "reddit_Music" "reddit_POLITIC" "reddit_worldnews" "reddit_leagueoflegends" "reddit_technology" "Music" "Books" "Movies_and_TV" "Electronics" "Beer_Advocate" "Rate_Beer")
 
 #InputFiles=("Books" "Movies_and_TV" "Music" "reddit_books" "reddit_movies" "reddit_Music" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends" "Rate_Beer" "Beer_Advocate")
-#InputFiles=("reddit_posts_books" "reddit_posts_movies" "reddit_posts_Music" "reddit_posts_funny" "reddit_posts_gaming" "reddit_posts_politics" "reddit_posts_leagueoflegends")
-InputFiles=("Rate_Beer")
+InputFiles=("reddit_posts_books" "reddit_posts_movies" "reddit_posts_Music" "reddit_posts_funny" "reddit_posts_gaming" "reddit_posts_politics" "reddit_posts_leagueoflegends")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -70,6 +69,37 @@ for x in ${InputFiles[*]}; do
         StateMachineCoeff=("4.5")
     fi
     if [[ $x == "reddit_leagueoflegends" ]]
+    then
+        StateMachineCoeff=("9.0")
+    fi
+    if [[ $x == "reddit_posts_funny" ]]
+    then
+        StateMachineCoeff=("6.0")
+    fi
+
+    if [[ $x == "reddit_posts_movies" ]]
+    then
+        StateMachineCoeff=("6.3")
+    fi
+
+    if [[ $x == "reddit_posts_books" ]]
+    then
+        StateMachineCoeff=("6.5")
+    fi
+
+    if [[ $x == "reddit_posts_gaming" ]]
+    then
+        StateMachineCoeff=("7.0")
+    fi
+    if [[ $x == "reddit_posts_politics" ]]
+    then
+        StateMachineCoeff=("9.0")
+    fi
+    if [[ $x == "reddit_posts_Music" ]]
+    then
+        StateMachineCoeff=("4.5")
+    fi
+    if [[ $x == "reddit_posts_leagueoflegends" ]]
     then
         StateMachineCoeff=("9.0")
     fi
