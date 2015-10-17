@@ -217,6 +217,8 @@ int main(int argc, char *argv[]) {
 	initialize(argv);
 	ifstream fin(argv[1]);
 	ReadAllRecords(fin, &records, &reviews, &edges, &author_id, &rev_author_id);
+        cerr << reviews.size() << " " << author_id.size() << endl;
+        return 0;
 	RemoveFakeNodes(&edges, author_id.size() + 1);
 	Components(&edges, author_id.size() + 1);
 	sort(reviews.begin(), reviews.end());

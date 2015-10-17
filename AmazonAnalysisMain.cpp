@@ -666,7 +666,7 @@ int main(int argc, char *argv[]) {
 		// Bucketing weeks to have same size and then averaging over different weeks instead of accumulating the experience over time
 		{
 			const int bucket_num_size = 1;
-			int bucket_num[bucket_num_size] = {200/*, 500, 1000, 2000, 5000, 10000, 20000, 30000*/};
+			int bucket_num[bucket_num_size] = {1500/*, 500, 1000, 2000, 5000, 10000, 20000, 30000*/};
 			for(int bucket_index = 0; bucket_index < bucket_num_size; bucket_index++) {
 				for(int i = 0; i < REL_SIZE; i++) {
 					authors_exp_relative_to_burst[i] = make_pair(0, 0);
@@ -888,7 +888,7 @@ int main(int argc, char *argv[]) {
 #if 1  // current experience median comparison
 	//	if(Amazon::Global::final == false) {
 	const int shifter = 1100;
-	int bucket_size = 200;
+	int bucket_size = 1500;
 	vector<int> week_dist[shifter];
 	vector<double> relative_alphas[2 * shifter];
 	for(Review review : reviews) {
