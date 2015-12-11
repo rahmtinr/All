@@ -154,13 +154,16 @@ int main(int argc, char *argv[]) {
 	if(Global::NAMEOFDATASET.substr(0, 6) == "reddit") {
 		reddit = true;
 	}
+	int rahmtin = 0;
 	while (true) {
+		rahmtin ++;
 		string filename(argv[1]);
 		if(reddit == true) {
 			if(!ReadOneRedditReview(fin, &reviews)) {
 				break;
 			}
 		} else {
+			cerr << rahmtin << " " << reviews.size() << endl;
 			if (!ReadOneReview(fin, &reviews)) {
 				break;
 			}
