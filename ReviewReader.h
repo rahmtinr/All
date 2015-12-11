@@ -125,6 +125,7 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		} else {
 			if(review.product_brand != "") {
 				review.user_id = review.product_brand;
+				review.text = review.product_title;
 				reviews->push_back(review);
 			}
 		}
