@@ -35,7 +35,7 @@ input_directory=$1
 #InputFiles=("Books" "Movies_and_TV" "Music" "reddit_books" "reddit_movies" "reddit_Music" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends" "Rate_Beer" "Beer_Advocate")
 
 #InputFiles=("reddit_posts_books" "reddit_posts_movies" "reddit_posts_Music" "reddit_posts_funny" "reddit_posts_gaming" "reddit_posts_politics" "reddit_posts_leagueoflegends")
-InputFiles=("ElectronicsWithBrand")
+InputFiles=("MusicWithBrand")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -128,9 +128,13 @@ for x in ${InputFiles[*]}; do
 
     if [[ $x == "ElectronicsWithBrand" ]]
     then
-        StateMachineCoeff=("3.0")
+        StateMachineCoeff=("2.0")
     fi
     
+    if [[ $x == "MusicWithBrand" ]]
+    then
+        StateMachineCoeff=("3.0")
+    fi
 #    StateMachineCoeff+=("0.05")
 #    StateMachineCoeff=("4.2" "4.5" "6.0" "9.0" "12.0")
 #    StateMachineCoeff=("2.5" "3" "4")

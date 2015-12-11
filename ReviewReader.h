@@ -89,7 +89,6 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		review.price = GetField(raw_input);
 		if(Amazon::Global::brand == true) {
 			getline(fin, raw_input);
-			cerr << raw_input << endl;
 			review.product_brand = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
 		}
 		getline(fin, raw_input);
@@ -108,7 +107,9 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		if (review_time == -1) {
 			getline(fin, raw_input);
 			getline(fin, raw_input);
-			getline(fin, raw_input);
+            if(Amazon::Global::brand == false) {
+    			getline(fin, raw_input);
+            }
 			return SUCCESS;
 		}
 		review.time = MyTime(localtime(&review_time));

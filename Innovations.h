@@ -330,7 +330,6 @@ public:
 			exit(0);
 		}
 		ret += Amazon::Global::sum_ln[d] - Amazon::Global::sum_ln[r];
-
 		ret -=  Amazon::Global::sum_ln[d - r];
 		return -ret;
 	}
@@ -374,6 +373,7 @@ public:
 			v[0] = viterbi[0];
 			v[1] = viterbi[1];
 			for(int j = 0; j < 2; j++) {
+//                cerr << word_time_line->alpha[j] << " " << ratio_sequence[i] << " "<< document_counter[i] << endl;
 				double same_state =
 						v[j] + ProbabilityFinderDocumentRatio(word_time_line->alpha[j], ratio_sequence[i], document_counter[i]);
 				double other_state = v[1-j] + log((1-p)/p) +

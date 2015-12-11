@@ -154,16 +154,13 @@ int main(int argc, char *argv[]) {
 	if(Global::NAMEOFDATASET.substr(0, 6) == "reddit") {
 		reddit = true;
 	}
-	int rahmtin = 0;
 	while (true) {
-		rahmtin ++;
 		string filename(argv[1]);
 		if(reddit == true) {
 			if(!ReadOneRedditReview(fin, &reviews)) {
 				break;
 			}
 		} else {
-			cerr << rahmtin << " " << reviews.size() << endl;
 			if (!ReadOneReview(fin, &reviews)) {
 				break;
 			}
@@ -222,6 +219,7 @@ int main(int argc, char *argv[]) {
 	 */
 
 //	if(EqDouble(0.05, Amazon::Global::state_coeffecient))
+#if 0
 	{ // No country for old members paper
 		map<string, long long> word_freq;
 		map<string, int> word_burst_start_date;
@@ -260,10 +258,14 @@ int main(int argc, char *argv[]) {
 		// Innovations::AnalyseInnovation(innovations, &reviews);
 //		return 0;
 	}
-
+#endif
 	if(Amazon::Global::state_machine_doc_ratio == true) { // need to change the time only by day and forget about the year
 		for(int i = 0; i < (int)reviews.size(); i++) {
 			reviews[i].time.day = reviews[i].time.epoch_time / (24 * 60 * 60) - (25 * 365); // setting the starting point to 25 * 365 days after Jan 1, 1970. The first review is in 1997 anyways
+            if(reviews[i].time.day == -9125) {
+                cerr << reviews[i].time.epoch_time << " " << reviews[i].time.epoch_time /(24*60*60) << " " << 25 * 365 << endl; 
+                exit(0);
+            }
 			// Bucket a week
 			reviews[i].time.day /= 7;
 		}
@@ -305,7 +307,7 @@ int main(int argc, char *argv[]) {
 				burst_innovation.insert(word_states);
 			}
 		}
-		if(Amazon::Global::state_machine_doc_ratio == true && longest_one > 8 && word_states.review_index->size() > 200){
+		if(Amazon::Global::state_machine_doc_ratio == true && longest_one > 4 && word_states.review_index->size() > 100){ // 8 and 200
 			burst_innovation.insert(word_states);
 		}
 	}
