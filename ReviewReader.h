@@ -85,8 +85,10 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		review.product_id = GetField(raw_input);
 		getline(fin, raw_input);
 		review.product_title = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
-		getline(fin, raw_input);
-		review.product_brand = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
+		if(Amazon::Global::brand == true) {
+			getline(fin, raw_input);
+			review.product_brand = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
+		}
 		getline(fin, raw_input);
 		review.price = GetField(raw_input);
 		getline(fin, raw_input);
@@ -116,10 +118,10 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		if(Amazon::Global::bigram == true) {
 			review.text = MakeBigram(review.text);
 		}
-		getline(fin, raw_input);
 		if(Amazon::Global::brand == false) {
 			if(Amazon::Global::remove_unknown == false ||
 					(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
+				getline(fin, raw_input);
 				reviews->push_back(review);
 			}
 		} else {
@@ -129,6 +131,7 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 				reviews->push_back(review);
 			}
 		}
+		exit(0);
 		return SUCCESS;
 	}
 	return FAIL;
