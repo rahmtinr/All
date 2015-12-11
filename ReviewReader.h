@@ -42,7 +42,10 @@ string GetField(string raw_input) {
 	if (delimeter == std::string::npos) {
 		return "THIS INPUT IS TRASH";
 	}
-	return raw_input.substr(delimeter+2);
+	if(delimeter + 2 == raw_input.size()) {
+		return "";
+	}
+	return raw_input.substr(delimeter + 2);
 }
 
 string RemoveAllSymbols(string raw_input) {
@@ -83,6 +86,8 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		getline(fin, raw_input);
 		review.product_title = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
 		getline(fin, raw_input);
+		review.product_brand = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input))));
+		getline(fin, raw_input);
 		review.price = GetField(raw_input);
 		getline(fin, raw_input);
 		review.user_id = GetField(raw_input);
@@ -112,9 +117,16 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 			review.text = MakeBigram(review.text);
 		}
 		getline(fin, raw_input);
-		if(Amazon::Global::remove_unknown == false ||
-				(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
-			reviews->push_back(review);
+		if(Amazon::Global::brand == false) {
+			if(Amazon::Global::remove_unknown == false ||
+					(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
+				reviews->push_back(review);
+			}
+		} else {
+			if(review.product_brand != "") {
+				review.user_id = review.product_brand;
+				reviews->push_back(review);
+			}
 		}
 		return SUCCESS;
 	}

@@ -217,8 +217,8 @@ int main(int argc, char *argv[]) {
 	initialize(argv);
 	ifstream fin(argv[1]);
 	ReadAllRecords(fin, &records, &reviews, &edges, &author_id, &rev_author_id);
-        cerr << reviews.size() << " " << author_id.size() << endl;
-        return 0;
+	cerr << reviews.size() << " " << author_id.size() << endl;
+	//return 0;
 	RemoveFakeNodes(&edges, author_id.size() + 1);
 	Components(&edges, author_id.size() + 1);
 	sort(reviews.begin(), reviews.end());
@@ -232,6 +232,8 @@ int main(int argc, char *argv[]) {
 			}
 		}
 	}
+
+
 	// Find the candidate for the paper
 	for(int i = 0; i < (int)reviews.size(); i++){
 		int cur_exp = -1;
@@ -252,6 +254,7 @@ int main(int argc, char *argv[]) {
 			if(cur_exp == experience_level[author]) {
 				nominated_author = j;
 			}
+			reviews[i].current_exp.push_back(experience_level[author]);
 			experience_level[author]++;
 		}
 		reviews[i].current_experience_level = cur_exp;
@@ -271,6 +274,7 @@ int main(int argc, char *argv[]) {
 			if(final_exp == experience_level[author]) {
 				nominated_author = j;
 			}
+			reviews[i].final_exp.push_back(experience_level[author]);
 		}
 		reviews[i].final_exp_best_author = reviews[i].authors[nominated_author];
 		reviews[i].final_experience_level = experience_level[reviews[i].final_exp_best_author];
@@ -1025,8 +1029,8 @@ int main(int argc, char *argv[]) {
 				pair<long long, long long> p;
 				int bucket = upper_bound(week, week + first_empty, reviews[i].time.day - start + SHIFTER) - week - 1;
 				p = authors_exp_relative_to_burst[bucket];
-					authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
-					median_finder[bucket].push_back(reviews[i].final_experience_level);
+				authors_exp_relative_to_burst[bucket] = make_pair(p.first + reviews[i].final_experience_level, p.second + 1);
+				median_finder[bucket].push_back(reviews[i].final_experience_level);
 			}
 		}
 
@@ -1062,7 +1066,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 1
+#if 0
 	// current experience median comparison
 	const int shifter = 100;
 	int bucket_size = 100;
@@ -1121,8 +1125,77 @@ int main(int argc, char *argv[]) {
 			num = 0;
 		}
 	}
-
 #endif
+
+#if 1
+	{
+		// MACRO averaging over all authors
+		const int shifter = 100;
+		int bucket_size = 100;
+		vector<int> week_dist[shifter];
+		vector<double> relative_alphas[2 * shifter];
+		for(Review review : reviews) {
+			int absolute_week = review.time.day;
+			for(int j = 0; j < (int)review.final_exp.size(); j++) {
+				week_dist[absolute_week].push_back(review.final_exp[j]);
+			}
+		}
+		for(int i = 0; i < shifter; i++) {
+			sort(week_dist[i].begin(), week_dist[i].end());
+		}
+		for(int i = 0; i < (int)reviews.size(); i++) {
+			stringstream ss(reviews[i].text);
+			string s;
+			while(!ss.eof()) {
+				ss >> s;
+				if(innovation_words.find(s) == innovation_words.end()) {
+					continue;
+				}
+				int start = top_innovations[innovation_words[s]].burst_start;
+				int absolute_week = reviews[i].time.day;
+				int relative_week = absolute_week - start + shifter;
+				for(int j = 0; j < reviews[i].final_exp.size(); j++) {
+					int index = upper_bound(week_dist[absolute_week].begin(),
+							week_dist[absolute_week].end(), reviews[i].final_exp[j])
+							- week_dist[absolute_week].begin();
+					relative_alphas[relative_week].push_back(index / (double)week_dist[absolute_week].size());
+				}
+			}
+		}
+		string filename = Amazon::Global::output_directory + "final_relative_year_MACRO_" + SimpleIntToString(bucket_size)  +"_median_comparison_" + SimpleIntToString(SIZE_OF_TOP_INNOVATIONS) + "_innovations_coeff" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
+
+		ofstream current_exp_out(filename.c_str());
+		current_exp_out << "Start_week   Average     Fraction" << endl;
+		double average = 0;
+		double median;
+		vector<double> values_in_this_bucket;
+		int starting_week;
+		int num = 0;
+		for(int i = 0; i < 2 * shifter; i++) {
+			if(relative_alphas[i].size() == 0) {
+				continue;
+			}
+			num += relative_alphas[i].size();
+			for(int j = 0; j < (int)relative_alphas[i].size(); j++){
+				average += relative_alphas[i][j];
+				values_in_this_bucket.push_back(relative_alphas[i][j]);
+			}
+			sort(values_in_this_bucket.begin(), values_in_this_bucket.end());
+			if(num >= bucket_size || i == 2 * shifter - 1) {
+				starting_week = i;
+				median = values_in_this_bucket[values_in_this_bucket.size() / 2];
+				average /= num;
+				current_exp_out << starting_week - shifter << " " << average << " " << median << endl;
+
+				average = 0;
+				median = 0;
+				values_in_this_bucket.clear();
+				num = 0;
+			}
+		}
+	}
+#endif
+
 #if 0
 	{
 		// [gamma,delta]

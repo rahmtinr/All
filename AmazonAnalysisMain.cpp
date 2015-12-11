@@ -110,6 +110,15 @@ void initialize(char *argv[]) {
 			Amazon::Global::bigram = false;
 		}
 	}
+
+	{
+		string temp(argv[8]);
+		if(temp == "Brand") {
+			Amazon::Global::brand = true;
+		} else {
+			Amazon::Global::brand = false;
+		}
+	}
 	cerr << Global::NAMEOFDATASET <<endl;
 	cerr << "Final = " << argv[6] << " " << Amazon::Global::final << endl;
 	// Preprocess
@@ -149,7 +158,7 @@ void initialize(char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 9) {
+	if(argc != 10) { // brand added
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}

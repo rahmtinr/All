@@ -19,6 +19,7 @@ class Review {
 public:
 	string product_id;
 	string product_title;
+	string product_brand;
 	string price;
 	string user_id;
 	string profile_name;
@@ -33,6 +34,7 @@ public:
 	string current_exp_best_author;
 	string final_exp_best_author;
 	vector<string> authors;
+	vector<int> final_exp, current_exp;
 	friend ostream& operator << (ostream& out, const Review &review);
 	bool operator < (const Review &other) const { // this is based on time!
 		if (time.year != other.time.year) {

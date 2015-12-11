@@ -132,10 +132,18 @@ void initialize(char *argv[]) {
 			Amazon::Global::bigram = false;
 		}
 	}
+	{
+		string temp(argv[7]);
+		if(temp == "Brand") {
+			Amazon::Global::brand = true;
+		} else {
+			Amazon::Global::brand = false;
+		}
+	}
 }
 
 int main(int argc, char *argv[]) {
-	if(argc != 7) {
+	if(argc != 8) {
 		cerr << "The number of arguments is not correct! Force quitting." << endl;
 		return 0;
 	}

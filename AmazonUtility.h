@@ -79,6 +79,7 @@ public:
 	static bool final;
 	static int denominator;
 	static bool bigram;
+	static bool brand;
 };
 }
 
@@ -159,5 +160,6 @@ bool Amazon::Global::final;
 vector<double> Amazon::Global::sum_ln;
 int Amazon::Global::denominator;
 bool Amazon::Global::bigram;
+bool Amazon::Global::brand;
 
 #endif /* AMAZONUTILITY_H_ */
