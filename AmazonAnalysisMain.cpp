@@ -112,7 +112,7 @@ void initialize(char *argv[]) {
 	}
 
 	{
-		string temp(argv[8]);
+		string temp(argv[9]);
 		if(temp == "Brand") {
 			Amazon::Global::brand = true;
 		} else {
