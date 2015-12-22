@@ -1,4 +1,4 @@
-library(ggplot2)
+ibrary(ggplot2)
 library(grid)
 library(gridExtra)
 draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size, bigram, myrange) {
@@ -34,13 +34,31 @@ draw_relative_year_comparison <- function(dataset, final, coeff, bucket_size, bi
          geom_line(data=t, aes(x=Start_week, y = Fraction, colour = "Innovation Median"), size=linesize) +
          xlab("Relative Week") +
          ylab("Median Fraction Score") + ggtitle(dataset) +
-         ylim(0.20,0.80) +
+         ylim(0.20,0.90) +
          scale_color_manual(values=c("Innovation Median"="black")) +
          geom_hline(aes(yintercept=0.5), color="red") + geom_vline(aes(xintercept=0), color="red")
     print(p)
     dev.off()
     return(p)
 }
+
+draw_all_brands <- function() {
+    p1=draw_relative_year_comparison("MusicWithBrand", "current", "5.0","1500", "words", 30)
+    p1=draw_relative_year_comparison("MusicWithBrand", "final", "5.0","1500", "words", 30)
+    p1=draw_relative_year_comparison("ElectronicsWithBrand", "current", "6.0","1500", "words", 30)
+    p1=draw_relative_year_comparison("ElectronicsWithBrand", "final", "6.0","1500", "words", 30)
+    p1=draw_relative_year_comparison("Movies_and_TVWithBrand", "current", "12.0","1500", "words", 30)
+    p1=draw_relative_year_comparison("Movies_and_TVWithBrand", "final", "12.0","1500", "words", 30)
+
+    p1=draw_relative_year_comparison("Rate_BeerWithBrand", "final", "6.0","1500", "words", 30)
+    p1=draw_relative_year_comparison("Rate_BeerWithBrand", "current", "6.0","1500", "words", 30)
+
+
+    p1=draw_relative_year_comparison("Beer_AdvocateWithBrand", "final", "4.2","1500", "words", 30)
+    p1=draw_relative_year_comparison("Beer_AdvocateWithBrand", "current", "4.2","1500", "words", 30)
+
+}
+
 
 draw_all <- function() {
     ExpOption = c("final", "current")

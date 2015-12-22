@@ -35,7 +35,7 @@ input_directory=$1
 #InputFiles=("Books" "Movies_and_TV" "Music" "reddit_books" "reddit_movies" "reddit_Music" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends" "Rate_Beer" "Beer_Advocate")
 
 #InputFiles=("reddit_posts_books" "reddit_posts_movies" "reddit_posts_Music" "reddit_posts_funny" "reddit_posts_gaming" "reddit_posts_politics" "reddit_posts_leagueoflegends")
-InputFiles=("Electronics")
+InputFiles=("Rate_BeerWithBrand") # "Beer_AdvocateWithBrand")  #"ElectronicsWithBrand"  "Movies_and_TVWithBrand" "MusicWithBrand")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -143,6 +143,15 @@ for x in ${InputFiles[*]}; do
     then
         StateMachineCoeff=("12.0")
     fi
+    if [[ $x == "Beer_AdvocateWithBrand" ]]
+    then
+        StateMachineCoeff=("4.2")
+    fi
+    if [[ $x == "Rate_BeerWithBrand" ]]
+    then
+        StateMachineCoeff=("6.0")
+    fi 
+
 #    StateMachineCoeff+=("0.05")
 #    StateMachineCoeff=("4.2" "4.5" "6.0" "9.0" "12.0")
 #    StateMachineCoeff=("2.5" "3" "4")
@@ -169,7 +178,7 @@ for x in ${InputFiles[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram Normal
+                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram Brand 2>chert
                     done
                 done
 #               time_line_txt=$output_directory$x"_timeline.txt"

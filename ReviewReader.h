@@ -107,9 +107,7 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 		if (review_time == -1) {
 			getline(fin, raw_input);
 			getline(fin, raw_input);
-            if(Amazon::Global::brand == false) {
-    			getline(fin, raw_input);
-            }
+    		getline(fin, raw_input);
 			return SUCCESS;
 		}
 		review.time = MyTime(localtime(&review_time));
@@ -125,7 +123,6 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 					(Amazon::Global::remove_unknown == true && review.user_id != "unknown")) {
 				reviews->push_back(review);
 			}
-			getline(fin, raw_input);
 		} else {
 			if(review.product_brand != "") {
 				review.user_id = review.product_brand;
@@ -133,6 +130,7 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 				reviews->push_back(review);
 			}
 		}
+		getline(fin, raw_input);
 		return SUCCESS;
 	}
 	return FAIL;
@@ -141,6 +139,7 @@ bool ReadOneReview(std::ifstream& fin, vector<Review> *reviews) {
 bool ReadOneRedditReview(std::ifstream& fin, vector<Review> *reviews) {
 	string raw_input;
 	Review review;
+    string brand;
 	if (getline(fin, raw_input)) {
 		review.product_id = GetField(raw_input);
 
@@ -159,16 +158,31 @@ bool ReadOneRedditReview(std::ifstream& fin, vector<Review> *reviews) {
 			return SUCCESS;
 		}
 		review.time = MyTime(localtime(&review_time));
+
+        if(Amazon::Global::brand == true) {
+            getline(fin, brand);
+        }
 		getline(fin, raw_input);
 		review.text = RemoveStopWords(RemoveAllSymbols(SimpleToLower(GetField(raw_input)))) + " ";
 		if(Amazon::Global::bigram == true) {
 			review.text = MakeBigram(review.text);
 		}
 		getline(fin, raw_input);
-		if(Amazon::Global::remove_unknown == false ||
-				(Amazon::Global::remove_unknown == true && review.user_id != "[deleted]")) {
-			reviews->push_back(review);
-		}
+        if(Amazon::Global::brand == true) {
+            stringstream ss(brand);
+            string temp;
+            ss >> temp;
+            while(ss >> temp) { // All websites are separate authors in Analysis
+                cerr << raw_input << " ::: " << temp << endl;
+                review.user_id = SimpleToLower(GetField(raw_input));
+                reviews->push_back(review);
+            }
+        } else {
+		    if(Amazon::Global::remove_unknown == false ||
+		    		(Amazon::Global::remove_unknown == true && review.user_id != "[deleted]")) {
+		    	reviews->push_back(review);
+		    }
+        }
 	/*	cerr << review.product_id << endl;
 		cerr << review.profile_name << endl;
 		cerr << review.user_id << endl;
