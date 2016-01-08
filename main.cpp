@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
 	cerr << reviews.size() << endl;
 	sort(reviews.begin(), reviews.end(), CompareReviewOnUserId);
 	reviews.erase(unique( reviews.begin(), reviews.end()), reviews.end());
-	cerr << reviews.size() << endl;
+	cerr << "reviews size: " << reviews.size() << endl;
 	sort(reviews.begin(), reviews.end());
 	reviews[0].index = 0;
 	for(int i = 1; i < (int) reviews.size(); i++) {
@@ -198,6 +198,7 @@ int main(int argc, char *argv[]) {
 		reviews[i].current_experience_level = experience_level[reviews[i].user_id];
 		experience_level[reviews[i].user_id]++;
 	}
+    cerr << "number of users: " <<  experience_level.size() << endl;
 	for(int i = 0; i < (int) reviews.size(); i++) {
 		reviews[i].final_experience_level = experience_level[reviews[i].user_id];
 	}

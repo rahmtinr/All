@@ -183,8 +183,6 @@ int main(int argc, char *argv[]) {
 		if(reviews.size() == 0) {
 			continue;
 		}
-        cerr << reviews.size() << "-----> "<< endl;
-        cerr << reviews[reviews.size() - 1] << endl;
 		Amazon::Global::min_year = min(Amazon::Global::min_year, reviews[reviews.size() - 1].time.year);
 		Amazon::Global::max_year = max(Amazon::Global::max_year, reviews[reviews.size() - 1].time.year);
 		Amazon::Global::earliest = min(Amazon::Global::earliest, reviews[reviews.size() - 1].time);

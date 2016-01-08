@@ -3,7 +3,7 @@ library(scales)
 library(gridExtra)
 library(grid)
 
-draw_cristian_plot <- function(dataset, coeff) {
+draw_cristian_plot <- function(dataset_name, dataset, coeff) {
     t = read.table(paste("~/Documents/Amazon/Output_All/",dataset,"_bursts/RealTime/MaxBenefit/",dataset, "_mlf_cristian_comparison_coeff_", coeff, ".txt", sep=""), header=TRUE)    
     colnames(t) = c("V1", "V2", "V3")
 
@@ -25,7 +25,7 @@ draw_cristian_plot <- function(dataset, coeff) {
             geom_line(data=t3, aes(x=V2, y = V3, colour = "Third quantile"), size=linesize) +
             geom_line(data=t4, aes(x=V2, y = V3, colour = "Fourth quantile"), size=linesize) +
             xlab("Current Experience") +
-            ylab("Innovation Per Document") + ggtitle(dataset) +
+            ylab("Innovation Per Document") + ggtitle(dataset_name) +
             scale_color_manual(values=c("First quantile"="blue", "Second quantile"="green", "Third quantile"="red",
                                 "Fourth quantile"="cyan"))
     name = paste("~/Pictures/today/Cristian/", dataset, "_mlf_cristian_comparison_coeff_", coeff, ".png"  ,sep="")
@@ -38,47 +38,53 @@ draw_cristian_plot <- function(dataset, coeff) {
 
 get_legend=function(myplot) {
     tmp <- ggplot_gtable(ggplot_build(myplot))
+        print("DAFUCK")
     leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+        print("DAFUCK")
     legend <- tmp$grobs[[leg]]
+        print("DAFUCK")
     return (legend)
 }
 draw_all <-function() {
-    p1=draw_cristian_plot("Music",  "5.0") +
+    p1=draw_cristian_plot("Amazon Music", "Music",  "5.0") +
         theme(legend.title=element_blank(),
               legend.position = "right",
               legend.text = element_text(size=14),
               legend.background = element_rect(fill=alpha(0.7)))
 
-    p2=draw_cristian_plot("Movies_and_TV",  "12.0")
+#    p2=draw_cristian_plot("Movies_and_TV",  "12.0")
 
-    p3=draw_cristian_plot("Books",  "9.0")
+    p3=draw_cristian_plot("Amazon Books", "Books",  "9.0")
 
-    p4=draw_cristian_plot("Beer_Advocate",  "4.2")
+#    p4=draw_cristian_plot("Beer_Advocate",  "4.2")
 
-    p5=draw_cristian_plot("Rate_Beer",  "6.0")
+#    p5=draw_cristian_plot("Rate_Beer",  "6.0")
 
-    p6=draw_cristian_plot("reddit_funny",  "6.0")
+#   p6=draw_cristian_plot("reddit_funny",  "6.0")
 
-    p7=draw_cristian_plot("reddit_gaming",  "7.0")
+    p7=draw_cristian_plot("Reddit gaming", "reddit_gaming",  "7.0")
 
-    p8=draw_cristian_plot("reddit_politics",  "9.0")
+#    p8=draw_cristian_plot("reddit_politics",  "9.0")
     
-    p9=draw_cristian_plot("reddit_Music",  "4.5")
+#    p9=draw_cristian_plot("reddit_Music",  "4.5")
     
-    p10=draw_cristian_plot("reddit_leagueoflegends",  "9.0")
+#    p10=draw_cristian_plot("reddit_leagueoflegends",  "9.0")
 
-    p11=draw_cristian_plot("reddit_books",  "6.5")
+#    p11=draw_cristian_plot("reddit_books",  "6.5")
 
-    p12=draw_cristian_plot("reddit_movies",  "6.3")
+#    p12=draw_cristian_plot("reddit_movies",  "6.3")
 
 
+    print("KIR")
     my_legend = get_legend(p1)
+    print("KIR")
     p1 = p1 + theme(legend.position="none")
-
-    png("~/Pictures/today/Finalized/Cristian.png", width= 1100, height = 1200, res = 60)
-    grid.arrange(arrangeGrob(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12,
-                             left = "", nrow=4), my_legend, 
-                 widths=unit(c(1000,175),"pt"), nrow=1)
+    print("KIR")
+    png("~/Pictures/ICWSM2016/Cristian.png", width= 1100, height = 300, res = 60)
+    print("KIR")
+    grid.arrange(arrangeGrob(p1, p3, p7,
+                             left = "", nrow=1), my_legend, 
+                widths=unit(c(1000,175),"pt"), nrow=1)
     dev.off()
 }
 

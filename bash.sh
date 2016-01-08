@@ -1,4 +1,4 @@
-#make main
+make main
 if [ $? -ne 0 ]
 then
     echo "Compilation error!"
@@ -12,7 +12,7 @@ then
     exit 0
 fi
 
-#make minLife
+make minLife
 if [ $? -ne 0 ]
 then
     echo "Compilation error!"
@@ -35,7 +35,7 @@ input_directory=$1
 #InputFiles=("Books" "Movies_and_TV" "Music" "reddit_books" "reddit_movies" "reddit_Music" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends" "Rate_Beer" "Beer_Advocate")
 
 #InputFiles=("reddit_posts_books" "reddit_posts_movies" "reddit_posts_Music" "reddit_posts_funny" "reddit_posts_gaming" "reddit_posts_politics" "reddit_posts_leagueoflegends")
-InputFiles=("Rate_BeerWithBrand") # "Beer_AdvocateWithBrand")  #"ElectronicsWithBrand"  "Movies_and_TVWithBrand" "MusicWithBrand")
+InputFiles=("reddit_worldnews") # "Beer_AdvocateWithBrand")  #"ElectronicsWithBrand"  "Movies_and_TVWithBrand" "MusicWithBrand")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -105,6 +105,10 @@ for x in ${InputFiles[*]}; do
     then
         StateMachineCoeff=("9.0")
     fi
+    if [[ $x == "reddit_worldnews" ]]
+    then
+        StateMachineCoeff=("6.0" "7.5" "9.0")
+    fi
     if [[ $x == "Music" ]]
     then
         StateMachineCoeff=("5.0")
@@ -151,6 +155,14 @@ for x in ${InputFiles[*]}; do
     then
         StateMachineCoeff=("6.0")
     fi 
+     if [[ $x == "reddit_worldnewsWithBrand" ]]
+    then
+        StateMachineCoeff=("7.5")
+    fi
+    if [[ $x == "BooksWithBrand" ]]
+    then
+        StateMachineCoeff=("9.0")
+    fi
 
 #    StateMachineCoeff+=("0.05")
 #    StateMachineCoeff=("4.2" "4.5" "6.0" "9.0" "12.0")
@@ -170,15 +182,15 @@ for x in ${InputFiles[*]}; do
 #   ####            rm $output_directory* -rf
 #               mkdir $output_directory"BurstPlots"
 #               mkdir $output_directory"AggregationPlots"
-#               ./main $inputi $burst_mode $time_mode $StateMachine $state_machine_coeff Unigram Brand
+               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram Normal
 #               ./empty2009 $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
                 echo "Done With finding the innovations"
-#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
+                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
                 for q in ${ExperienceState[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram Brand 2>chert
+#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram Brand
                     done
                 done
 #               time_line_txt=$output_directory$x"_timeline.txt"
