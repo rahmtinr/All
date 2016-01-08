@@ -598,7 +598,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 #endif
-#if 1 //TODO
+#if 0 //TODO
 	{
 		cerr << "Got to median comparison" << endl;
 		// Median comparison
@@ -772,7 +772,7 @@ int main(int argc, char *argv[]) {
 	}
 #endif
 
-#if 0
+#if 1
 	{
 		if(Amazon::Global::bigram == false) {
 			// Comparison with "No country for old men"
@@ -844,7 +844,7 @@ int main(int argc, char *argv[]) {
 						continue;
 					}
 						 */
-						num[numerator][reviews[i].current_experience_level]++; // Only the max final_exp added
+						num[numerator][(50 * reviews[i].current_experience_level / reviews[i].final_experience_level)]++; // Only the max final_exp added
 					}
 				}
 				for(pair<string, int> p : experience_level) {
@@ -852,7 +852,7 @@ int main(int argc, char *argv[]) {
 						continue;
 					}
 					for(int j = 0; j <= p.second; j++) {
-						denom[numerator][j]++;
+						denom[numerator][(int)(50 * (j / p.second))]++;
 					}
 				}
 			}
@@ -860,6 +860,13 @@ int main(int argc, char *argv[]) {
 			string filename;
 			filename = Amazon::Global::output_directory + "cristian_comparison_coeff_" + SimpleDoubleToString(Amazon::Global::state_coeffecient) + ".txt";
 			ofstream cristian_fout(filename.c_str());
+// life mapped to [0, 1]
+			for(int i = 1 ; i <= 4; i++) {
+				for(int j = 0 ; j < 50; j++) {
+					cristian_fout << i << " " << j << " " << (double) num[i][j] / denom[i][j] << endl;
+				}
+			}
+/*	// Cristian life phase
 			for(int i = 1; i <= 4; i++) {
 				int each_bucket = 30;
 				long long sum_numerator = 0;
@@ -891,6 +898,7 @@ int main(int argc, char *argv[]) {
 					cristian_fout << i << " " << bucket_num	 << " " << sum_numerator / ((double)sum_denominator + 1) << endl;
 				}
 			}
+*/
 		}
 	}
 #endif

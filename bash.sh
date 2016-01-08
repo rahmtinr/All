@@ -35,7 +35,7 @@ input_directory=$1
 #InputFiles=("Books" "Movies_and_TV" "Music" "reddit_books" "reddit_movies" "reddit_Music" "reddit_funny" "reddit_gaming" "reddit_politics" "reddit_leagueoflegends" "Rate_Beer" "Beer_Advocate")
 
 #InputFiles=("reddit_posts_books" "reddit_posts_movies" "reddit_posts_Music" "reddit_posts_funny" "reddit_posts_gaming" "reddit_posts_politics" "reddit_posts_leagueoflegends")
-InputFiles=("reddit_worldnews") # "Beer_AdvocateWithBrand")  #"ElectronicsWithBrand"  "Movies_and_TVWithBrand" "MusicWithBrand")
+InputFiles=("Amazon_Music" "Beer_Advocate" "Amazon_Books" "reddit_gaming") # "Beer_AdvocateWithBrand")  #"ElectronicsWithBrand"  "Movies_and_TVWithBrand" "MusicWithBrand")
 TimeMode=("RealTime")
 BurstMode=("MaxBenefit")
 StateMachine=("DocRatio")
@@ -182,15 +182,15 @@ for x in ${InputFiles[*]}; do
 #   ####            rm $output_directory* -rf
 #               mkdir $output_directory"BurstPlots"
 #               mkdir $output_directory"AggregationPlots"
-               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram Normal
+#               ./main $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram Normal
 #               ./empty2009 $input $burst_mode $time_mode $StateMachine $state_machine_coeff Bigram
                 echo "Done With finding the innovations"
-                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
+#                ./minLife $input $burst_mode $time_mode $StateMachine $state_machine_coeff final 4 Bigram
                 for q in ${ExperienceState[*]}; do
                     experience_state=$q;
                     for p in ${Denominators[*]}; do
                         denominator=$p
-#                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram Brand
+                       ./amazonAnalysis $input $burst_mode $time_mode $StateMachine $state_machine_coeff $experience_state $denominator Unigram Normal
                     done
                 done
 #               time_line_txt=$output_directory$x"_timeline.txt"
